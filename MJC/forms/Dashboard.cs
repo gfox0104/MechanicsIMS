@@ -40,12 +40,6 @@ namespace MJC.forms
             _initiallizeNavButtons(navButtons);
 
             SetImage();
-
-            login.Login login = new login.Login();
-            if (login.ShowDialog() != DialogResult.OK)
-            {
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-            }
         }
 
         private void AddHKEvents()

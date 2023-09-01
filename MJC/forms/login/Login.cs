@@ -47,10 +47,10 @@ namespace MJC.forms.login
         {
             if (UserModelObj.Login(Username.GetTextBox().Text, Password.GetTextBox().Text))
             {
-                this.Hide();
-
                 Dashboard dashboard = new Dashboard();
                 dashboard.Show();
+
+                this.Hide();
             }
             else
             {
