@@ -197,7 +197,7 @@ namespace MJC.model
                     SqlDataAdapter sda;
                     DataSet ds;
 
-                    command.CommandText = @"SELECT categoryName, tblSKU.* FROM Categories INNER JOIN (SELECT category, tblOrderSKU.* FROM SKU INNER JOIN (SELECT skuId, sku, description, message, quantity, coreCharge, lineTotal, orderItemType FROM OrderItems WHERE orderId = @Value1) AS tblOrderSKU ON tblOrderSKU.skuId = SKU.id) AS tblSKU ON tblSKU.category = Categories.id";
+                    command.CommandText = @"SELECT categoryName, tblSKU.* FROM Categories RIGHT JOIN (SELECT category, tblOrderSKU.* FROM SKU INNER JOIN (SELECT skuId, sku, description, message, quantity, coreCharge, lineTotal, orderItemType FROM OrderItems WHERE orderId = @Value1) AS tblOrderSKU ON tblOrderSKU.skuId = SKU.id) AS tblSKU ON tblSKU.category = Categories.id";
                     command.Parameters.AddWithValue("@Value1", orderId);
 
                     sda = new SqlDataAdapter(command);

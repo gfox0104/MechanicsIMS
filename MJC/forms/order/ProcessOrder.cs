@@ -129,55 +129,58 @@ namespace MJC.forms.order
                         int rowIndex = POGridRefer.SelectedRows[0].Index;
                         DataGridViewRow row = POGridRefer.Rows[rowIndex];
                         int orderId = (int)row.Cells[1].Value;
-
-                        if (orderId != 0)
+                        if(saveFlag != 0 && saveFlag != 7)
                         {
-                            if (saveFlag == 1)
+                            if (orderId != 0)
                             {
-                                status = 3;
-                                OrderModelObj.UpdateOrderStatus(status, orderId);
-                                printInvoice(orderId, status);
-                            }
-                            else if (saveFlag == 2)
-                            {
-                                status = 3;
-                                OrderModelObj.UpdateOrderStatus(status, orderId);
-                                printInvoice(orderId, status);
-                            }
-                            else if (saveFlag == 3)
-                            {
-                                status = 2;
-                                OrderModelObj.UpdateOrderStatus(status, orderId);
-                                printInvoice(orderId, status);
-                            }
-                            else if (saveFlag == 4)
-                            {
-                                status = 2;
-                                OrderModelObj.UpdateOrderStatus(status, orderId);
-                                printInvoice(orderId, status);
-                            }
-                            else if (saveFlag == 5)
-                            {
-                                status = 1;
-                                OrderModelObj.UpdateOrderStatus(status, orderId);
-                            }
-                            else if (saveFlag == 6)
-                            {
-                                status = 1;
-                                OrderModelObj.UpdateOrderStatus(status, orderId);
-                                printInvoice(orderId, status);
-                            }
-                            else if (saveFlag == 7)
-                            {
-                                _navigateToPrev(sender, e);
-                            }
-                            else if (saveFlag == 8)
-                            {
+                                if (saveFlag == 1)
+                                {
+                                    status = 3;
+                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    printInvoice(orderId, status);
+                                }
+                                else if (saveFlag == 2)
+                                {
+                                    status = 3;
+                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    printInvoice(orderId, status);
+                                }
+                                else if (saveFlag == 3)
+                                {
+                                    status = 2;
+                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    printInvoice(orderId, status);
+                                }
+                                else if (saveFlag == 4)
+                                {
+                                    status = 2;
+                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    printInvoice(orderId, status);
+                                }
+                                else if (saveFlag == 5)
+                                {
+                                    status = 1;
+                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                }
+                                else if (saveFlag == 6)
+                                {
+                                    status = 1;
+                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    printInvoice(orderId, status);
+                                }
+                                else if (saveFlag == 7)
+                                {
+                                    _navigateToPrev(sender, e);
+                                }
+                                else if (saveFlag == 8)
+                                {
 
+                                }
                             }
-                        } else
-                        {
-                            MessageBox.Show("Order info is not saved yet, please save order info first");
+                            else
+                            {
+                                MessageBox.Show("Order info is not saved yet, please save order info first");
+                            }
                         }
                     }
                 };
@@ -478,10 +481,11 @@ namespace MJC.forms.order
                 selectedRow.Cells["sku"].Value = sku.Name;
                 selectedRow.Cells["qboSkuId"].Value = sku.QboSkuId;
                 selectedRow.Cells["description"].Value = sku.Description;
-                selectedRow.Cells["priceTier"].Value = sku.PriceTier;
+                selectedRow.Cells["priceTier"].Value = sku.PriceTierId;
                 selectedRow.Cells["unitPrice"].Value = sku.Price;
                 selectedRow.Cells["lineTotal"].Value = sku.Price * sku.Qty;
                 selectedRow.Cells["salesCode"].Value = sku.CostCode;
+                selectedRow.Cells["quantity"].Value = 1;
             }
         }
 
@@ -532,7 +536,9 @@ namespace MJC.forms.order
             //    }
             //}
 
-            this.OrderItemData.Add(new OrderItem { SkuId = this.SubSkuList[0].Id, QboSkuId = SubSkuList[0].QboSkuId });
+            SKUOrderItem sku = this.SubSkuList[0];
+
+            this.OrderItemData.Add(new OrderItem { SkuId = sku.Id, QboSkuId = sku.QboSkuId, Description = sku.Description, PriceTier = sku.PriceTierId, UnitPrice = sku.Price, LineTotal = sku.Price * sku.Qty, SC = sku.CostCode.ToString(), Quantity = sku.Qty });
             BindingList<OrderItem> dataList = new BindingList<OrderItem>(this.OrderItemData);
 
             POGridRefer.DataSource = dataList;

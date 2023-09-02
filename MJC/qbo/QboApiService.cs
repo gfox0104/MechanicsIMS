@@ -279,15 +279,10 @@ namespace MJC.qbo
                 int index = 0;
                 foreach (OrderItem item in itemList)
                 {
-                    string qboItemId = "1";
-                    if (item.QboItemId != null)
+                    string qboItemId = "0";
+                    if (!string.IsNullOrEmpty(item.QboItemId))
                         qboItemId = item.QboItemId.ToString();
-                    else
-                    {
-                        qboItemId = (index * (-1)).ToString();
-                    }
-                    var m_test = item.QboSkuId;
-
+                    
                     SalesItemLineDetail salesItemLineDetail = new SalesItemLineDetail { ItemRef = new ReferenceType { value = item.QboSkuId, name = item.Sku, type = null}, Qty = item.Quantity, UnitPrice = Convert.ToDecimal(item.UnitPrice), TaxCodeRef = new ReferenceType { value = "Tax" } };
 
                     //SubTotalLineDetail subTotalLineDetail = new SubTotalLineDetail { ServiceDate = DateTime.Now, ItemRef = new ReferenceType { name = "test_subTotalLine", value = "15" } };
