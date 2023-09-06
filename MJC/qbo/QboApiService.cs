@@ -526,7 +526,7 @@ namespace MJC.qbo
                 {
                     command.Connection = connection;
                     command.CommandText = @"SELECT * FROM dbo.Customers WHERE qboId=@qboId";
-                    command.Parameters.AddWithValue("@qboId", 1);
+                    command.Parameters.AddWithValue("@qboId", customer.Id);
 
                     var row = command.ExecuteScalar();
                     if (row != null)
@@ -590,7 +590,7 @@ namespace MJC.qbo
 
                     command.Parameters.AddWithValue("@Value1", active);
                     if (customerNumber != null)
-                        command.Parameters.AddWithValue("@Value2", customerNumber);
+                        command.Parameters.AddWithValue("@Value2", customerName);
                     else command.Parameters.AddWithValue("@Value2", DBNull.Value);
                     if (customerName != null)
                         command.Parameters.AddWithValue("@Value3", customerName);
@@ -857,8 +857,7 @@ namespace MJC.qbo
                         }
                     }
                 }
-
-                MessageBox.Show("QuickBooks data has been synced.");
+                 
 
             } catch(Exception ex)
             {

@@ -47,8 +47,18 @@ namespace MJC.forms
             hkSyncQuickBooks.GetButton().Click += async (sender, e) =>
             {
                 QboApiService qboClient = new QboApiService();
-                qboClient.InitDatabase();
-                qboClient.LoadCustomers();
+                try
+                {
+                    qboClient.InitDatabase();
+                    qboClient.LoadCustomers();
+
+
+                    ShowInformation("QuickBooks successfully downloaded.");
+                }
+                catch(Exception exception)
+                {
+                    ShowError("QuickBooks failed to download data.");
+                }
             };
         }
 

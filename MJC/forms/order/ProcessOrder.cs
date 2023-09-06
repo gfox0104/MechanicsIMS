@@ -304,8 +304,8 @@ namespace MJC.forms.order
             var index = Customer_ComBo.GetComboBox().SelectedIndex;
             if (index == oldCustomerIndex) return;
 
-            if (!changeDetected || (MessageBox.Show("The current order will be lost. Are you sure you want to change the customer without saving the current changes?", "Change?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
-            {
+            //if (!changeDetected || (MessageBox.Show("The current order will be lost. Are you sure you want to change the customer without saving the current changes?", "Change?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
+            //{
                 CustomerData selectedItem = (CustomerData)Customer_ComBo.GetComboBox().SelectedItem;
                 int customerId = selectedItem.Id;
                 this.customerId = customerId;
@@ -338,11 +338,11 @@ namespace MJC.forms.order
                     LoadOrderItemList();
 
                 POGridRefer.Select();
-            }
-            else
-            {
-                Customer_ComBo.GetComboBox().SelectedIndex = oldCustomerIndex;
-            }
+            //}
+            //else
+            //{
+            //    Customer_ComBo.GetComboBox().SelectedIndex = oldCustomerIndex;
+            //}
 
             oldCustomerIndex = Customer_ComBo.GetComboBox().SelectedIndex;
         }
