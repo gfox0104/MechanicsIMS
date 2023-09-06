@@ -354,7 +354,7 @@ namespace MJC.common
                     string dateStr = "";
                     dateStr = date?.ToString("MM-dd-yy") ?? string.Empty;
 
-                    PrintOrder printOrder = new PrintOrder { AcctNumber = printOrderInfo.customerName.ToString(), Date = dateStr, PONumber = printOrderInfo.poNumber, ShipVia = printOrderInfo.shipVia, Terms = printOrderInfo.terms };
+                    PrintOrder printOrder = new PrintOrder { AcctNumber = printOrderInfo.customerName, Date = dateStr, PONumber = printOrderInfo.poNumber, ShipVia = printOrderInfo.shipVia, Terms = printOrderInfo.terms };
 
                     Type printOrderType = printOrder.GetType();
                     PropertyInfo[] properties = printOrderType.GetProperties();
@@ -387,7 +387,7 @@ namespace MJC.common
                                 break;
                         }
 
-                        printOrderColumnContentList.Add(new PrintItem { value = propertyValue.ToString(), width = orderWidth, height = orderHeight, marginLeft = orderMarginLeft, marginTop = orderMarginTop });
+                        printOrderColumnContentList.Add(new PrintItem { value = propertyValue?.ToString(), width = orderWidth, height = orderHeight, marginLeft = orderMarginLeft, marginTop = orderMarginTop });
                     }
 
                     int orderContentX = iLeftMargin + 50;

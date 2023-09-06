@@ -46,8 +46,7 @@ namespace MJC.forms.order
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
 
-            InitOrderItemsList();
-
+            
             InitGridFooter();
 
             //ComboBox_SelectedIndexChanged(Customer.GetComboBox(), EventArgs.Empty);
@@ -190,6 +189,8 @@ namespace MJC.forms.order
                 newRow.Cells["state"].Value = row["state"];
                 newRow.Cells["zipcode"].Value = row["zipcode"];
             }
+
+            var rows = OEGridRefer.Rows;
         }
 
         private void OEGridRefer_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
@@ -204,9 +205,29 @@ namespace MJC.forms.order
 
         private void addProcessOrder(object sender, EventArgs e, int customerId = 0)
         {
-            ProcessOrder processForm = new ProcessOrder(customerId, 0);
+            ProcessOrder processForm = new ProcessOrder(customerId, 0, true);
             _navigateToForm(sender, e, processForm);
             this.Hide();
+        }
+
+ 
+
+        private void OrderEntry_Load(object sender, EventArgs e)
+        {
+           
+        }
+
+        private void OrderEntry_Activated(object sender, EventArgs e)
+        {
+            InitOrderItemsList();
+
+
+
+        }
+
+        private void OrderEntry_Validated(object sender, EventArgs e)
+        {
+
         }
     }
 }

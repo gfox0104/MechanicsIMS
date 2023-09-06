@@ -175,7 +175,6 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("New Customer is added successfully.");
                 }
 
                 return true;

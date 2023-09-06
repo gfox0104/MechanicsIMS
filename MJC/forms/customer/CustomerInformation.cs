@@ -308,7 +308,7 @@ namespace MJC.forms.customer
         
         }
 
-        private void SaveCustomer(object sender, KeyEventArgs e)
+        private async void SaveCustomer(object sender, KeyEventArgs e)
         {
             string customerNumber = CustomerNum.GetTextBox().Text;
             string displayName = DisplayName.GetTextBox().Text;
@@ -372,17 +372,24 @@ namespace MJC.forms.customer
                 ytdInterest = decimal.Parse(YTDInterest.GetTextBox().Text);
             DateTime last_date_purch = DateLastPurch.GetDateTimePicker().Value;
 
-            if (string.IsNullOrEmpty(displayName) || string.IsNullOrEmpty(givenName) || string.IsNullOrEmpty(middleName) || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(title) || string.IsNullOrEmpty(suffix))
-            {
-                MessageBox.Show("Please fill String field.");
-                return;
-            }
-
+            if (!IsFieldsValidated()) return;
+ 
             QboApiService qboClient = new QboApiService();
 
-            if(this.customerId == 0)
-                qboClient.CreateCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipcode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, customerNumber);
-            else qboClient.UpdateCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipcode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, this.qboId, this.syncToken, this.customerId, customerNumber);
+            if (this.customerId == 0)
+            {
+                var success = await qboClient.CreateCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipcode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, customerNumber);
+               
+                ShowInformation("The customers has been added successfully.");
+            }
+            else
+            {
+                qboClient.UpdateCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipcode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, this.qboId, this.syncToken, this.customerId, customerNumber);
+
+                ShowInformation("The customers information has been updated successfully.");
+            }
+
+            _navigateToPrev(sender, e);
             //string modeText = customerId == 0 ? "creating" : "updating";
 
             //if (refreshData)
@@ -391,6 +398,82 @@ namespace MJC.forms.customer
             //    this._navigateToPrev(sender, e);
             //}
             //else MessageBox.Show("An Error occured while " + modeText + " the customer.");
+        }
+
+        private bool IsFieldsValidated()
+        {
+            string customerNumber = CustomerNum.GetTextBox().Text;
+            string displayName = DisplayName.GetTextBox().Text;
+            string givenName = GiveName.GetTextBox().Text;
+            string middleName = MiddleName.GetTextBox().Text;
+            string familyName = FamilyName.GetTextBox().Text;
+            string title = Title.GetTextBox().Text;
+            string suffix = Suffix.GetTextBox().Text;
+            string address1 = AddressLine1.GetTextBox().Text;
+            string address2 = AddressLine2.GetTextBox().Text;
+            string city = City.GetTextBox().Text;
+            string state = State.GetTextBox().Text;
+            string zipcode = Zip.GetTextBox().Text;
+            string business_phone = BusPhone.GetTextBox().Text;
+            string homePhone = HomePhone.GetTextBox().Text;
+            string fax = Fax.GetTextBox().Text;
+            string email = EMail.GetTextBox().Text;
+
+            if (string.IsNullOrEmpty(customerNumber))
+            {
+                ShowError("Please provide a customer number.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(displayName))
+            {
+                ShowError("Please provide a display name.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(givenName))
+            {
+                ShowError("Please provide the customers first name");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(familyName))
+            {
+                ShowError("Please provide the customers lastname");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(address1))
+            {
+                ShowError("Please provide the customers address.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(city))
+            {
+                ShowError("Please provide the customers city.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(state))
+            {
+                ShowError("Please provide the customers state.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(zipcode))
+            {
+                ShowError("Please provide the customers zip code.");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(business_phone))
+            {
+                ShowError("Please provide the customers business phone number.");
+                return false;
+            }
+
+            return true;
         }
 
         private void CustomerDetail_Load(object sender, EventArgs e)

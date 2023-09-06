@@ -5,8 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using MJC.forms.sku;
 using MJC.qbo;
-using System.Windows.Forms;
-
+ 
 namespace MJC.forms.order
 {
     public partial class ProcessOrder : GlobalLayout
@@ -45,6 +44,8 @@ namespace MJC.forms.order
         private bool isAddNewOrderItem = false;
         private int selectedOrderId = 0;
 
+        private bool changeDetected = true;
+
         private string searchKey;
 
         private CustomersModel CustomersModelObj = new CustomersModel();
@@ -60,20 +61,26 @@ namespace MJC.forms.order
         {
             InitializeComponent();
             _initBasicSize();
+
             this.isAddNewOrderItem = isAddNewOrderItem;
             this.customerId = customerId;
             this.selectedOrderId = orderId;
 
             dynamic customer = CustomersModelObj.GetCustomerDataById(customerId);
             this.TotalSkuList = SKUModelObj.LoadSkuOrderItems();
-            if(customer != null)
+
+            int priceTierId;
+            if (customer != null && int.TryParse(customer?.priceTierId?.ToString() ?? "0", out priceTierId))
             {
                 this.SubSkuList = this.TotalSkuList.Where(sku => sku.PriceTierId == customer.priceTierId).ToList();
             } else
             {
                 this.SubSkuList = this.TotalSkuList;
             }
-            HotkeyButton[] hkButtons = new HotkeyButton[9] { hkAdds, hkDeletes, hkEdit, hkSaveOrder, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
+
+            // HotkeyButton[] hkButtons = new HotkeyButton[9] { hkAdds, hkDeletes, hkEdit, hkSaveOrder, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
+            HotkeyButton[] hkButtons = new HotkeyButton[] { hkAdds, hkDeletes, hkEdit, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
+
             _initializeHKButtons(hkButtons, false);
             AddHotKeyEvents();
 
@@ -81,8 +88,6 @@ namespace MJC.forms.order
             InitCustomerInfo(this.customerId);
 
             InitGridFooter();
-
-
         }
 
         private void printInvoice(int orderId, int orderStatus)
@@ -117,7 +122,7 @@ namespace MJC.forms.order
                 CloseOrderActions CloseOrderActionsModal = new CloseOrderActions();
                 this.Enabled = false;
                 CloseOrderActionsModal.Show();
-                CloseOrderActionsModal.FormClosed += (ss, sargs) =>
+                CloseOrderActionsModal.FormClosed += async (ss, sargs) =>
                 {
                     this.Enabled = true;
                     int saveFlag = CloseOrderActionsModal.GetSaveFlage();
@@ -128,45 +133,56 @@ namespace MJC.forms.order
                     {
                         int rowIndex = POGridRefer.SelectedRows[0].Index;
                         DataGridViewRow row = POGridRefer.Rows[rowIndex];
-                        int orderId = (int)row.Cells[1].Value;
-                        if(saveFlag != 0 && saveFlag != 7)
+                        int orderId = selectedOrderId;
+                        if (saveFlag != 0 && saveFlag != 7)
                         {
+                            await CreateInvoice();
+
                             if (orderId != 0)
                             {
                                 if (saveFlag == 1)
                                 {
-                                    status = 3;
+                                    status = 3;  
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
+                                    _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 2)
                                 {
                                     status = 3;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
+
+                                    _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 3)
                                 {
                                     status = 2;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
+
+                                    _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 4)
                                 {
                                     status = 2;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
+
+                                    _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 5)
                                 {
                                     status = 1;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 6)
                                 {
                                     status = 1;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
+                                    _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 7)
                                 {
@@ -179,7 +195,7 @@ namespace MJC.forms.order
                             }
                             else
                             {
-                                MessageBox.Show("Order info is not saved yet, please save order info first");
+                                //MessageBox.Show("Order info is not saved yet, please save order info first");
                             }
                         }
                     }
@@ -265,6 +281,8 @@ namespace MJC.forms.order
             Customer_ComBo.GetComboBox().ValueMember = "Id";
 
             Customer_ComBo.GetComboBox().SelectedIndexChanged += new EventHandler(Customer_SelectedIndexChanged);
+            Customer_ComBo.GetComboBox().SelectedValueChanged += new EventHandler(ProcessOrder_SelectedValueChanged);
+
 
             if (customerId == 0)
             {
@@ -280,40 +298,61 @@ namespace MJC.forms.order
             //POGridRefer.Select();
         }
 
-        private void Customer_SelectedIndexChanged(object sender, EventArgs e)
+        private int oldCustomerIndex = 0;
+        private void ProcessOrder_SelectedValueChanged(object? sender, EventArgs e)
         {
-            CustomerData selectedItem = (CustomerData)Customer_ComBo.GetComboBox().SelectedItem;
-            int customerId = selectedItem.Id;
-            this.customerId = customerId;
+            var index = Customer_ComBo.GetComboBox().SelectedIndex;
+            if (index == oldCustomerIndex) return;
 
-            var customerData = CustomersModelObj.GetCustomerData(customerId);
-            if (customerData != null)
+            if (!changeDetected || (MessageBox.Show("The current order will be lost. Are you sure you want to change the customer without saving the current changes?", "Change?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
             {
-                if (customerData.customerName != "") CustomerName.SetContext(customerData.customerName);
-                else CustomerName.SetContext("N/A");
+                CustomerData selectedItem = (CustomerData)Customer_ComBo.GetComboBox().SelectedItem;
+                int customerId = selectedItem.Id;
+                this.customerId = customerId;
 
-                if (customerData.terms != "") Terms.SetContext(customerData.terms);
-                else Terms.SetContext("N/A");
-
-                //if(customerData.zipcode != "") Zone.SetContext(customerData.zipcode);
-                //else Zone.SetContext("N/A");
-
-                if(!string.IsNullOrEmpty(customerData.poRequired))
+                var customerData = CustomersModelObj.GetCustomerData(customerId);
+                if (customerData != null)
                 {
-                    if(bool.Parse(customerData.poRequired))
-                        Position.SetContext("Yes");
-                    else Position.SetContext("No");
+                    if (customerData.customerName != "") CustomerName.SetContext(customerData.customerName);
+                    else CustomerName.SetContext("N/A");
+
+                    if (customerData.terms != "") Terms.SetContext(customerData.terms);
+                    else Terms.SetContext("N/A");
+
+                    //if(customerData.zipcode != "") Zone.SetContext(customerData.zipcode);
+                    //else Zone.SetContext("N/A");
+
+                    if (!string.IsNullOrEmpty(customerData.poRequired))
+                    {
+                        if (bool.Parse(customerData.poRequired))
+                            Position.SetContext("Yes");
+                        else Position.SetContext("No");
+                    }
+                    else Position.SetContext("N/A");
+
+                    this.TotalSkuList = SKUModelObj.LoadSkuOrderItems();
+
                 }
-                else Position.SetContext("N/A");
 
-                this.TotalSkuList = SKUModelObj.LoadSkuOrderItems();
+                if (POGridRefer != null)
+                    LoadOrderItemList();
 
+                POGridRefer.Select();
+            }
+            else
+            {
+                Customer_ComBo.GetComboBox().SelectedIndex = oldCustomerIndex;
             }
 
-            if (POGridRefer != null)
-                LoadOrderItemList();
-            POGridRefer.Select();
+            oldCustomerIndex = Customer_ComBo.GetComboBox().SelectedIndex;
         }
+
+        private void Customer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+
+        }
+ 
 
         private void InitOrderItemsList()
         {
@@ -337,6 +376,7 @@ namespace MJC.forms.order
             POGridRefer.EditingControlShowing += POGridRefer_EditingControlShowing;
 
             this.Controls.Add(POGridRefer);
+            
             LoadOrderItemList();
 
             foreach (DataGridViewRow row in POGridRefer.Rows)
@@ -348,18 +388,18 @@ namespace MJC.forms.order
                 }
             }
 
-            if (this.isAddNewOrderItem)
-            {
-                this.OrderItemData.Add(new OrderItem());
-                BindingList<OrderItem> dataList = new BindingList<OrderItem>(this.OrderItemData);
+            //if (this.isAddNewOrderItem)
+            //{
+            //    this.OrderItemData.Add(new OrderItem());
+            //    BindingList<OrderItem> dataList = new BindingList<OrderItem>(this.OrderItemData);
 
-                POGridRefer.DataSource = dataList;
+            //    POGridRefer.DataSource = dataList;
 
-                int rowIndex = POGridRefer.Rows.Count - 1;
+            //    int rowIndex = POGridRefer.Rows.Count - 1;
 
-                POGridRefer.CurrentCell = POGridRefer.Rows[rowIndex].Cells[3];
-                POGridRefer.BeginEdit(true);
-            }
+            //    POGridRefer.CurrentCell = POGridRefer.Rows[rowIndex].Cells[3];
+            //    POGridRefer.BeginEdit(true);
+            //}
         }
 
         private void InitGridFooter()
@@ -398,7 +438,12 @@ namespace MJC.forms.order
 
         public void LoadOrderItemList(string sort = "")
         {
-            this.OrderItemData = OrderItemsModalObj.GetOrderItemsListByCustomerId(this.customerId, this.selectedOrderId, sort);
+            this.OrderItemData = new List<OrderItem>(); // this.selectedOrderId
+
+            if (!isAddNewOrderItem)
+            {
+                OrderItemData = OrderItemsModalObj.GetOrderItemsListByCustomerId(this.customerId, 0, sort);
+            }
 
             POGridRefer.Columns.Clear();
             POGridRefer.DataSource = this.OrderItemData;
@@ -466,11 +511,16 @@ namespace MJC.forms.order
             int columnIndex = POGridRefer.Columns.IndexOf(comboBoxColumn);
 
             POGridRefer.CellValueChanged += PoGridRefer_CellValueChanged;
+
+            InsertItem(null, null); 
+            POGridRefer.CurrentCell = POGridRefer.Rows[POGridRefer.Rows.Count - 1].Cells[13];
+            //POGridRefer.Select();
+            //POGridRefer.BeginEdit(true);
+
         }
 
         private void PoGridRefer_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-
             if (e.RowIndex >= 0 && e.ColumnIndex == 13)
             {
                 DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -487,14 +537,20 @@ namespace MJC.forms.order
                 selectedRow.Cells["salesCode"].Value = sku.CostCode;
                 selectedRow.Cells["quantity"].Value = 1;
             }
+
+            changeDetected = true;
         }
 
-        async private void InvoiceAction(object sender, EventArgs e)
+        private async Task CreateInvoice()
         {
             List<OrderItem> orderItems = this.OrderItemData;
             QboApiService qboApiService = new QboApiService();
             CustomerData customer = (CustomerData)this.Customer_ComBo.GetComboBox().SelectedItem;
-            string invoiceNumber = "invoice-" + DateTime.Now.ToString("yyyy-MM-dd");
+
+            var orderId = OrderModelObj.GetNextOrderId();
+            string invoiceNumber = $"INV-{orderId}";
+            
+            // Started: 1 -
             if (orderItems.Count > 0)
             {
                 this.selectedOrderId = orderItems[orderItems.Count - 1].OrderId;
@@ -504,7 +560,18 @@ namespace MJC.forms.order
                     orderItems = orderItems.Where(item => item.OrderId == 0).ToList();
                     bool res = await qboApiService.CreateInvoice(customer, invoiceNumber, orderItems);
                     if (res)
-                        LoadOrderItemList();
+                    {
+                        this.isAddNewOrderItem = false;
+
+                        //LoadOrderItemList();
+
+                        selectedOrderId = orderId;
+
+                    }
+                    else
+                    {
+                        ShowError("Invoice was not created.");
+                    }
                 }
                 else
                 {
@@ -513,11 +580,75 @@ namespace MJC.forms.order
                     var m_test = selectedOrder.qboOrderId;
                     bool res = await qboApiService.UpdateInvoice(customer, orderItems, selectedOrder);
                     if (res)
+                    {
+                        // LoadOrderItemList();
+
+                        selectedOrderId = orderId;
+
+                        ShowInformation("The invoice has been updated successfully");
+                    }
+                    else
+                    {
+                        ShowError("Invoice was not created #2.");
+                    }
+                }
+            }
+            else
+            {
+                ShowError("Order Item does not exist.");
+            }
+        }
+
+        async private void InvoiceAction(object sender, EventArgs e)
+        {
+            List<OrderItem> orderItems = this.OrderItemData;
+            QboApiService qboApiService = new QboApiService();
+            CustomerData customer = (CustomerData)this.Customer_ComBo.GetComboBox().SelectedItem;
+            
+            string invoiceNumber = "invoice-" + DateTime.Now.ToString("yyyy-MM-dd");
+            // Started: 1 -
+            if (orderItems.Count > 0)
+            {
+                this.selectedOrderId = orderItems[orderItems.Count - 1].OrderId;
+
+                if (this.selectedOrderId == 0)
+                {
+                    orderItems = orderItems.Where(item => item.OrderId == 0).ToList();
+
+                    bool res = await qboApiService.CreateInvoice(customer, invoiceNumber, orderItems);
+                    if (res)
+                    {
+                        this.isAddNewOrderItem = false;
+
                         LoadOrderItemList();
+
+                        ShowInformation("The invoice has been created successfully");
+                    }
+                    else
+                    {
+                        ShowError("Invoice was not created.");
+                    }
+                }
+                else
+                {
+                    orderItems = orderItems.Where(item => item.OrderId == selectedOrderId).ToList();
+                    dynamic selectedOrder = OrderModelObj.GetOrderById(this.selectedOrderId);
+                    var m_test = selectedOrder.qboOrderId;
+                    bool res = await qboApiService.UpdateInvoice(customer, orderItems, selectedOrder);
+                    if (res)
+                    {
+                        LoadOrderItemList();
+
+                        ShowInformation("The invoice has been updated successfully");
+                    }
+                    else
+                    {
+                        ShowError("Invoice was not created #2.");
+                    }
                 }
             } else
             {
-                MessageBox.Show("Order Item is not existed");
+                ShowError("Order Item does not exist.");
             }
 
             
@@ -538,7 +669,7 @@ namespace MJC.forms.order
 
             SKUOrderItem sku = this.SubSkuList[0];
 
-            this.OrderItemData.Add(new OrderItem { SkuId = sku.Id, QboSkuId = sku.QboSkuId, Description = sku.Description, PriceTier = sku.PriceTierId, UnitPrice = sku.Price, LineTotal = sku.Price * sku.Qty, SC = sku.CostCode.ToString(), Quantity = sku.Qty });
+            this.OrderItemData.Add(new OrderItem { SkuId = sku.Id, Sku = sku.Name, QboSkuId = sku.QboSkuId, Description = sku.Description, PriceTier = sku.PriceTierId, UnitPrice = sku.Price, LineTotal = sku.Price * sku.Qty, SC = sku.CostCode.ToString(), Quantity = sku.Qty });
             BindingList<OrderItem> dataList = new BindingList<OrderItem>(this.OrderItemData);
 
             POGridRefer.DataSource = dataList;
@@ -549,7 +680,9 @@ namespace MJC.forms.order
                 DataGridViewCell cell = row.Cells["SkuNumber"];
 
                 if (this.OrderItemData[index].SkuId != 0)
+                {
                     cell.Value = this.OrderItemData[index].SkuId;
+                }
 
                 index++;
             }

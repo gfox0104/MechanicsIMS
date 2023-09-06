@@ -23,7 +23,9 @@ namespace MJC.forms.sku
 
             this.Size = new Size(360, 300);
             this.StartPosition = FormStartPosition.CenterScreen;
+
             this.SKUId = _skuId;
+
 
             InitButton();
             InitInputBox(_skuId, _skuName);

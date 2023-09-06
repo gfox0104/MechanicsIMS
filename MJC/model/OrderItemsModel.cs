@@ -86,13 +86,14 @@ namespace MJC.model
                     SqlDataAdapter sda;
                     DataSet ds;
 
-                    if(customerId !=  0 && orderId != 0)
+                    if (customerId != 0 && orderId != 0)
                     {
                         command.CommandText = @"SELECT OrderItems.* FROM OrderItems INNER JOIN
                                             (SELECT id FROM Orders WHERE id = @Value1) AS tblOrder ON tblOrder.id = OrderItems.orderId " + sort;
 
                         command.Parameters.AddWithValue("@Value1", orderId);
-                    } else
+                    }
+                    else
                     {
                         command.CommandText = @"SELECT OrderItems.* FROM OrderItems INNER JOIN
                                             (SELECT id FROM Orders WHERE customerId = @Value1) AS tblOrder ON tblOrder.id = OrderItems.orderId " + sort;
@@ -409,9 +410,7 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value16", updatedBy);
 
                     orderItemId = (int)command.ExecuteScalar();
-
-                    //MessageBox.Show("The OrderItem is added successfully.");
-
+ 
                     return orderItemId;
                 }
             }

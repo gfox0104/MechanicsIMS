@@ -50,6 +50,25 @@ namespace MJC.model
             }
         }
 
+        public dynamic GetNextOrderId()
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                using (var command = new SqlCommand())
+                {
+                    List<dynamic> returnList = new List<dynamic>();
+                    command.Connection = connection;
+                    command.CommandText = @"SELECT TOP 1 id from Orders ORDER BY id  DESC";
+
+                    var orderId = (int)command.ExecuteScalar();
+
+                    // no rows returned
+                    return orderId + 1;
+                }
+            }
+        }
+
         public int CreateOrder(int customerId, string customerName, string terms, string invoiceNumber, DateTime invoiceDate, string invoiceDesc, double invoiceTotal, string syncToken, string qboOrderId, int createdBy = 1, int updatedBy = 1)
         {
             using (var connection = GetConnection())
@@ -79,7 +98,6 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value13", 1);
 
                     orderId = (int)command.ExecuteScalar();
-                    MessageBox.Show("The Order is added successfully.");
                 }
 
                 return orderId;

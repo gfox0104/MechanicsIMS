@@ -14,7 +14,7 @@ namespace QboLib
             // and saving them in static properties saves us from
             // deserializing again when we want to read or write the data.
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string tokenFilePath = Path.Combine(directory, "Merlin", "Tokens.jsonc");
+            string tokenFilePath = Path.Combine(directory, "Merlin", "Tokens.json");
             
             Tokens = JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
             {

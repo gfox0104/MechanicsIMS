@@ -7,6 +7,11 @@ using MJC.config;
 using System.Data;
 using MJC.model;
 
+using Intuit.Ipp.OAuth2PlatformClient;
+using static System.Windows.Forms.AxHost;
+using System.Reflection.Emit;
+using System;
+
 namespace MJC.qbo
 {
     public class QboApiService : DbConnection
@@ -279,11 +284,22 @@ namespace MJC.qbo
                 int index = 0;
                 foreach (OrderItem item in itemList)
                 {
+                    var sku = item.Sku;
+                    
                     string qboItemId = "0";
                     if (!string.IsNullOrEmpty(item.QboItemId))
                         qboItemId = item.QboItemId.ToString();
-                    
-                    SalesItemLineDetail salesItemLineDetail = new SalesItemLineDetail { ItemRef = new ReferenceType { value = item.QboSkuId, name = item.Sku, type = null}, Qty = item.Quantity, UnitPrice = Convert.ToDecimal(item.UnitPrice), TaxCodeRef = new ReferenceType { value = "Tax" } };
+
+
+                    SalesItemLineDetail salesItemLineDetail = new SalesItemLineDetail { 
+                        ItemRef = new ReferenceType { 
+                            value = item.QboSkuId, 
+                            name = item.Sku,
+                            type = null
+                        },
+                            Qty = item.Quantity,  
+                            UnitPrice = Convert.ToDecimal(item.UnitPrice), 
+                        TaxCodeRef = new ReferenceType { value = "Tax" } };
 
                     //SubTotalLineDetail subTotalLineDetail = new SubTotalLineDetail { ServiceDate = DateTime.Now, ItemRef = new ReferenceType { name = "test_subTotalLine", value = "15" } };
 
@@ -299,7 +315,7 @@ namespace MJC.qbo
                     LineList[index] = salesItemLine;
                     index++;
                 }
-           
+
                 var result = await dataService.PostAsync(new Invoice
                 {
                     CustomerRef = new ReferenceType
@@ -317,8 +333,9 @@ namespace MJC.qbo
                     {
                         Address = customer.Email
                     },
+                    DueDate = DateTime.Now,
                     Line = LineList
-                });
+                }) ;
 
                 Invoice invoice = result.Response;
                 DateTime invoiceDate = DateTime.Now;
@@ -326,6 +343,7 @@ namespace MJC.qbo
                 string invoiceDesc = "";
 
                 int orderId = orderModelObj.CreateOrder(customer.Id, customer.Name, "", invoiceNumber, invoiceDate, invoiceDesc, invoiceTotal, invoice.SyncToken, invoice.Id, 1, 1);
+                
                 Line[] items = invoice.Line;
                 index = 0;
 
@@ -348,7 +366,8 @@ namespace MJC.qbo
                     double unitPrice = Convert.ToDouble(item.SalesItemLineDetail?.UnitPrice ?? 0);
                     double? lineTotal = null;
                     string salesCode = "";
-                    string? sku = item.SalesItemLineDetail?.ItemRef?.name;
+                    //string? sku = item.SalesItemLineDetail?.ItemRef?.name;
+                    string sku = itemList[i].Sku;
                     string tempSkuId = item.SalesItemLineDetail?.ItemRef?.value ?? "";
                     int qboSkuId = 0;
                     if (!string.IsNullOrEmpty(tempSkuId))
@@ -372,7 +391,7 @@ namespace MJC.qbo
             }
         }
 
-        async public void CreateCustomer(string displayName, string givenName, string middleName, string familyName, string title, string suffix, string business_phone, string homePhone, string fax, string address1, string address2, string city, string state, string zipCode, string email, DateTime date_opened, string salesman, bool resale, string stmtCustomerNumber, string stmtName, int? priceTierId, string terms, string limit, string memo, bool taxable, bool send_stm, string core_tracking, decimal? coreBalance, string acct_type, bool print_core_tot, bool porequired, int? creditCodeId, decimal? interestRate, decimal? accountBalance, int? ytdPurchases, decimal? ytdInterest, DateTime last_date_purch, string customerNumber)
+        async public Task<bool> CreateCustomer(string displayName, string givenName, string middleName, string familyName, string title, string suffix, string business_phone, string homePhone, string fax, string address1, string address2, string city, string state, string zipCode, string email, DateTime date_opened, string salesman, bool resale, string stmtCustomerNumber, string stmtName, int? priceTierId, string terms, string limit, string memo, bool taxable, bool send_stm, string core_tracking, decimal? coreBalance, string acct_type, bool print_core_tot, bool porequired, int? creditCodeId, decimal? interestRate, decimal? accountBalance, int? ytdPurchases, decimal? ytdInterest, DateTime last_date_purch, string customerNumber)
         {
             DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: true);
 
@@ -407,13 +426,15 @@ namespace MJC.qbo
                     qboId = customer.Id;
                     syncToken = customer.SyncToken;
                 }
-                customerModelObj.AddCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipCode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, qboId, syncToken, customerNumber);
+                return customerModelObj.AddCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipCode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, qboId, syncToken, customerNumber);
             }
             catch ( Exception ex )
             {
                 Console.WriteLine(ex);
                 MessageBox.Show("QuickBooks authorization failed");
-            }           
+            }
+
+            return false;
         }
 
         async public void UpdateCustomer(string displayName, string givenName, string middleName, string familyName, string title, string suffix, string business_phone, string homePhone, string fax, string address1, string address2, string city, string state, string zipCode, string email, DateTime date_opened, string salesman, bool resale, string stmtCustomerNumber, string stmtName, int? priceTierId, string terms, string limit, string memo, bool taxable, bool send_stm, string core_tracking, decimal? coreBalance, string acct_type, bool print_core_tot, bool porequired, int? creditCodeId, decimal? interestRate, decimal? accountBalance, int? ytdPurchases, decimal? ytdInterest, DateTime last_date_purch, string qboId, string syncToken, int customerId, string customerNumber)
@@ -474,101 +495,15 @@ namespace MJC.qbo
                 var customers = result.Response.Entities;
                 foreach (var customer in customers)
                 {
-                    bool? active = customer.Active;
-                    string customerNumber = customer.Id;
-                    string customerName = customer.DisplayName;
-                    string? address1 = null;
-                    string? address2 = null;
-                    string? city = null;
-                    string? state = null;
-                    string? zipCode = null;
-                    if (customer.BillAddr != null)
+                    if (await DoesCustomerExist(customer))
                     {
-                        address1 = customer.BillAddr.Line1;
-                        address2 = customer.BillAddr.Line2;
-                        city = customer.BillAddr.City;
-                        state = customer.BillAddr.CountrySubDivisionCode;
-                        zipCode = customer.BillAddr.PostalCode;
+                        UpdateCustomer(customer);
+                    }
+                    else
+                    {
+                        CreateNewCustomer(customer);
                     }
 
-                    string businessPhone = customer.BusinessNumber;
-                    string? fax = null;
-                    if (customer.Fax != null)
-                        fax = customer.Fax.FreeFormNumber;
-                    string? homePhone = null;
-                    if (customer.PrimaryPhone != null)
-                        homePhone = customer.PrimaryPhone.FreeFormNumber;
-                    string? email = null;
-                    if (customer.PrimaryEmailAddr != null)
-                        email = customer.PrimaryEmailAddr.Address;
-                    DateTime dateOpened = DateTime.Now;
-                    decimal? balance = customer.Balance;
-                    DateTimeOffset? createdAt = customer.MetaData.CreateTime;
-                    int createdBy = 2;
-                    //if (customer.MetaData.CreatedByRef != null)
-                    //    createdBy = int.Parse(customer.MetaData.CreatedByRef.value);
-                    DateTimeOffset? updatedAt = customer.MetaData.LastUpdatedTime;
-                    int updatedBy = 2;
-                    //if (customer.MetaData.CreatedByRef != null)
-                    //    updatedBy = int.Parse(customer.MetaData.LastModifiedByRef.value);
-
-                    using (var connection = GetConnection())
-                    {
-                        connection.Open();
-
-                        using (var command = new SqlCommand())
-                        {
-                            command.Connection = connection;
-                            command.CommandText = @"INSERT INTO dbo.Customers(active, customerNumber, customerName, address1, address2, city, state, zipcode, businessPhone, fax, homePhone, email, dateOpened, accountBalance, createdAt, createdBy, updatedAt, updatedBy) OUTPUT INSERTED.id VALUES(@Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18)";
-
-                            command.Parameters.AddWithValue("@Value1", active);
-                            if (customerNumber != null)
-                                command.Parameters.AddWithValue("@Value2", customerNumber);
-                            else command.Parameters.AddWithValue("@Value2", DBNull.Value);
-                            if (customerName != null)
-                                command.Parameters.AddWithValue("@Value3", customerName);
-                            else command.Parameters.AddWithValue("@Value3", DBNull.Value);
-                            if (address1 != null)
-                                command.Parameters.AddWithValue("@Value4", address1);
-                            else command.Parameters.AddWithValue("@Value4", DBNull.Value);
-                            if (address2 != null)
-                                command.Parameters.AddWithValue("@Value5", address2);
-                            else command.Parameters.AddWithValue("@Value5", DBNull.Value);
-                            if (city != null)
-                                command.Parameters.AddWithValue("@Value6", city);
-                            else command.Parameters.AddWithValue("@Value6", DBNull.Value);
-                            if (state != null)
-                                command.Parameters.AddWithValue("@Value7", state);
-                            else command.Parameters.AddWithValue("@Value7", DBNull.Value);
-                            if (zipCode != null)
-                                command.Parameters.AddWithValue("@Value8", zipCode);
-                            else command.Parameters.AddWithValue("@Value8", DBNull.Value);
-                            if (businessPhone != null)
-                                command.Parameters.AddWithValue("@Value9", businessPhone);
-                            else command.Parameters.AddWithValue("@Value9", DBNull.Value);
-                            if (fax != null)
-                                command.Parameters.AddWithValue("@Value10", fax);
-                            else command.Parameters.AddWithValue("@Value10", DBNull.Value);
-                            if (homePhone != null)
-                                command.Parameters.AddWithValue("@Value11", homePhone);
-                            else command.Parameters.AddWithValue("@Value11", DBNull.Value);
-                            if (email != null)
-                                command.Parameters.AddWithValue("@Value12", email);
-                            else command.Parameters.AddWithValue("@Value12", DBNull.Value);
-                            if (dateOpened != null)
-                                command.Parameters.AddWithValue("@Value13", dateOpened);
-                            else command.Parameters.AddWithValue("@Value13", DBNull.Value);
-                            if (balance != null)
-                                command.Parameters.AddWithValue("@Value14", balance);
-                            else command.Parameters.AddWithValue("@Value14", DBNull.Value);
-                            command.Parameters.AddWithValue("@Value15", createdAt);
-                            command.Parameters.AddWithValue("@Value16", createdBy);
-                            command.Parameters.AddWithValue("@Value17", updatedAt);
-                            command.Parameters.AddWithValue("@Value18", updatedBy);
-
-                            command.ExecuteScalar();
-                        }
-                    }
                 }
 
                 Console.WriteLine("Customer is synchorized");
@@ -578,6 +513,240 @@ namespace MJC.qbo
             {
                 Console.WriteLine("Exception->" + ex.ToString());
                 MessageBox.Show("QuickBooks authorization failed");
+            }
+        }
+
+        async private Task<bool> DoesCustomerExist(Customer customer)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = @"SELECT * FROM dbo.Customers WHERE qboId=@qboId";
+                    command.Parameters.AddWithValue("@qboId", 1);
+
+                    var row = command.ExecuteScalar();
+                    if (row != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        async private void CreateNewCustomer(Customer customer)
+        {
+            bool? active = customer.Active;
+            string customerNumber = customer.Id;
+            string customerName = customer.DisplayName;
+            string? address1 = null;
+            string? address2 = null;
+            string? city = null;
+            string? state = null;
+            string? zipCode = null;
+            if (customer.BillAddr != null)
+            {
+                address1 = customer.BillAddr.Line1;
+                address2 = customer.BillAddr.Line2;
+                city = customer.BillAddr.City;
+                state = customer.BillAddr.CountrySubDivisionCode;
+                zipCode = customer.BillAddr.PostalCode;
+            }
+
+            string businessPhone = customer.BusinessNumber;
+            string? fax = null;
+            if (customer.Fax != null)
+                fax = customer.Fax.FreeFormNumber;
+            string? homePhone = null;
+            if (customer.PrimaryPhone != null)
+                homePhone = customer.PrimaryPhone.FreeFormNumber;
+            string? email = null;
+            if (customer.PrimaryEmailAddr != null)
+                email = customer.PrimaryEmailAddr.Address;
+            DateTime dateOpened = DateTime.Now;
+            decimal? balance = customer.Balance;
+            DateTimeOffset? createdAt = customer.MetaData.CreateTime;
+            int createdBy = 1; // TODO: Remove hard coding
+            //if (customer.MetaData.CreatedByRef != null)
+            //    createdBy = int.Parse(customer.MetaData.CreatedByRef.value);
+            DateTimeOffset? updatedAt = customer.MetaData.LastUpdatedTime;
+            int updatedBy = 1;
+            //if (customer.MetaData.CreatedByRef != null)
+            //    updatedBy = int.Parse(customer.MetaData.LastModifiedByRef.value);
+
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = @"INSERT INTO dbo.Customers(active, customerNumber, displayName, title, address1, address2, city, state, zipcode, businessPhone, fax, homePhone, email, dateOpened, accountBalance, createdAt, createdBy, updatedAt, updatedBy, qboId) OUTPUT INSERTED.id VALUES(@Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @qboId)";
+
+                    command.Parameters.AddWithValue("@Value1", active);
+                    if (customerNumber != null)
+                        command.Parameters.AddWithValue("@Value2", customerNumber);
+                    else command.Parameters.AddWithValue("@Value2", DBNull.Value);
+                    if (customerName != null)
+                        command.Parameters.AddWithValue("@Value3", customerName);
+                    else command.Parameters.AddWithValue("@Value3", DBNull.Value);
+
+                    if (customerName != null)
+                        command.Parameters.AddWithValue("@Value4", string.IsNullOrEmpty(customer.Title) ? "" : customer.Title);
+                    else command.Parameters.AddWithValue("@Value4", DBNull.Value);
+
+                    if (address1 != null)
+                        command.Parameters.AddWithValue("@Value5", address1);
+                    else command.Parameters.AddWithValue("@Value5", DBNull.Value);
+                    if (address2 != null)
+                        command.Parameters.AddWithValue("@Value6", address2);
+                    else command.Parameters.AddWithValue("@Value6", DBNull.Value);
+                    if (city != null)
+                        command.Parameters.AddWithValue("@Value7", city);
+                    else command.Parameters.AddWithValue("@Value7", DBNull.Value);
+                    if (state != null)
+                        command.Parameters.AddWithValue("@Value8", state);
+                    else command.Parameters.AddWithValue("@Value8", DBNull.Value);
+                    if (zipCode != null)
+                        command.Parameters.AddWithValue("@Value9", zipCode);
+                    else command.Parameters.AddWithValue("@Value9", DBNull.Value);
+                    if (businessPhone != null)
+                        command.Parameters.AddWithValue("@Value10", businessPhone);
+                    else command.Parameters.AddWithValue("@Value10", DBNull.Value);
+                    if (fax != null)
+                        command.Parameters.AddWithValue("@Value11", fax);
+                    else command.Parameters.AddWithValue("@Value11", DBNull.Value);
+                    if (homePhone != null)
+                        command.Parameters.AddWithValue("@Value12", homePhone);
+                    else command.Parameters.AddWithValue("@Value12", DBNull.Value);
+                    if (email != null)
+                        command.Parameters.AddWithValue("@Value13", email);
+                    else command.Parameters.AddWithValue("@Value13", DBNull.Value);
+                    if (dateOpened != null)
+                        command.Parameters.AddWithValue("@Value14", dateOpened);
+                    else command.Parameters.AddWithValue("@Value14", DBNull.Value);
+                    if (balance != null)
+                        command.Parameters.AddWithValue("@Value15", balance);
+                    else command.Parameters.AddWithValue("@Value15", DBNull.Value);
+                    command.Parameters.AddWithValue("@Value16", createdAt);
+                    command.Parameters.AddWithValue("@Value17", createdBy);
+                    command.Parameters.AddWithValue("@Value18", updatedAt);
+                    command.Parameters.AddWithValue("@Value19", updatedBy);
+                    command.Parameters.AddWithValue("@qboId", customer.Id);
+
+                    command.ExecuteScalar();
+                }
+            }
+        }
+
+
+        async private void UpdateCustomer(Customer customer)
+        {
+            bool? active = customer.Active;
+            string customerNumber = customer.Id;
+            string customerName = customer.DisplayName;
+            string? address1 = null;
+            string? address2 = null;
+            string? city = null;
+            string? state = null;
+            string? zipCode = null;
+            if (customer.BillAddr != null)
+            {
+                address1 = customer.BillAddr.Line1;
+                address2 = customer.BillAddr.Line2;
+                city = customer.BillAddr.City;
+                state = customer.BillAddr.CountrySubDivisionCode;
+                zipCode = customer.BillAddr.PostalCode;
+            }
+
+            string businessPhone = customer.BusinessNumber;
+            string? fax = null;
+            if (customer.Fax != null)
+                fax = customer.Fax.FreeFormNumber;
+            string? homePhone = null;
+            if (customer.PrimaryPhone != null)
+                homePhone = customer.PrimaryPhone.FreeFormNumber;
+            string? email = null;
+            if (customer.PrimaryEmailAddr != null)
+                email = customer.PrimaryEmailAddr.Address;
+            DateTime dateOpened = DateTime.Now;
+            decimal? balance = customer.Balance;
+            DateTimeOffset? createdAt = customer.MetaData.CreateTime;
+            int createdBy = 2;
+            //if (customer.MetaData.CreatedByRef != null)
+            //    createdBy = int.Parse(customer.MetaData.CreatedByRef.value);
+            DateTimeOffset? updatedAt = customer.MetaData.LastUpdatedTime;
+            int updatedBy = 2;
+            //if (customer.MetaData.CreatedByRef != null)
+            //    updatedBy = int.Parse(customer.MetaData.LastModifiedByRef.value);
+
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = @"UPDATE dbo.Customers SET active=@Value1, customerNumber=@Value2, displayName=@Value3, title=@Value4, address1=@Value5, address2=@Value6, city=@Value7, state=@Value8, zipcode=@Value9, businessPhone=@Value10, fax=@Value11, homePhone=@Value12, email=@Value13, dateOpened=@Value14, accountBalance=@Value15, createdAt=@Value16, createdBy=@Value17, updatedAt=@Value18, updatedBy=@Value19  WHERE qboid=@Value20";
+
+                    command.Parameters.AddWithValue("@Value1", active);
+                    if (customerNumber != null)
+                        command.Parameters.AddWithValue("@Value2", customerNumber);
+                    else command.Parameters.AddWithValue("@Value2", DBNull.Value);
+                    if (customerName != null)
+                        command.Parameters.AddWithValue("@Value3", customerName);
+                    else command.Parameters.AddWithValue("@Value3", DBNull.Value);
+
+                    if (customerName != null)
+                        command.Parameters.AddWithValue("@Value4", string.IsNullOrEmpty(customer.Title) ? "" : customer.Title);
+                    else command.Parameters.AddWithValue("@Value4", DBNull.Value);
+
+                    if (address1 != null)
+                        command.Parameters.AddWithValue("@Value5", address1);
+                    else command.Parameters.AddWithValue("@Value5", DBNull.Value);
+                    if (address2 != null)
+                        command.Parameters.AddWithValue("@Value6", address2);
+                    else command.Parameters.AddWithValue("@Value6", DBNull.Value);
+                    if (city != null)
+                        command.Parameters.AddWithValue("@Value7", city);
+                    else command.Parameters.AddWithValue("@Value7", DBNull.Value);
+                    if (state != null)
+                        command.Parameters.AddWithValue("@Value8", state);
+                    else command.Parameters.AddWithValue("@Value8", DBNull.Value);
+                    if (zipCode != null)
+                        command.Parameters.AddWithValue("@Value9", zipCode);
+                    else command.Parameters.AddWithValue("@Value9", DBNull.Value);
+                    if (businessPhone != null)
+                        command.Parameters.AddWithValue("@Value10", businessPhone);
+                    else command.Parameters.AddWithValue("@Value10", DBNull.Value);
+                    if (fax != null)
+                        command.Parameters.AddWithValue("@Value11", fax);
+                    else command.Parameters.AddWithValue("@Value11", DBNull.Value);
+                    if (homePhone != null)
+                        command.Parameters.AddWithValue("@Value12", homePhone);
+                    else command.Parameters.AddWithValue("@Value12", DBNull.Value);
+                    if (email != null)
+                        command.Parameters.AddWithValue("@Value13", email);
+                    else command.Parameters.AddWithValue("@Value13", DBNull.Value);
+                    if (dateOpened != null)
+                        command.Parameters.AddWithValue("@Value14", dateOpened);
+                    else command.Parameters.AddWithValue("@Value14", DBNull.Value);
+                    if (balance != null)
+                        command.Parameters.AddWithValue("@Value15", balance);
+                    else command.Parameters.AddWithValue("@Value15", DBNull.Value);
+                    command.Parameters.AddWithValue("@Value16", createdAt);
+                    command.Parameters.AddWithValue("@Value17", createdBy);
+                    command.Parameters.AddWithValue("@Value18", updatedAt);
+                    command.Parameters.AddWithValue("@Value19", updatedBy);
+                    command.Parameters.AddWithValue("@Value20", customer.Id);
+
+                    command.ExecuteScalar();
+                }
             }
         }
 
@@ -593,7 +762,7 @@ namespace MJC.qbo
                     string customerId = invoice.CustomerRef.value;
                     string customerName = invoice.CustomerRef.name;
                     string creditCode = "";
-                    string terms = invoice.SalesTermRef.value;
+                    string terms = invoice.SalesTermRef?.value;
                     string zone = "";
                     string? poNumber = invoice.PONumber;
                     string? shipVia = null;
@@ -639,7 +808,7 @@ namespace MJC.qbo
                             command.Parameters.AddWithValue("@Value2", customerId);
                             command.Parameters.AddWithValue("@Value3", customerName);
                             command.Parameters.AddWithValue("@Value4", creditCode);
-                            command.Parameters.AddWithValue("@Value5", terms);
+                            command.Parameters.AddWithValue("@Value5", terms ?? "No default terms");
                             command.Parameters.AddWithValue("@Value6", zone);
                             if (poNumber != null)
                                 command.Parameters.AddWithValue("@Value7", poNumber);

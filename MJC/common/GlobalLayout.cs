@@ -461,5 +461,17 @@ namespace MJC.common
                 }
             }
         }
+
+        public void ShowInformation(string message, string title = "Notice")
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public void ShowError(string message, string title = "Error")
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+ 
+
     }
 }
