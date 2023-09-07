@@ -91,13 +91,13 @@ namespace MJC.forms.price
             if (refreshData)
             {
                 PTGridRefer.DataSource = PriceTiersModelObj.PriceTierDataList;
-                PTGridRefer.Columns[0].HeaderText = "Price Tier #";
-                PTGridRefer.Columns[0].Width = 300;
+                PTGridRefer.Columns[0].Visible = false;
                 PTGridRefer.Columns[1].HeaderText = "Price Tier";
                 PTGridRefer.Columns[1].Width = 300;
                 PTGridRefer.Columns[2].HeaderText = "Profit Margin";
                 PTGridRefer.Columns[2].Width = 600;
-                PTGridRefer.Columns[3].Visible = false;
+                PTGridRefer.Columns[3].HeaderText = "Code";
+                PTGridRefer.Columns[3].Width = 300;
             }
         }
 

@@ -107,9 +107,10 @@ namespace MJC.forms
 
             var refreshData = CustomersModelObj.LoadCustomerData("", false);
 
-            CustomerName.GetComboBox().DataSource = CustomersModelObj.CustomerDataList;
+
             CustomerName.GetComboBox().DisplayMember = "Name";
             CustomerName.GetComboBox().ValueMember = "Id";
+            CustomerName.GetComboBox().DataSource = CustomersModelObj.CustomerDataList;
 
             CustomerName.GetComboBox().SelectedValueChanged += CustomerChanged;
         }

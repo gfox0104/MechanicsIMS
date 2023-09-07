@@ -28,7 +28,14 @@ namespace MJC.qbo
         public QboApiService()
         {
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string tokenFilePath = Path.Combine(directory, "Merlin", "Tokens.json");
+            string tokenFilePath = Path.Combine(directory, "MechanicsIMS", "Tokens.json");
+
+            // Check if directory %appdata%s\MechanicsIMS\ exists
+
+            // If not, create %appdata%\MechanicsIMS\ and download Tokens.json to it
+
+            // If so, proceed
+
             QboAuthTokens? Tokens = null;
             Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
             {
