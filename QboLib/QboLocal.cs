@@ -14,7 +14,7 @@ namespace QboLib
             // and saving them in static properties saves us from
             // deserializing again when we want to read or write the data.
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string tokenFilePath = Path.Combine(directory, "Merlin", "Tokens.json");
+            string tokenFilePath = Path.Combine(directory, "MechanicsIMS", "Tokens.json");
             
             Tokens = JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
             {
@@ -32,7 +32,7 @@ namespace QboLib
             {
                 throw new InvalidDataException(
                     "The ClientId or ClientSecret was null or empty.\n" +
-                    "Make sure that 'Tokens.jsonc' is setup with your credentials."
+                    "Make sure that 'Tokens.json' is setup with your credentials."
                 );
             }
         }
