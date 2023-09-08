@@ -21,7 +21,7 @@ namespace MJC.forms
         private FInputBox Phone = new FInputBox("Phone");
         private FInputBox Fax = new FInputBox("Fax");
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
-        private FCheckBox TradingModeOFF = new FCheckBox("Trading Mode OFF");
+        private FCheckBox TradingModeOFF = new FCheckBox("Training Mode OFF");
         private FInputBox TargetPrinter = new FInputBox("Target Printer");
         private FInputBox ProcessingTax = new FInputBox("Processing Tax");
 
@@ -36,7 +36,7 @@ namespace MJC.forms
             InitInputBox();
         }
 
-        private void AddHotKeyEvents()
+        private async void AddHotKeyEvents()
         {
             hkOpenQuickBooks.GetButton().Click += (sender, e) =>
             {
@@ -50,7 +50,8 @@ namespace MJC.forms
                 try
                 {
                     qboClient.InitDatabase();
-                    qboClient.LoadCustomers();
+
+                    await qboClient.LoadCustomers();
 
 
                     ShowInformation("QuickBooks successfully downloaded.");

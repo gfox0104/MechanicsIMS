@@ -52,14 +52,14 @@ namespace MJC.model
 
                     if (archived) whereClause += " AND archived = 1";
 
-                    command.CommandText = @"select id, customerNumber, givenName, address1, city, state, zipcode, qboId, email
+                    command.CommandText = @"select id, customerNumber, displayName, address1, city, state, zipcode, qboId, email
                                             from dbo.Customers" + whereClause;
 
                     if (filter != "")
                     {
-                        command.CommandText = @"select id, customerNumber, givenName, address1, city, state, zipcode, qboId, email
+                        command.CommandText = @"select id, customerNumber, displayName, address1, city, state, zipcode, qboId, email
                                                 from dbo.Customers
-                                                where customerNumber like @filter or givenName like @filter or address1 or city like @filter or state like @filter or zipcode like @filter";
+                                                where customerNumber like @filter or displayName like @filter or address1 or city like @filter or state like @filter or zipcode like @filter";
                         command.Parameters.Add("@filter", System.Data.SqlDbType.VarChar).Value = "%" + filter + "%";
                     }
 

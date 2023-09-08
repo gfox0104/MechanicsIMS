@@ -228,8 +228,11 @@ namespace MJC.forms.customer
                 CLGridRefer.DataSource = CustomersModelObj.CustomerDataList;
                 CLGridRefer.Columns[0].Visible = false;
                 CLGridRefer.Columns[1].HeaderText = "Customer #";
+                CLGridRefer.Columns[1].DataPropertyName = "Num";
                 CLGridRefer.Columns[1].Width = 300;
+
                 CLGridRefer.Columns[2].HeaderText = "Name";
+
                 CLGridRefer.Columns[2].Width = 300;
                 CLGridRefer.Columns[3].HeaderText = "Address";
                 CLGridRefer.Columns[3].Width = 500;

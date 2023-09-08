@@ -8,11 +8,11 @@ namespace MJC.forms.order
     {
         private ModalButton MBOk = new ModalButton("(Enter) OK", Keys.Enter);
         private Button MBOk_button;
-        private FInputBox Message = new FInputBox("Message:");
+        public FInputBox Message = new FInputBox("Message:");
 
         private int orderItemId = 0;
         private OrderItemsModel OrderItemModelObj = new OrderItemsModel();
-
+ 
         public OrderItemMessage() : base("Add Message")
         {
             InitializeComponent();
@@ -22,6 +22,10 @@ namespace MJC.forms.order
 
             InitMBOKButton();
             InitInputBox();
+
+            Message.GetTextBox().TabIndex = 0;
+            Message.GetTextBox().Focus();
+            Message.GetTextBox().Select();
         }
 
         private void InitMBOKButton()
@@ -38,14 +42,19 @@ namespace MJC.forms.order
             Message.SetPosition(new Point(30, 30));
             this.Controls.Add(Message.GetLabel());
             this.Controls.Add(Message.GetTextBox());
+
         }
 
         public void setDetails(int _id)
         {
             orderItemId = _id;
             var orderItem = OrderItemModelObj.GetOrderItemMessageById(_id);
-
-            this.Message.GetTextBox().Text = orderItem.message;
+            if (orderItem != null)
+            {
+                this.Message.GetTextBox().Text = orderItem.message;
+                this.Message.GetTextBox().Select();
+                this.Message.GetTextBox().Focus();
+            }
         }
 
         private void ok_button_Click(object sender, EventArgs e)
@@ -53,27 +62,15 @@ namespace MJC.forms.order
             string message = this.Message.GetTextBox().Text;
             if (string.IsNullOrWhiteSpace(message))
             {
-                MessageBox.Show("please enter Message.");
+                MessageBox.Show("Please enter a message.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Message.GetTextBox().Select();
                 return;
             }
 
-            bool refreshData = false;
-            if (orderItemId == 0)
-                Console.WriteLine("Create Order Message");
-            else refreshData = OrderItemModelObj.UpdateOrderItemMessageById(message, this.orderItemId);
-
             string modeText = orderItemId == 0 ? "creating" : "updating";
-
-            if (refreshData)
-            {
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("An Error occured while " + modeText + " the Order item message.");
-            }
+ 
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
     }
 }

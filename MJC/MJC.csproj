@@ -8,6 +8,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>imgs\icon.ico</ApplicationIcon>
     <AssemblyName>MechanicsIMS</AssemblyName>
+	<Version>1.0.0</Version>
+	<AssemblyVersion>1.0.*</AssemblyVersion>
+	<Deterministic>false</Deterministic>
+    <FileVersion></FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

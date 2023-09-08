@@ -192,7 +192,7 @@ namespace MJC.common
                                     320, this.paperHeight), strFormat);
                     titleHeight = (int)e.Graphics.MeasureString(title, _fontInvoice, 320).Height;
 
-
+                    
                     string address = "18594 SR7, MARIETTA, OH, 45750 (740) 376-9977, FAX(740) 376--9975";
                     int addressX = 250;
                     int addressY = iTopMargin + titleHeight - 13;

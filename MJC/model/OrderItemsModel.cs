@@ -292,13 +292,11 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"UPDATE OrderItems SET message = @Value1 WHERE id = @Value2";
+                    command.CommandText = @"UPDATE OrderItems SET message=@Value1 WHERE id=@Value2";
                     command.Parameters.AddWithValue("@Value1", message);
                     command.Parameters.AddWithValue("@Value2", id);
 
                     command.ExecuteNonQuery();
-
-                    MessageBox.Show("The OrderItem Message updated successfully.");
 
                     return true;
                 }
@@ -363,7 +361,7 @@ namespace MJC.model
             return OrderList;
         }
 
-        public int CreateOrderItem(int orderId, int skuId, decimal? qty, string description, bool? tax, int? priceTier, double? unitPrice, double? lineTotal, string salesCode, string sku, int qboSkuId, string qboOrderItemId, int lineNum, int createdBy = 0, int updatedBy = 0)
+        public int CreateOrderItem(int orderId, int skuId, decimal? qty, string description, string message, bool? tax, int? priceTier, double? unitPrice, double? lineTotal, string salesCode, string sku, int qboSkuId, string qboOrderItemId, int lineNum, int createdBy = 0, int updatedBy = 0)
         {
             using (var connection = GetConnection())
             {
@@ -373,7 +371,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"INSERT INTO OrderItems(active, orderId, skuId, quantity, description, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboOrderItemId, lineNum, createdBy, updatedBy) OUTPUT INSERTED.id VALUES(@Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16)";
+                    command.CommandText = @"INSERT INTO OrderItems(active, orderId, skuId, quantity, description, message, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboOrderItemId, lineNum, createdBy, updatedBy) OUTPUT INSERTED.id VALUES(@Value1, @Value2, @Value3, @Value4, @Value5, @message, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16)";
                     command.Parameters.AddWithValue("@Value1", 1);
                     command.Parameters.AddWithValue("@Value2", orderId);
                     if(skuId != 0)
@@ -408,6 +406,7 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value14", lineNum);
                     command.Parameters.AddWithValue("@Value15", createdBy);
                     command.Parameters.AddWithValue("@Value16", updatedBy);
+                    command.Parameters.AddWithValue("@message", message);
 
                     orderItemId = (int)command.ExecuteScalar();
  

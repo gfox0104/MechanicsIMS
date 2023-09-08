@@ -241,6 +241,7 @@ namespace MJC.qbo
                     double? unitPrice = item.UnitPrice;
                     double? lineTotal = item.LineTotal;
                     string salesCode = item.SC;
+                    string message = item.message;
                     string sku = item.Sku;
                     string tempSkuId = items[index].SalesItemLineDetail.ItemRef?.value ?? "";
                     int qboSkuId = int.Parse(tempSkuId);
@@ -254,11 +255,11 @@ namespace MJC.qbo
                     if (orderItemId > 0)
                     {  
                         orderItemModelObj.UpdateOrderItem(skuId, qty, description, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboItemId, lineNum, createdBy, updatedBy, orderItemId);
-
+                        orderItemModelObj.UpdateOrderItemMessageById(message, orderId);
                     } else
                     {
-                        orderItemModelObj.CreateOrderItem(orderId, skuId, qty, description, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboItemId, lineNum, createdBy, updatedBy);
-
+                        orderItemModelObj.CreateOrderItem(orderId, skuId, qty, description, message, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboItemId, lineNum, createdBy, updatedBy);
+                        orderItemModelObj.UpdateOrderItemMessageById(message, orderId);
                     }
                 }
 
@@ -368,6 +369,7 @@ namespace MJC.qbo
                     string salesCode = "";
                     //string? sku = item.SalesItemLineDetail?.ItemRef?.name;
                     string sku = itemList[i].Sku;
+                    var message = itemList[i].message;
                     string tempSkuId = item.SalesItemLineDetail?.ItemRef?.value ?? "";
                     int qboSkuId = 0;
                     if (!string.IsNullOrEmpty(tempSkuId))
@@ -378,7 +380,9 @@ namespace MJC.qbo
                     int createdBy = 1;
                     int updatedBy = 1;
                   
-                    orderItemModelObj.CreateOrderItem(orderId, skuId, qty, description, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboItemId, lineNum, createdBy, updatedBy);
+                    orderItemModelObj.CreateOrderItem(orderId, skuId, qty, description, message, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboItemId, lineNum, createdBy, updatedBy);
+                    //orderItemModelObj.UpdateOrderItemMessageById(message, orderId); 
+                    
                     index++;
                 }
 
@@ -485,7 +489,7 @@ namespace MJC.qbo
             }
         }
 
-        async public void LoadCustomers()
+        async public Task LoadCustomers()
         {
             DataService dataService= new DataService(this.accessToken, this.realmId, useSandbox: true);
 
@@ -509,7 +513,8 @@ namespace MJC.qbo
                 Console.WriteLine("Customer is synchorized");
                 LoadInvoices();
 
-            } catch(Exception ex)
+            }
+            catch(Exception ex)
             {
                 Console.WriteLine("Exception->" + ex.ToString());
                 MessageBox.Show("QuickBooks authorization failed");
@@ -542,8 +547,8 @@ namespace MJC.qbo
         async private void CreateNewCustomer(Customer customer)
         {
             bool? active = customer.Active;
-            string customerNumber = customer.Id;
-            string customerName = customer.DisplayName;
+            string customerNumber = customer.DisplayName;
+            string customerName = customer.CompanyName;
             string? address1 = null;
             string? address2 = null;
             string? city = null;
@@ -590,7 +595,7 @@ namespace MJC.qbo
 
                     command.Parameters.AddWithValue("@Value1", active);
                     if (customerNumber != null)
-                        command.Parameters.AddWithValue("@Value2", customerName);
+                        command.Parameters.AddWithValue("@Value2", customerNumber);
                     else command.Parameters.AddWithValue("@Value2", DBNull.Value);
                     if (customerName != null)
                         command.Parameters.AddWithValue("@Value3", customerName);
@@ -648,8 +653,8 @@ namespace MJC.qbo
         async private void UpdateCustomer(Customer customer)
         {
             bool? active = customer.Active;
-            string customerNumber = customer.Id;
-            string customerName = customer.DisplayName;
+            string customerNumber = customer.DisplayName;
+            string customerName = customer.CompanyName;
             string? address1 = null;
             string? address2 = null;
             string? city = null;

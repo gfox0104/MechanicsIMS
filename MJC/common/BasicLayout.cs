@@ -118,7 +118,7 @@ namespace MJC.common
             this._projectVersion.BackColor = System.Drawing.Color.Transparent;
             this._projectVersion.Font = this._fontPoint4_2;
             this._projectVersion.ForeColor = this._textMainColor;
-            this._projectVersion.Text = "v1.0.0";
+            this._projectVersion.Text = "v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             this._header.Controls.Add(this._projectVersion);
             this._projectVersion.Location = new System.Drawing.Point(this.Width - this._projectVersion.Width - 30, 45);
         }

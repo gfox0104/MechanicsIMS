@@ -23,6 +23,8 @@ namespace MJC.model
         private string _qboSkuId;
         private string _qboItemId;
         private int? _priceTier;
+        private string _priceTierCode;
+        public string message;
 
         public int Id 
         {
@@ -32,6 +34,7 @@ namespace MJC.model
                 OnPropertyChanged();
             }
         }
+
         public int OrderId
         {
             get => _orderId;
@@ -140,6 +143,16 @@ namespace MJC.model
             set
             {
                 _sc = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string PriceTierCode
+        {
+            get => _priceTierCode;
+            set
+            {
+                _priceTierCode = value;
                 OnPropertyChanged();
             }
         }

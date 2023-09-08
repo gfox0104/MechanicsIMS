@@ -39,17 +39,17 @@ namespace MJC.forms.sku
         private FCheckBox allowDiscount = new FCheckBox("Allow discount");
         private FCheckBox commissionable = new FCheckBox("Commissionable");
 
-        private FInputBox orderForm = new FInputBox("OrderForm");
-        private FDateTime lastSold = new FDateTime("LastSold");
+        private FInputBox orderForm = new FInputBox("Order Form");
+        private FDateTime lastSold = new FDateTime("Last Sold");
         private FInputBox manufacturer = new FInputBox("Manufacturer");
         private FInputBox location = new FInputBox("Location");
 
-        private FGroupLabel quantityTracking = new FGroupLabel("QuantityTracking");
+        private FGroupLabel quantityTracking = new FGroupLabel("Quantity Tracking");
         private FInputBox quantity = new FInputBox("Quantity");
-        private FInputBox qtyAllocated = new FInputBox("QtyAllocated");
-        private FInputBox qtyAvaiable = new FInputBox("QtyAvailable");
-        private FInputBox criticalQty = new FInputBox("CirticalQty");
-        private FInputBox recorderQty = new FInputBox("RecorderQty");
+        private FInputBox qtyAllocated = new FInputBox("Qty Allocated");
+        private FInputBox qtyAvaiable = new FInputBox("Qty Available");
+        private FInputBox criticalQty = new FInputBox("Cirtical Qty");
+        private FInputBox recorderQty = new FInputBox("Recorder Qty");
 
         private FGroupLabel sales = new FGroupLabel("Sales");
         private FInputBox soldThisMonth = new FInputBox("Sold this Month");
