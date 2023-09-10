@@ -16,8 +16,7 @@ namespace MJC.forms
     public partial class CustomerProfile : GlobalLayout
     {
         private HotkeyButton hkPreviousScreen = new HotkeyButton("Esc", "Previous Screen", Keys.Escape);
-        private HotkeyButton hkCustomerJump = new HotkeyButton("F4", "Customer Jump", Keys.F4);
-
+        
         private FComboBox Customer = new FComboBox("Customer#", 150);
         private FlabelConstant CustomerName = new FlabelConstant("Name", 150);
 
@@ -31,7 +30,7 @@ namespace MJC.forms
         {
             InitializeComponent();
             _initBasicSize();
-            HotkeyButton[] hkButtons = new HotkeyButton[2] { hkPreviousScreen, hkCustomerJump };
+            HotkeyButton[] hkButtons = new HotkeyButton[] { hkPreviousScreen };
             _initializeHKButtons(hkButtons);
             hkPreviousScreen.GetButton().Click += new EventHandler(_navigateToPrev);
 
@@ -40,26 +39,11 @@ namespace MJC.forms
             InitCustomerProfileList();
             LoadProfilerList();
         }
+
         private void AddHotKeyEvents()
         {
-            hkCustomerJump.GetButton().Click += (sender, e) =>
-            {
-                this.Enabled = false;
-                SearchInput searchInputModal = new SearchInput();
-                searchInputModal.SetSearchKey(this.searchKey);
-                searchInputModal.Show();
-
-                searchInputModal.FormClosed += (ss, ee) =>
-                {
-                    if (this.searchKey != searchInputModal.GetSearchKey())
-                    {
-                        this.searchKey = searchInputModal.GetSearchKey();
-                        this.LoadProfilerList();
-                    }
-                    this.Enabled = true;
-                };
-            };
         }
+
         private void InitCustomerInfo(int customerId = 0)
         {
             List<dynamic> FormComponents = new List<dynamic>();
@@ -95,6 +79,7 @@ namespace MJC.forms
                 }
             }
         }
+
         private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             FComboBoxItem selectedItem = (FComboBoxItem)Customer.GetComboBox().SelectedItem;
