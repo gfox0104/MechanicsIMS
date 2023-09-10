@@ -119,16 +119,23 @@ namespace MJC.forms.vendor
             if (refreshData)
             {
                 VGridRefer.DataSource = VendorsModelObj.VendorDataList;
-                VGridRefer.Columns[0].HeaderText = "Vendor #";
-                VGridRefer.Columns[0].Width = 300;
-                VGridRefer.Columns[1].HeaderText = "Name";
-                VGridRefer.Columns[1].Width = 300;
-                VGridRefer.Columns[2].HeaderText = "City";
-                VGridRefer.Columns[2].Width = 500;
-                VGridRefer.Columns[3].HeaderText = "State";
-                VGridRefer.Columns[3].Width = 200;
-                VGridRefer.Columns[4].HeaderText = "Phone";
+                VGridRefer.Columns[0].HeaderText = "ID";
+                VGridRefer.Columns[0].Visible = false;
+
+                VGridRefer.Columns[1].HeaderText = "Vendor #";
+                VGridRefer.Columns[1].Width = 200;
+                VGridRefer.Columns[1].DataPropertyName = "number";
+
+                VGridRefer.Columns[2].HeaderText = "Name";
+                VGridRefer.Columns[2].Width = 300;
+                VGridRefer.Columns[2].DataPropertyName = "name";
+
+                VGridRefer.Columns[3].HeaderText = "City";
+                VGridRefer.Columns[3].Width = 500;
+                VGridRefer.Columns[4].HeaderText = "State";
                 VGridRefer.Columns[4].Width = 200;
+                VGridRefer.Columns[5].HeaderText = "Phone";
+                VGridRefer.Columns[5].Width = 200;
             }
         }
 

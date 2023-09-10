@@ -97,20 +97,22 @@ namespace MJC.forms.vendor
         private void ok_button_Click(object sender, EventArgs e)
         {
             string vendorName = this.VendorName.GetTextBox().Text;
+            string vendorNumber = this.VendorNum.GetTextBox().Text;
+
             string address1 = this.AddressLine1.GetTextBox().Text;
             string address2 = this.AddressLine2.GetTextBox().Text;
             string city = this.City.GetTextBox().Text;
             string state = this.State.GetTextBox().Text;
             string zipcode = this.Zip.GetTextBox().Text;
-            string busphone = this.BusPhone.GetTextBox().Text;
-            string fax = this.Fax.GetTextBox().Text;
+            string busphone = this.BusPhone.GetTextBox().Text.Replace("(", string.Empty).Replace(")", string.Empty).Replace("-", string.Empty).Replace(" ", string.Empty);
+            string fax = this.Fax.GetTextBox().Text.Replace("(", string.Empty).Replace(")", string.Empty).Replace("-", string.Empty).Replace(" ", string.Empty);
 
             bool refreshData = false;
 
             try
             {
-                if (vendorId == 0) refreshData = VendorsModelObj.AddVendor(vendorName, address1, address2, city, state, zipcode, busphone, fax);
-                else refreshData = VendorsModelObj.UpdateVendor(vendorName, address1, address2, city, state, zipcode, busphone, fax, vendorId);
+                if (vendorId == 0) refreshData = VendorsModelObj.AddVendor(vendorName, vendorNumber, address1, address2, city, state, zipcode, busphone, fax);
+                else refreshData = VendorsModelObj.UpdateVendor(vendorName, vendorNumber, address1, address2, city, state, zipcode, busphone, fax, vendorId);
 
                 string modeText = vendorId == 0 ? "creating" : "updating";
 
@@ -141,7 +143,7 @@ namespace MJC.forms.vendor
         {
             this.vendorId = id;
 
-            this.VendorNum.GetTextBox().Text = data[0].id.ToString();
+            this.VendorNum.GetTextBox().Text = data[0].vendorNumber.ToString();
             this.VendorName.GetTextBox().Text = data[0].vendorName.ToString();
             this.AddressLine1.GetTextBox().Text = data[0].address1.ToString();
             this.AddressLine2.GetTextBox().Text = data[0].address2.ToString();
