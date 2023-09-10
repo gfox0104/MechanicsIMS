@@ -38,6 +38,8 @@ namespace MJC.common
         private PrintInvoiceModel printInvoiceModelObj = new PrintInvoiceModel();
         private int orderStatus = 0;
 
+        private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
+
         public OrderPrint(int orderId, int orderStatus)
         {
             //printOrderItemList = new List<PrintOrderItem>();
@@ -185,7 +187,7 @@ namespace MJC.common
                     int titleX = 250;
                     int titleY = iTopMargin;
 
-                    string title = "Marietta Joint & Clutch";
+                    string title = SettingsModelObj.Settings.businessName;
 
                     e.Graphics.DrawString(title,
                                     _fontInvoice, Brushes.Black,
@@ -194,7 +196,7 @@ namespace MJC.common
                     titleHeight = (int)e.Graphics.MeasureString(title, _fontInvoice, 320).Height;
 
                     
-                    string address = "18594 SR7, MARIETTA, OH, 45750 (740) 376-9977, FAX(740) 376--9975";
+                    string address = $"{SettingsModelObj.Settings.address1} {SettingsModelObj.Settings.address2}, {SettingsModelObj.Settings.city}, {SettingsModelObj.Settings.state}, {SettingsModelObj.Settings.postalCode} {SettingsModelObj.Settings.phone}, FAX {SettingsModelObj.Settings.fax}";
                     int addressX = 250;
                     int addressY = iTopMargin + titleHeight - 13;
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
