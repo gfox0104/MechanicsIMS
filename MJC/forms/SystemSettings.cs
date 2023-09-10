@@ -3,6 +3,8 @@ using MJC.common;
 using MJC.forms.qbo;
 using MJC.qbo;
 using System.Xml.Linq;
+using System.Drawing.Printing;
+
 
 namespace MJC.forms
 {
@@ -24,7 +26,7 @@ namespace MJC.forms
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
         private FCheckBox TradingModeOFF = new FCheckBox("Training Mode OFF");
         private FComboBox TargetPrinter = new FComboBox("Target Printer");
-        private FInputBox ProcessingTax = new FInputBox("Processing Tax");
+        private FComboBox ProcessingTax = new FComboBox("Processing Tax");
 
         public SystemSettings() : base("System Settings", "Manage system settings")
         {
@@ -88,11 +90,29 @@ namespace MJC.forms
 
         private void initTargetPrinter()
         {
-            FComboBoxItem HOrdersItem = new FComboBoxItem(0, "Held Orders");
-            TargetPrinter.GetComboBox().Items.Add(HOrdersItem);
-            TargetPrinter.GetComboBox().Items.Add(new FComboBoxItem(1, "Invoice"));
+            for (int i = 0; i < System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count; i++)
+            {
+                string printer = System.Drawing.Printing.PrinterSettings.InstalledPrinters[i];
+                TargetPrinter.GetComboBox().Items.Add(new FComboBoxItem(i, printer));
+            }
 
-            TargetPrinter.GetComboBox().SelectedItem = HOrdersItem;
+        }
+        // Function to get printer status
+        private string GetPrinterStatusText(string status)
+        {
+            switch (status)
+            {
+                case "2":
+                    return "Ready";
+                case "3":
+                    return "Printing";
+                case "4":
+                    return "Paused";
+                case "5":
+                    return "Offline";
+                default:
+                    return "Unknown";
+            }
         }
     }
 }
