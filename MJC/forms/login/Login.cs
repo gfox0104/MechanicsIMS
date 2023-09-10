@@ -49,6 +49,8 @@ namespace MJC.forms.login
             {
                 Dashboard dashboard = new Dashboard();
                 dashboard.Show();
+                
+                Session.LoggedIn = true;
 
                 this.Hide();
             }

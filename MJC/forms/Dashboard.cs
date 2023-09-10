@@ -61,11 +61,7 @@ namespace MJC.forms
 
         private void Dashboard_FormClosed(object sender, FormClosedEventArgs e)
         {
-            //if (MessageBox.Show("Are you sure you want to exit the application?", "Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            //{ 
-            //    Application.Exit();
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-            //}
+
         }
 
         private void Dashboard_Load(object sender, EventArgs e)

@@ -1,4 +1,5 @@
 ﻿using MJC.common.components;
+using MJC.forms.login;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace MJC.common
         public Form _prevForm { get; set; }
 
         protected int _accountId = 1;
-
+        
         private Label _comingSoonTxt;
         private NavigationHistory navigationHistory = new NavigationHistory();
 
@@ -125,12 +126,29 @@ namespace MJC.common
 
         protected void _closeProgram(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show("Are you sure you want to close this program?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
+            if (Session.LoggedIn)
             {
-                this.Close();
+                DialogResult result = MessageBox.Show("Are you sure you want to logout?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    Session.LoggedIn = false;
+
+                    Login login = new Login();
+                    login.Show();
+                    this.Close();
+                }
             }
+            else
+            {
+                DialogResult result = MessageBox.Show("Are you sure you want to exit?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    this.Close();
+                }
+            }
+
         }
 
         protected void _navigateToForm(object sender, EventArgs e, GlobalLayout targetForm)
