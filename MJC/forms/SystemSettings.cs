@@ -2,6 +2,7 @@
 using MJC.common;
 using MJC.forms.qbo;
 using MJC.qbo;
+using System.Xml.Linq;
 
 namespace MJC.forms
 {
@@ -22,7 +23,7 @@ namespace MJC.forms
         private FInputBox Fax = new FInputBox("Fax");
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
         private FCheckBox TradingModeOFF = new FCheckBox("Training Mode OFF");
-        private FInputBox TargetPrinter = new FInputBox("Target Printer");
+        private FComboBox TargetPrinter = new FComboBox("Target Printer");
         private FInputBox ProcessingTax = new FInputBox("Processing Tax");
 
         public SystemSettings() : base("System Settings", "Manage system settings")
@@ -81,6 +82,17 @@ namespace MJC.forms
             FormComponents.Add(ProcessingTax);
 
             _addFormInputs(FormComponents, 30, 150, 500, 50);
+
+            initTargetPrinter();
+        }
+
+        private void initTargetPrinter()
+        {
+            FComboBoxItem HOrdersItem = new FComboBoxItem(0, "Held Orders");
+            TargetPrinter.GetComboBox().Items.Add(HOrdersItem);
+            TargetPrinter.GetComboBox().Items.Add(new FComboBoxItem(1, "Invoice"));
+
+            TargetPrinter.GetComboBox().SelectedItem = HOrdersItem;
         }
     }
 }
