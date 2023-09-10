@@ -284,7 +284,6 @@ namespace MJC.common
 
                     string soldToInfo = printSoldToInfo.customerName + "\n" + printSoldToInfo.address1 + "\n" + printSoldToInfo.address2 + " \n" + printSoldToInfo.city + " " + printSoldToInfo.state + " " + printSoldToInfo.zipcode + " \n" + printSoldToInfo.businessPhone;
 
-                    //string soldToInfo = "HI-VAC CORPORATION \n117 INDUSTRY RD \nFAX # 740-374-2737 \nMARIETTA OH 45750 \n(740) 374-2306";
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
                     int soldToContentX = iLeftMargin + soldToWidth + 16;
                     int soldToContentY = iTopMargin + titleHeight + addressHeight - 13 + 2;
@@ -307,7 +306,7 @@ namespace MJC.common
                                 14, soldToHeight), strFormat);
 
                     string shipToInfo = printShipToInfo.name + "\n" + printShipToInfo.address1 + "\n" + printShipToInfo.address2 + " \n" + printShipToInfo.city + " " + printShipToInfo.state + " " + printShipToInfo.zipcode + " \n" + printShipToInfo.businessPhone;
-                    //string shipToInfo = "HI-VAC CORPORATION \n117 INDUSTRY RD \nFAX # 740-374-2737 \nMARIETTA OH 45750 \n(740) 374-2306";
+
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
                     int shipToContentX = 450 + shipToWidth + 16;
                     int shipToContentY = iTopMargin + titleHeight + addressHeight - 13 + 2;

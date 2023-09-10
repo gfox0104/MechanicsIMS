@@ -84,6 +84,14 @@ namespace MJC.forms.order
 
             dynamic customer = CustomersModelObj.GetCustomerDataById(customerId);
             this.TotalSkuList = SKUModelObj.LoadSkuOrderItems();
+            SKUModelObj.LoadSKUData("",false);
+            
+
+            // Default customer to the first priceTierId
+            if (customer?.priceTierId == null)
+            {
+                customer.priceTierId = 1;
+            }
 
             int priceTierId;
             if (customer != null && int.TryParse(customer?.priceTierId?.ToString() ?? "0", out priceTierId))
@@ -93,7 +101,7 @@ namespace MJC.forms.order
             {
                 this.SubSkuList = this.TotalSkuList;
             }
-
+           
             // HotkeyButton[] hkButtons = new HotkeyButton[9] { hkAdds, hkDeletes, hkEdit, hkSaveOrder, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
             HotkeyButton[] hkButtons = new HotkeyButton[] { hkAdds, hkDeletes, hkEdit, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
 
@@ -105,6 +113,7 @@ namespace MJC.forms.order
 
             InitGridFooter();
         }
+
 
         private void printInvoice(int orderId, int orderStatus)
         {
@@ -143,13 +152,13 @@ namespace MJC.forms.order
                         DataGridViewRow row = POGridRefer.Rows[rowIndex];
                          
                         if (saveFlag != 0 && saveFlag != 7)
-                        {
-                            await CreateInvoice();
-                       
+                        {                       
                             if (orderId != 0)
                             {
                                 if (saveFlag == 1)
                                 {
+                                    await CreateInvoice();
+
                                     status = 3;  
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
@@ -157,6 +166,8 @@ namespace MJC.forms.order
                                 }
                                 else if (saveFlag == 2)
                                 {
+                                    await CreateInvoice();
+
                                     status = 3;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
@@ -173,6 +184,8 @@ namespace MJC.forms.order
                                 }
                                 else if (saveFlag == 4)
                                 {
+                                    await CreateInvoice();
+
                                     status = 2;
                                     OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
@@ -524,7 +537,7 @@ namespace MJC.forms.order
             POGridRefer.Columns[12].Width = 200;
             POGridRefer.Columns[13].Visible = false;
 
-            POGridRefer.Columns[6].HeaderText = "Disc. %";
+            POGridRefer.Columns[6].HeaderText = "Price Tier";
             POGridRefer.Columns[6].Name = "PriceTierCode";
             POGridRefer.Columns[6].DataPropertyName = "PriceTierCode";
             POGridRefer.Columns[6].Width = 200;
@@ -534,7 +547,7 @@ namespace MJC.forms.order
 
             // DataGrid ComboBox column
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
-            comboBoxColumn.DataSource = this.SubSkuList;
+            comboBoxColumn.DataSource = SKUModelObj.SKUDataList;
             comboBoxColumn.HeaderText = "SKU#";
             comboBoxColumn.Width = 300;
             comboBoxColumn.Name = "skuNumber";
@@ -542,32 +555,39 @@ namespace MJC.forms.order
             comboBoxColumn.ValueMember = "Id";
             comboBoxColumn.DisplayMember = "Name";
             comboBoxColumn.AutoComplete = true;
-            comboBoxColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
 
             comboBoxColumn.DisplayIndex = 6;
             comboBoxColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
-
+ 
             POGridRefer.Columns.Add(comboBoxColumn);
             int columnIndex = POGridRefer.Columns.IndexOf(comboBoxColumn);
 
             POGridRefer.CellValueChanged += PoGridRefer_CellValueChanged;
+            POGridRefer.CellEndEdit += POGridRefer_CellEndEdit;
 
-            InsertItem(null, null); 
+            InsertItem(null, null);
             POGridRefer.CurrentCell = POGridRefer.Rows[POGridRefer.Rows.Count - 1].Cells[12];
             //POGridRefer.Select();
             //POGridRefer.BeginEdit(true);
 
         }
 
+        private void POGridRefer_CellEndEdit(object? sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
         private void PoGridRefer_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.ColumnIndex == 11)
+            if (e.RowIndex >= 0 && e.ColumnIndex == 14)
             {
                 DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 int selectedValue = int.Parse(comboBoxCell.Value?.ToString());
                 DataGridViewRow selectedRow = POGridRefer.SelectedRows[0];
 
-                SKUOrderItem sku = this.SubSkuList.Where(item => item.Id == selectedValue).ToList()[0];
+                var skuId = SKUModelObj.SKUDataList.FirstOrDefault(item => item.Id == selectedValue).Id;
+
+                SKUOrderItem sku = this.SubSkuList.Where(item => item.Id == skuId).ToList()[0];
                 selectedRow.Cells["sku"].Value = sku.Name;
                 selectedRow.Cells["qboSkuId"].Value = sku.QboSkuId;
                 selectedRow.Cells["description"].Value = sku.Description;

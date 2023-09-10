@@ -38,13 +38,20 @@ namespace MJC.qbo
 
             // If so, proceed
 
-            QboAuthTokens? Tokens = null;
-            Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
+            try
             {
-                ReadCommentHandling = JsonCommentHandling.Skip
-            }) ?? new();
-            this.accessToken = Tokens.AccessToken;
-            this.realmId = long.Parse(Tokens.RealmId);
+                QboAuthTokens? Tokens = null;
+                Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
+                {
+                    ReadCommentHandling = JsonCommentHandling.Skip
+                }) ?? new();
+                this.accessToken = Tokens.AccessToken;
+                this.realmId = long.Parse(Tokens.RealmId);
+            }
+            catch(Exception e)
+            {
+                Messages.ShowError("There was a problem locating your QuickBooks Online Tokens.json file. Please make sure the file exists and try again.");
+            }
         }
 
         async public void CreateAccounting(string accountName, string acctNum, AccountTypeEnum acctType, string subAcctType)

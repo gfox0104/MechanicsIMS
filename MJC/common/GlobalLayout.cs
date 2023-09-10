@@ -145,7 +145,7 @@ namespace MJC.common
 
                 if (result == DialogResult.Yes)
                 {
-                    this.Close();
+                    System.Diagnostics.Process.GetCurrentProcess().Kill();
                 }
             }
 
