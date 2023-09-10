@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using Antlr4.Runtime.Tree;
+using MJC.common;
 using MJC.config;
 
 namespace MJC.model
@@ -400,7 +401,7 @@ namespace MJC.model
                         if (!SKUPricesModelObj.UpdateSKUPrice(id, key, value, active, createdBy, updatedBy)) SKUPricesModelObj.AddSKUPrice(id, key, value);
                     }
 
-                    MessageBox.Show("The SKU updated successfully.");
+                    Messages.ShowInformation("The SKU updated successfully.");
                 }
 
                 return true;
@@ -462,7 +463,7 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("The SKU was deleted.");
+                    Messages.ShowInformation("The SKU was deleted.");
                 }
 
                 return true;

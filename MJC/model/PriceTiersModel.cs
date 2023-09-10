@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using MJC.common;
 using MJC.config;
 
 
@@ -82,7 +83,7 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("New PriceTier is added successfully.");
+                    Messages.ShowInformation("New PriceTier has been added successfully.");
                 }
 
                 return true;
@@ -106,7 +107,7 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("The PriceTier updated successfully.");
+                    Messages.ShowInformation("The PriceTier has been updated successfully.");
                 }
 
                 return true;
@@ -128,7 +129,7 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("The PriceTier was deleted.");
+                    Messages.ShowInformation("The PriceTier was deleted.");
                 }
 
                 return true;
