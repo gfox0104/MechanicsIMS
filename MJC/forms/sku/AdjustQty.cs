@@ -1,6 +1,7 @@
 ﻿using MJC.common.components;
 using MJC.common;
 using MJC.model;
+using Sentry;
 
 namespace MJC.forms.sku
 {
@@ -44,7 +45,6 @@ namespace MJC.forms.sku
             MBSave_button = MBSave.GetButton();
             MBSave_button.Location = new Point(140, 190);
             MBSave_button.Click += (sender, e) => {
-                Messages.ShowInformation("Quantity has been updated.");
                 saveNewQty();
             };
             this.Controls.Add(MBSave_button);
@@ -71,6 +71,10 @@ namespace MJC.forms.sku
 
         private void saveNewQty()
         {
+            int currentQuantity = SKUModelObj.GetQuantity(SKUId);
+            int availableQuantity = SKUModelObj.GetQuantityAvailable(SKUId);
+            int quantityAllocated = 2; // SKUModelObj.GetQuantityAllocated(SKUId);
+
             string cross_ref = NewQty.GetTextBox().Text;
             if (string.IsNullOrWhiteSpace(cross_ref))
             {
@@ -87,7 +91,43 @@ namespace MJC.forms.sku
                 return;
             }
 
-            SKUModelObj.UpdateQuantity(newQty, this.SKUId);
+            try
+            {
+                if (newQty < availableQuantity)
+                {
+                    // Current quantity brings our available quantity down.
+                    if(MessageBox.Show("The new quantity will bring your available quantity to a negative. Are you sure you want to continue?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) 
+                    {
+                        var qualityDifference = (newQty - currentQuantity);
+                        int newAvailableQuantity = (availableQuantity + qualityDifference) - quantityAllocated;
+
+                        SKUModelObj.UpdateQuantity(newQty, newAvailableQuantity, this.SKUId);
+                    }
+                }
+                else if(newQty > currentQuantity)
+                {
+                    // Increase both quantities when newQty is added.
+                    var qualityDifference = (newQty - currentQuantity);
+                    availableQuantity = availableQuantity + qualityDifference;
+
+                    SKUModelObj.UpdateQuantity(newQty, availableQuantity, this.SKUId);
+                }
+                else 
+                {
+                    // Available Quantity is sufficient with our current quantity
+                    // Lower the current quantity but don't touch the available quantity.
+                    var qualityDifference = (newQty - currentQuantity);
+
+                    SKUModelObj.UpdateQuantity(newQty, availableQuantity, this.SKUId);
+                }
+            }
+            catch (Exception e)
+            {
+                SentrySdk.CaptureException(e);
+                Messages.ShowError("There was a problem updating the quantity.");
+            }
+
+            Messages.ShowInformation("The quantity has been updated.");
             this.Close();
         }
     }

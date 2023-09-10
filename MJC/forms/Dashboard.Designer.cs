@@ -48,7 +48,6 @@
             this.MaximizeBox = false;
             this.Name = "Dashboard";
             this.Text = "Dashboard";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Dashboard_FormClosed);
             this.Load += new System.EventHandler(this.Dashboard_Load);
             this.ResumeLayout(false);
 
