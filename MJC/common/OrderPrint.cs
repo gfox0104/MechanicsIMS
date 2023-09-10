@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using MJC.model;
 using Newtonsoft.Json.Linq;
+using Sentry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -692,8 +693,15 @@ namespace MJC.common
             }
             catch (Exception exc)
             {
-                MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK,
-                   MessageBoxIcon.Error);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+                else
+                {
+                    Messages.ShowError(exc.Message);
+                }
             }
         }
 
@@ -713,9 +721,17 @@ namespace MJC.common
                 bFirstPage = true;
                 bNewPage = true;
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+                else
+                {
+                    Messages.ShowError(exc.Message);
+                } 
             }
         }
     }

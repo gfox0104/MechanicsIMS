@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MJC.forms.sales;
 using System.Data.SqlClient;
+using Sentry;
 
 namespace MJC.forms.sku
 {
@@ -95,16 +96,43 @@ namespace MJC.forms.sku
                             selectedSKUId = (int)row.Cells[0].Value;
                         }
                     }
-                    bool refreshData = SKUModelObj.DeleteSKU(selectedSKUId);
-                    if (refreshData)
+
+                    try
                     {
-                        LoadSKUList();
+                        bool refreshData = SKUModelObj.DeleteSKU(selectedSKUId);
+                        if (refreshData)
+                        {
+                            LoadSKUList();
+                        }
+                    }
+                    catch(Exception exc)
+                    {
+                        SentrySdk.CaptureException(exc);
+                        if (exc.Message.Contains("REFERENCE"))
+                        {
+                            ShowError("The SKU cannot be deleted because it is attached to an existing order.");
+                        }
+                        else
+                        {
+                            ShowError("There was a problem deleting the SKU.");
+                        }
                     }
                 }
             };
             hkSelects.GetButton().Click += (sender, e) =>
             {
-                updateSKU(sender, e);
+                try
+                {
+                    updateSKU(sender, e);
+                }
+                catch (Exception exc)
+                {
+                    SentrySdk.CaptureException(exc);
+                    if (exc.Message.Contains("KEY"))
+                    {
+                        ShowError("There was a problem updating the SKU.");
+                    }
+                }
             };
             hkCrossRefLookup.GetButton().Click += (sender, e) =>
             {
@@ -308,7 +336,7 @@ namespace MJC.forms.sku
                 SKUGridRefer.Columns[3].Width = 500;
                 SKUGridRefer.Columns[4].HeaderText = "Qty Avail";
                 SKUGridRefer.Columns[4].Width = 300;
-                SKUGridRefer.Columns[5].HeaderText = "Qty Tracking";
+                SKUGridRefer.Columns[5].HeaderText = "Qty On Hand";
                 SKUGridRefer.Columns[5].Width = 300;
             }
 

@@ -464,12 +464,12 @@ namespace MJC.common
 
         public void ShowInformation(string message, string title = "Notice")
         {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Messages.ShowInformation(message, title);
         }
 
         public void ShowError(string message, string title = "Error")
         {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Messages.ShowError(message, title);
         }
  
 

@@ -11,6 +11,8 @@ using Intuit.Ipp.OAuth2PlatformClient;
 using static System.Windows.Forms.AxHost;
 using System.Reflection.Emit;
 using System;
+using MJC.common;
+using Sentry;
 
 namespace MJC.qbo
 {
@@ -58,9 +60,16 @@ namespace MJC.qbo
                     AccountSubType = subAcctType,
                     AccountType = acctType
                 });
-            } catch(Exception ex)
+            }
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
 
@@ -73,9 +82,15 @@ namespace MJC.qbo
                 var result = await dataService.QueryAsync<Payment>("select * from Payment");
                 Payment[] Accounts = result.Response.Entities;
             }
-            catch(Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
         
@@ -96,10 +111,15 @@ namespace MJC.qbo
                     }
                 });
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
-                MessageBox.Show("QuickBooks authorization failed");
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
 
@@ -132,11 +152,15 @@ namespace MJC.qbo
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
-                MessageBox.Show("QuickBooks Authorization failed");
-                return false;
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
 
@@ -151,9 +175,15 @@ namespace MJC.qbo
 
                 });
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
         
@@ -272,11 +302,15 @@ namespace MJC.qbo
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
-                MessageBox.Show("QuickBooks authorization failed");
-                return false;
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
 
@@ -395,10 +429,15 @@ namespace MJC.qbo
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
-                return false;
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
 
@@ -439,10 +478,15 @@ namespace MJC.qbo
                 }
                 return customerModelObj.AddCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipCode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, qboId, syncToken, customerNumber);
             }
-            catch ( Exception ex )
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
-                MessageBox.Show("QuickBooks authorization failed");
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
 
             return false;
@@ -488,11 +532,15 @@ namespace MJC.qbo
                 }
                 customerModelObj.UpdateCustomer(displayName, givenName, middleName, familyName, title, suffix, business_phone, homePhone, fax, address1, address2, city, state, zipCode, email, date_opened, salesman, resale, stmtCustomerNumber, stmtName, priceTierId, terms, limit, memo, taxable, send_stm, core_tracking, coreBalance, acct_type, print_core_tot, porequired, creditCodeId, interestRate, accountBalance, ytdPurchases, ytdInterest, last_date_purch, qboId, syncToken, customerId, customerNumber);
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine(ex);
-                MessageBox.Show("QuickBooks authorization failed");
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
 
+                throw;
             }
         }
 
@@ -521,10 +569,15 @@ namespace MJC.qbo
                 LoadInvoices();
 
             }
-            catch(Exception ex)
+            catch (Exception exc)
             {
-                Console.WriteLine("Exception->" + ex.ToString());
-                MessageBox.Show("QuickBooks authorization failed");
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
             }
         }
 
@@ -869,13 +922,20 @@ namespace MJC.qbo
                         }
                     }
                 }
-                 
 
-            } catch(Exception ex)
-            {
-                MessageBox.Show("Unauthorized accessToken");
+
             }
-           
+            catch (Exception exc)
+            {
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
+            }
+
         }
 
         public SqlCommand RunQuryNoParameters(string query)
@@ -895,9 +955,15 @@ namespace MJC.qbo
                         connection.Close();
                     }
                 }
-                catch (Exception e)
+                catch (Exception exc)
                 {
-                    Console.WriteLine(e);
+                    SentrySdk.CaptureException(exc);
+                    if (exc.Message.Contains("KEY"))
+                    {
+                        Messages.ShowError("There was a problem updating the SKU.");
+                    }
+
+                 
                     connection.Close();
                 }
                 return command;

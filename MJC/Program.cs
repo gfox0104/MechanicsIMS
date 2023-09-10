@@ -1,5 +1,6 @@
 using MJC.forms;
 using MJC.forms.login;
+using Sentry;
 using System.Reflection;
 
 
@@ -17,13 +18,26 @@ namespace MJC
             // see https://aka.ms/applicationconfiguration.
             Application.EnableVisualStyles();
             ApplicationConfiguration.Initialize();
-            
+
+            SentrySdk.Init(o =>
+            {
+                // Tells which project in Sentry to send events to:
+                o.Dsn = "https://4b7926db913b708af6e2bdde51bc6243@o382651.ingest.sentry.io/4505844276527104";
+                // When configuring for the first time, to see what the SDK is doing:
+                o.Debug = true;
+                // Set TracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+                // We recommend adjusting this value in production.
+                o.TracesSampleRate = 1.0;
+            });
+            // Configure WinForms to throw exceptions so Sentry can capture them.
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
+           
             ShowSplash();
 
             Login login = new Login();
             Application.Run(login);
-
         }
+
         private static void ShowSplash()
         {
             Splash sp = new Splash();

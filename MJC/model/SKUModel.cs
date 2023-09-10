@@ -594,7 +594,7 @@ namespace MJC.model
                     SqlDataAdapter sda;
                     DataSet ds;
 
-                    command.CommandText = @"SELECT customerName, tblSKU.* FROM Customers RIGHT JOIN (SELECT SKUPrices.price, tblOrder.* FROM SKUPrices RIGHT JOIN (SELECT invoiceDate, customerId, invoiceNumber, tblOrderItem.* FROM Orders RIGHT JOIN (SELECT OrderItems.quantity, orderId, OrderItems.skuId, tblSKU.sku FROM OrderItems INNER JOIN (SELECT * FROM SKU WHERE id = @Value1) AS tblSKU ON tblSKU.id = OrderItems.skuId) AS tblOrderItem ON tblOrderItem.orderId = Orders.id) AS tblOrder ON tblOrder.skuId = SKUPrices.skuId) AS tblSKU ON tblSKU.customerId = Customers.id";
+                    command.CommandText = @"SELECT displayName, tblSKU.* FROM Customers RIGHT JOIN (SELECT SKUPrices.price, tblOrder.* FROM SKUPrices RIGHT JOIN (SELECT invoiceDate, customerId, invoiceNumber, tblOrderItem.* FROM Orders RIGHT JOIN (SELECT OrderItems.quantity, orderId, OrderItems.skuId, tblSKU.sku FROM OrderItems INNER JOIN (SELECT * FROM SKU WHERE id = @Value1) AS tblSKU ON tblSKU.id = OrderItems.skuId) AS tblOrderItem ON tblOrderItem.orderId = Orders.id) AS tblOrder ON tblOrder.skuId = SKUPrices.skuId) AS tblSKU ON tblSKU.customerId = Customers.id";
                     command.Parameters.AddWithValue("@Value1", skuId);
 
                     sda = new SqlDataAdapter(command);
@@ -606,7 +606,7 @@ namespace MJC.model
                         DateTime? invoiceDate = null;
                         if (!row.IsNull("invoiceDate"))
                             invoiceDate = row.Field<DateTime>("invoiceDate");
-                        string customerName = row["customerName"].ToString();
+                        string customerName = row["displayName"].ToString();
                         string invoiceNumber = row["invoiceNumber"].ToString();
                         int? qty = null;
                         if (!row.IsNull("quantity"))

@@ -232,8 +232,13 @@ namespace MJC.forms.sku
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(quantityTracking);
             FormComponents2.Add(quantity);
+
+            qtyAllocated.GetTextBox().Enabled = false;
+            qtyAvaiable.GetTextBox().Enabled = false;
+
             FormComponents2.Add(qtyAllocated);
             FormComponents2.Add(qtyAvaiable);
+
             FormComponents2.Add(criticalQty);
             FormComponents2.Add(recorderQty);
 
@@ -258,6 +263,7 @@ namespace MJC.forms.sku
             recorderQty.GetTextBox().KeyPress += KeyValidateNumber;
             soldThisMonth.GetTextBox().KeyPress += KeyValidateNumber;
             soldYTD.GetTextBox().KeyPress += KeyValidateNumber;
+ 
 
             string filter = "";
             var refreshData = PriceTiersModelObj.LoadPriceTierData(filter);

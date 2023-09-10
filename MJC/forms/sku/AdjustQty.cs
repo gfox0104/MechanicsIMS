@@ -44,7 +44,7 @@ namespace MJC.forms.sku
             MBSave_button = MBSave.GetButton();
             MBSave_button.Location = new Point(140, 190);
             MBSave_button.Click += (sender, e) => {
-                MessageBox.Show("Qty is updated.");
+                Messages.ShowInformation("Quantity has been updated.");
                 saveNewQty();
             };
             this.Controls.Add(MBSave_button);
@@ -74,7 +74,7 @@ namespace MJC.forms.sku
             string cross_ref = NewQty.GetTextBox().Text;
             if (string.IsNullOrWhiteSpace(cross_ref))
             {
-                MessageBox.Show("Please enter SKU Name");
+                Messages.ShowError("You must enter a SKU Name.");
                 NewQty.GetTextBox().Select();
                 return;
             }
@@ -82,7 +82,7 @@ namespace MJC.forms.sku
             int newQty;
             if (!int.TryParse(cross_ref, out newQty))
             {
-                MessageBox.Show("Please enter a valid integer quantity");
+                Messages.ShowError("Please enter a valid quantity.");
                 NewQty.GetTextBox().Select();
                 return;
             }

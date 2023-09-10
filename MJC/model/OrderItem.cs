@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MJC.model
 {
-    public class OrderItem
+    public class OrderItem : IEquatable<OrderItem>, IComparable<OrderItem>
     {
         private int _id;
         private int _orderId;
@@ -163,6 +163,40 @@ namespace MJC.model
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            OrderItem objAsPart = obj as OrderItem;
+            if (objAsPart == null) return false;
+            else return Equals(objAsPart);
+        }
+        public int SortByNameAscending(string name1, string name2)
+        {
+
+            return name1.CompareTo(name2);
+        }
+
+        // Default comparer for Part type.
+        public int CompareTo(OrderItem comparePart)
+        {
+            // A null value means that this object is greater.
+            if (comparePart == null)
+                return 1;
+
+            else
+                return this.SkuId.CompareTo(comparePart.SkuId);
+        }
+        public override int GetHashCode()
+        {
+            return SkuId;
+        }
+        public bool Equals(OrderItem other)
+        {
+            if (other == null) return false;
+            return (this.Sku.Equals(other.Sku));
         }
     }
 }
