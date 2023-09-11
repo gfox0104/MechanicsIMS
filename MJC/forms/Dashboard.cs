@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace MJC.forms
 {
@@ -25,6 +26,7 @@ namespace MJC.forms
         private NavigationButton Users = new NavigationButton("Users", new Users());
         //private NavigationButton Accounting = new NavigationButton("Accounting", new Accounting());
         private NavigationButton SystemInformation = new NavigationButton("System Information", new SystemSettings());
+        private NavLinkButton OpenQuickbooks = new NavLinkButton("Open Quickbooks", "");
 
         private PictureBox hkPicture;
         public Dashboard() : base("Dashboard", "Dashboard view")
@@ -40,6 +42,7 @@ namespace MJC.forms
             _initiallizeNavButtons(navButtons);
 
             SetImage();
+            SetLinkButtion();
         }
 
         private void AddHKEvents()
@@ -56,6 +59,26 @@ namespace MJC.forms
             hkPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             hkPicture.TabStop = false;
             hkPicture.Location = new System.Drawing.Point(this.Width - hkPicture.Image.Width - 30, 120);
+            this.Controls.Add(hkPicture);
+        }
+
+        private void SetLinkButtion()
+        {
+            OpenQuickbooks.GetButton().Click += (sender, e) =>
+            {
+                System.Diagnostics.Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd",
+                    Arguments = $"/c start https://quickbooks.intuit.com/",
+                    CreateNoWindow = true
+                });
+            };
+
+            this.Controls.Add(OpenQuickbooks.GetButton());
+            OpenQuickbooks.SetPosition(new Point(this.Width - hkPicture.Image.Width - 30, 120));
+
+            OpenQuickbooks.GetButton().Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            OpenQuickbooks.GetButton().Location = new System.Drawing.Point(this.Width - hkPicture.Image.Width - 30, hkPicture.Image.Height + 130);
             this.Controls.Add(hkPicture);
         }
 
