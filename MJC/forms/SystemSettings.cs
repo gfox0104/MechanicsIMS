@@ -25,6 +25,7 @@ namespace MJC.forms
         private FCheckBox TrainingMode = new FCheckBox("Training Mode");
         private FInputBox TargetPrinter = new FInputBox("Target Printer");
         private FInputBox ProcessingTax = new FInputBox("Processing Tax");
+        private FInputBox businessDescription = new FInputBox("Description");
 
         private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
         private SalesTaxCodeModel SalesTaxModelObj = new SalesTaxCodeModel();
@@ -49,6 +50,7 @@ namespace MJC.forms
             SettingsModelObj.LoadSettings();
 
             BusinessName.GetTextBox().Text = SettingsModelObj.Settings.businessName;
+            businessDescription.GetTextBox().Text = SettingsModelObj.Settings.businessDescription;
             AddressLine1.GetTextBox().Text = SettingsModelObj.Settings.address1;
             AddressLine2.GetTextBox().Text = SettingsModelObj.Settings.address2;
             City.GetTextBox().Text = SettingsModelObj.Settings.city;
@@ -89,6 +91,7 @@ namespace MJC.forms
         private bool SaveSettings()
         {
             var businessName = BusinessName.GetTextBox().Text;
+            var description = businessDescription.GetTextBox().Text;
             var address1 = AddressLine1.GetTextBox().Text;
             var address2 = AddressLine2.GetTextBox().Text;
             var city = City.GetTextBox().Text;
@@ -129,7 +132,7 @@ namespace MJC.forms
 
             try
             {
-                SettingsModelObj.SaveSetting(taxCodeId, businessName, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken);
+                SettingsModelObj.SaveSetting(taxCodeId, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken);
             }
             catch(Exception exception) 
             {
@@ -179,6 +182,7 @@ namespace MJC.forms
             List<dynamic> FormComponents = new List<dynamic>();
 
             FormComponents.Add(BusinessName);
+            FormComponents.Add(businessDescription);
             FormComponents.Add(AddressLine1);
             FormComponents.Add(AddressLine2);
             FormComponents.Add(City);

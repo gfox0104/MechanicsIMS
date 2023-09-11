@@ -54,6 +54,7 @@ namespace MJC.common
             printShipToInfo = printInvoiceModelObj.GetPrintShipToInfo(orderId);
             printOrderInfo = printInvoiceModelObj.GetPrintOrderInfo(orderId);
             printOrderItemInfoList = printInvoiceModelObj.GetPrintOrderItemInfo(orderId);
+
             int orderItemCount = printOrderItemInfoList.Count;
             while( orderItemCount < 10 ) {
                 printOrderItemInfoList.Add(new PrintOrderItemInfo());
@@ -528,7 +529,7 @@ namespace MJC.common
                         else
                         {
                             // Footer
-                            string desc = "MARIETTA JOINT & CLUTCH PERFORMANCE DRIVESHAFT AND CLUTCH\n4*4 FRONT AND REAR SHAFTS DODGE AMERICAN AXLE PARTS 03 AND UP AXLE U JOINTS";
+                            string desc = SettingsModelObj.Settings.businessDescription;
                             strFormat.Alignment = StringAlignment.Center;
                             Font _fontDesc = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 

@@ -94,7 +94,7 @@ namespace MJC.forms.sku
             if(this.skuId != 0)
             {
                 var calcPriceInfo = quickCalcPriceModelObj.GetQuickCalcPriceInfo(this.skuId);
-                Category.SetContext(calcPriceInfo.categoryName);
+                Category.SetContext(calcPriceInfo.categoryName.Replace("&","&&")); // "& stands for underscore -- use && to escape.
                 if(calcPriceInfo.calculateAs == 1)
                     Calculating.SetContext("Markup");
                 else Calculating.SetContext("Margin");

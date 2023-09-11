@@ -161,5 +161,27 @@ namespace MJC.model
                 }
             }
         }
+
+        public bool DeleteOrder(int orderId)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+
+                    command.CommandText = @"DELETE FROM OrderItems WHERE id = @Value1";
+                    command.Parameters.AddWithValue("@Value1", orderId);
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = @"DELETE FROM Orders WHERE id = @Value1";
+                    command.ExecuteNonQuery();
+
+                    //MessageBox.Show("The Order Status updated successfully.");
+                    return true;
+                }
+            }
+        }
     }
 }
