@@ -75,6 +75,7 @@ namespace MJC.forms
             RecorderRefer.Columns[5].Width = 300;
             RecorderRefer.Columns[6].HeaderText = "Reorder Qty";
             RecorderRefer.Columns[6].Width = 300;
+            RecorderRefer.Columns[7].Visible = false;
         }
     }
 }

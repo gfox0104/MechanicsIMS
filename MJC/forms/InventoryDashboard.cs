@@ -103,5 +103,17 @@ namespace MJC.forms
                 }
             }
         }
+
+        private void InventoryDashboard_Activated(object sender, EventArgs e)
+        {
+            //SKUList = new NavigationButton("SKU List", new SKUList());
+            //Receive = new NavigationButton("Receive", new ReceiveInventory());
+            //Deplete = new NavigationButton("Deplete", new DepleteInventory());
+            ////private NavigationButton PriceChange = new NavigationButton("Price Change", new PriceChange());
+            //CategoryMargins = new NavigationButton("Category Margins", new CategoryMargin());
+            //Vendors = new NavigationButton("Vendors", new VendorList());
+            //RecorderReport = new NavigationButton("Reorder Report", new Reorder());
+            //ModuleInformation = new NavigationButton("Module Information", new ModuleInformation());
+        }
     }
 }

@@ -852,10 +852,13 @@ namespace MJC.model
                         int qty = (int)reader.GetValue(3);
                         int qtyAvailable = (int)reader.GetValue(4);
                         int qtyCritical = (int)reader.GetValue(5);
-                        int qtyRecorder = (int)reader.GetValue(6);
+                        int qtyReorder = (int)reader.GetValue(6);
                         string qboSkuId = reader.GetValue(7).ToString();
 
-                        skuRecorderList.Add(new SKURecorder(id, sku, description, qty, qtyAvailable, qtyCritical, qtyRecorder, qboSkuId));
+                        if (qtyAvailable <= qtyCritical)
+                        {
+                            skuRecorderList.Add(new SKURecorder(id, sku, description, qty, qtyAvailable, qtyCritical, qtyReorder, qboSkuId));
+                        }
                     }
                     return skuRecorderList;
                 }
