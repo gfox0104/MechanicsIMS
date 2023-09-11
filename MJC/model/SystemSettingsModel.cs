@@ -50,7 +50,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,authorizationCode,accessToken,refreshToken
+                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter
                                             from dbo.SystemSettings";
 
                     var reader = command.ExecuteReader();
@@ -69,8 +69,10 @@ namespace MJC.model
                         var ein = reader.GetString(10);
                         var training = reader.GetBoolean(11);
                         var targetPrinter = reader.GetString(12);
-                        var authorizationCode = reader.GetValue(13)?.ToString();
+                        var accessToken = reader.GetValue(13)?.ToString();
                         var refreshToken = reader.GetValue(14)?.ToString();
+                        var invoiceTerms = reader.GetValue(15)?.ToString();
+                        var invoiceFooter = reader.GetValue(16)?.ToString();
 
                         Settings = new SystemSettings()
                         {
@@ -86,8 +88,10 @@ namespace MJC.model
                             ein = ein,
                             trainingEnabled = training,
                             targetPrinter = targetPrinter,
-                            accessToken = authorizationCode,
-                            refreshToken = refreshToken
+                            accessToken = accessToken,
+                            refreshToken = refreshToken,
+                            businessFooter = invoiceFooter,
+                            businessTermsOfService = invoiceTerms
                         };
                     }
 
@@ -98,7 +102,7 @@ namespace MJC.model
             return true;
         }
 
-        public bool SaveSetting(int? taxCodeId, string companyName, string description, string address1, string address2, string city, string state, string zipcode, string phone, string fax, string federalTaxNumber, bool trainingMode, string targetPrinter, string authorizationCode, string refreshToken)
+        public bool SaveSetting(int? taxCodeId, string companyName, string description, string address1, string address2, string city, string state, string zipcode, string phone, string fax, string federalTaxNumber, bool trainingMode, string targetPrinter, string accessToken, string refreshToken, string invoiceFooter, string invoiceTermsOfService)
         {
             using (var connection = GetConnection())
             {
@@ -110,7 +114,7 @@ namespace MJC.model
                     command.CommandText = @"TRUNCATE TABLE dbo.SystemSettings";
                     command.ExecuteNonQuery();
 
-                    command.CommandText = @"INSERT INTO dbo.SystemSettings (companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,taxCodeId) Values(@Value1,@description,@Value2,@Value3,@Value4,@Value5,@Value6,@Value7,@Value8,@Value9,@Value10,@Value11,@Value12,@Value13,@Value14)";
+                    command.CommandText = @"INSERT INTO dbo.SystemSettings (companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,taxCodeId,invoiceFooter,invoiceTermsOfService) Values(@Value1,@description,@Value2,@Value3,@Value4,@Value5,@Value6,@Value7,@Value8,@Value9,@Value10,@Value11,@Value12,@Value13,@Value14,@Value15,@Value16)";
                     command.Parameters.AddWithValue("@Value1", companyName);
                     command.Parameters.AddWithValue("@description", description);
                     command.Parameters.AddWithValue("@Value2", address1);
@@ -123,9 +127,11 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value9", federalTaxNumber);
                     command.Parameters.AddWithValue("@Value10", trainingMode);
                     command.Parameters.AddWithValue("@Value11", targetPrinter);
-                    command.Parameters.AddWithValue("@Value12", authorizationCode);
+                    command.Parameters.AddWithValue("@Value12", accessToken);
                     command.Parameters.AddWithValue("@Value13", refreshToken);
                     command.Parameters.AddWithValue("@Value14", taxCodeId != null ? taxCodeId : DBNull.Value );
+                    command.Parameters.AddWithValue("@Value15", invoiceFooter);
+                    command.Parameters.AddWithValue("@Value16", invoiceTermsOfService);
                     command.ExecuteScalar();
                 }
 

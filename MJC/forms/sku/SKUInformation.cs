@@ -478,5 +478,10 @@ namespace MJC.forms.sku
                 e.Handled = true;
             }
         }
+
+        private void SKUInformation_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
