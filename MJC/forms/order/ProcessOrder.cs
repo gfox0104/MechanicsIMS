@@ -143,7 +143,13 @@ namespace MJC.forms.order
                 {
                     this.Enabled = true;
                     int saveFlag = CloseOrderActionsModal.GetSaveFlage();
-                    if (saveFlag == 7) _navigateToPrev(sender, e);
+                    if (saveFlag == 7)
+                    {
+                        OrderModelObj.DeleteOrder(orderId);
+
+                        _navigateToPrev(sender, e);
+                    }
+
                     int status = 0;
 
                     if (POGridRefer.Rows.Count > 0)
@@ -157,22 +163,26 @@ namespace MJC.forms.order
                             {
                                 if (saveFlag == 1)
                                 {
-                                    await CreateInvoice();
+                                    if (await CreateInvoice())
+                                    {
 
-                                    status = 3;  
-                                    OrderModelObj.UpdateOrderStatus(status, orderId);
-                                    printInvoice(orderId, status);
-                                    _navigateToPrev(sender, e);
+                                        status = 3;
+                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        printInvoice(orderId, status);
+                                        _navigateToPrev(sender, e);
+                                    }
                                 }
                                 else if (saveFlag == 2)
                                 {
-                                    await CreateInvoice();
+                                    if (await CreateInvoice())
+                                    {
 
-                                    status = 3;
-                                    OrderModelObj.UpdateOrderStatus(status, orderId);
-                                    printInvoice(orderId, status);
+                                        status = 3;
+                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        printInvoice(orderId, status);
 
-                                    _navigateToPrev(sender, e);
+                                        _navigateToPrev(sender, e);
+                                    }
                                 }
                                 else if (saveFlag == 3)
                                 {
@@ -184,13 +194,15 @@ namespace MJC.forms.order
                                 }
                                 else if (saveFlag == 4)
                                 {
-                                    await CreateInvoice();
+                                    if (await CreateInvoice()) 
+                                    { 
 
-                                    status = 2;
-                                    OrderModelObj.UpdateOrderStatus(status, orderId);
-                                    printInvoice(orderId, status);
+                                        status = 2;
+                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        printInvoice(orderId, status);
 
-                                    _navigateToPrev(sender, e);
+                                        _navigateToPrev(sender, e);
+                                    }
                                 }
                                 else if (saveFlag == 5)
                                 {
@@ -200,10 +212,13 @@ namespace MJC.forms.order
                                 }
                                 else if (saveFlag == 6)
                                 {
-                                    status = 1;
-                                    OrderModelObj.UpdateOrderStatus(status, orderId);
-                                    printInvoice(orderId, status);
-                                    _navigateToPrev(sender, e);
+                                    if (await CreateInvoice())
+                                    {
+                                        status = 1;
+                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        printInvoice(orderId, status);
+                                        _navigateToPrev(sender, e);
+                                    }
                                 }
                                 else if (saveFlag == 7)
                                 {
@@ -601,7 +616,7 @@ namespace MJC.forms.order
             changeDetected = true;
         }
 
-        private async Task CreateInvoice()
+        private async Task<bool> CreateInvoice()
         {
             List<OrderItem> orderItems = this.OrderItemData;
             QboApiService qboApiService = new QboApiService();
@@ -621,20 +636,41 @@ namespace MJC.forms.order
                 if (this.selectedOrderId == 0)
                 {
                     orderItems = orderItems.Where(item => item.OrderId == 0).ToList();
-                    bool res = await qboApiService.CreateInvoice(customer, invoiceNumber, orderItems);
-                    if (res)
+                    try
                     {
-                        this.isAddNewOrderItem = false;
+                        bool res = await qboApiService.CreateInvoice(customer, invoiceNumber, orderItems);
 
-                        // TODO: Where are order items saved?
-                        //LoadOrderItemList();
+                        if (res)
+                        {
+                            this.isAddNewOrderItem = false;
 
-                        selectedOrderId = orderId;
+                            // TODO: Where are order items saved?
+                            //LoadOrderItemList();
 
+                            selectedOrderId = orderId;
+
+                        }
+                        else
+                        {
+                            ShowError("The invoice could not be created.");
+                            return false;
+                        }
                     }
-                    else
+                    catch(Exception e)
                     {
-                        ShowError("Invoice was not created.");
+                        if(e.Message.Contains("TOKEN"))
+                        {
+                            ShowError("The invoice could not be created: QuickBooks tokens.json was not found.");
+                        }
+                        else if(e.Message.Contains("Unauthorized"))
+                        {
+                            ShowError("The invoice could not be created: QuickBooks needs to be reauthorized.");
+                        }
+                        else
+                        {
+                            ShowError("The invoice could not be created.");
+                        }
+                        return false;
                     }
                 }
                 else
@@ -653,14 +689,18 @@ namespace MJC.forms.order
                     }
                     else
                     {
-                        ShowError("Invoice was not created #2.");
+                        ShowError("Invoice was not created #2."); 
+                        return false;
                     }
                 }
             }
             else
             {
                 ShowError("Order Item does not exist.");
+                return false;
             }
+
+            return true;
         }
 
 

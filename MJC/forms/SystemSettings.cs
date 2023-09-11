@@ -24,9 +24,10 @@ namespace MJC.forms
         private FInputBox Phone = new FInputBox("Phone");
         private FInputBox Fax = new FInputBox("Fax");
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
-        private FCheckBox TradingModeOFF = new FCheckBox("Training Mode OFF");
+        private FCheckBox TrainingMode = new FCheckBox("Training Mode");
         private FComboBox TargetPrinter = new FComboBox("Target Printer");
-        private FComboBox ProcessingTax = new FComboBox("Processing Tax");
+        private FInputBox ProcessingTax = new FInputBox("Processing Tax");
+        private FInputBox businessDescription = new FInputBox("Description");
 
         private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
         private SalesTaxCodeModel SalesTaxModelObj = new SalesTaxCodeModel();
@@ -51,6 +52,7 @@ namespace MJC.forms
             SettingsModelObj.LoadSettings();
 
             BusinessName.GetTextBox().Text = SettingsModelObj.Settings.businessName;
+            businessDescription.GetTextBox().Text = SettingsModelObj.Settings.businessDescription;
             AddressLine1.GetTextBox().Text = SettingsModelObj.Settings.address1;
             AddressLine2.GetTextBox().Text = SettingsModelObj.Settings.address2;
             City.GetTextBox().Text = SettingsModelObj.Settings.city;
@@ -59,7 +61,7 @@ namespace MJC.forms
             Phone.GetTextBox().Text = SettingsModelObj.Settings.phone;
             Fax.GetTextBox().Text = SettingsModelObj.Settings.fax;
             FederalTax.GetTextBox().Text = SettingsModelObj.Settings.ein;
-            TargetPrinter.GetTextBox().Text = SettingsModelObj.Settings.targetPrinter;
+            TargetPrinter.GetComboBox().Text = SettingsModelObj.Settings.targetPrinter;
             TrainingMode.GetCheckBox().Checked = SettingsModelObj.Settings.trainingEnabled;
             ProcessingTax.GetTextBox().Text = SettingsModelObj.Settings.taxCodeId.GetValueOrDefault().ToString();
         }
@@ -91,6 +93,7 @@ namespace MJC.forms
         private bool SaveSettings()
         {
             var businessName = BusinessName.GetTextBox().Text;
+            var description = businessDescription.GetTextBox().Text;
             var address1 = AddressLine1.GetTextBox().Text;
             var address2 = AddressLine2.GetTextBox().Text;
             var city = City.GetTextBox().Text;
@@ -101,7 +104,7 @@ namespace MJC.forms
             var ein = FederalTax.GetTextBox().Text;
             var taxCode = ProcessingTax.GetTextBox().Text;
             var training = TrainingMode.GetCheckBox().Checked;
-            var targetPrinter = TargetPrinter.GetTextBox().Text;
+            var targetPrinter = TargetPrinter.GetComboBox().Text;
             var authorizationCode = string.Empty;
             var refreshToken = string.Empty;
 
@@ -131,7 +134,7 @@ namespace MJC.forms
 
             try
             {
-                SettingsModelObj.SaveSetting(taxCodeId, businessName, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken);
+                SettingsModelObj.SaveSetting(taxCodeId, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken);
             }
             catch(Exception exception) 
             {
@@ -181,6 +184,7 @@ namespace MJC.forms
             List<dynamic> FormComponents = new List<dynamic>();
 
             FormComponents.Add(BusinessName);
+            FormComponents.Add(businessDescription);
             FormComponents.Add(AddressLine1);
             FormComponents.Add(AddressLine2);
             FormComponents.Add(City);

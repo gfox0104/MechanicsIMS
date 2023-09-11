@@ -50,7 +50,7 @@ namespace MJC.qbo
             }
             catch(Exception e)
             {
-                Messages.ShowError("There was a problem locating your QuickBooks Online Tokens.json file. Please make sure the file exists and try again.");
+                throw new Exception("TOKENS");
             }
         }
 
@@ -439,10 +439,6 @@ namespace MJC.qbo
             catch (Exception exc)
             {
                 SentrySdk.CaptureException(exc);
-                if (exc.Message.Contains("KEY"))
-                {
-                    Messages.ShowError("There was a problem updating the SKU.");
-                }
 
                 throw;
             }

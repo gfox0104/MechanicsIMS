@@ -1151,7 +1151,7 @@ namespace MJC.model
                     command.CommandText = @"SELECT categoryName, tblSKU.* FROM Categories INNER JOIN (SELECT id, sku, category, description, quantity, inventoryValue, qtyAvailable FROM SKU WHERE id = @Value1) AS tblSKU ON tblSKU.category = Categories.id;";
                     command.Parameters.AddWithValue("@Value1", skuId);
 
-                    command.ExecuteNonQuery();
+                    //command.ExecuteNonQuery();
                     sda = new SqlDataAdapter(command);
                     ds = new DataSet();
                     sda.Fill(ds);
@@ -1166,10 +1166,10 @@ namespace MJC.model
                         string categoryName = row["categoryName"].ToString();
                         string description = row["description"].ToString();
                         int? qty = null;
-                        if (row.IsNull("quantity"))
+                        if (!row.IsNull("quantity"))
                             qty = int.Parse(row["quantity"].ToString());
                         int? qtyAvailable = null;
-                        if (row.IsNull("qtyAvailable"))
+                        if (!row.IsNull("qtyAvailable"))
                             qtyAvailable = int.Parse(row["qtyAvailable"].ToString());
                         int? cost = null;
                         if (row.IsNull("inventoryValue"))

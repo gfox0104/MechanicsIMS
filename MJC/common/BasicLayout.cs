@@ -45,6 +45,7 @@ namespace MJC.common
             this._initLayout();
             this._initHeader("Form title");
             this._initFooter("Form Description");
+
         }
 
         public BasicLayout(string title, string formDescription) : base()
@@ -52,6 +53,7 @@ namespace MJC.common
             this._initLayout();
             this._initHeader(title);
             this._initFooter(formDescription);
+
         }
 
         protected void _initBasicSize()
@@ -155,6 +157,22 @@ namespace MJC.common
         protected void _changeFormText(string formTitle)
         {
             this._formTitle.Text = formTitle;
+        }
+
+        private void BasicLayout_Activated(object sender, EventArgs e)
+        {
+            SettingsModelObj.LoadSettings();
+            this._companyName.Text = !string.IsNullOrEmpty(SettingsModelObj.Settings.businessName) ? SettingsModelObj.Settings.businessName : "DEFAULT COMPANY NAME";
+        }
+
+        private void BasicLayout_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BasicLayout_Enter(object sender, EventArgs e)
+        {
+
         }
     }
 }
