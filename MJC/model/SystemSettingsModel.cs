@@ -25,6 +25,9 @@ namespace MJC.model
         public string refreshToken { get; set; }
         public bool trainingEnabled { get; set; }
         public string businessDescription { get; set; }
+        public string businessFooter { get; set; }
+        public string businessTermsOfService { get; set; }
+
 
     }
 

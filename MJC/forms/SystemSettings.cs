@@ -28,6 +28,8 @@ namespace MJC.forms
         private FComboBox TargetPrinter = new FComboBox("Target Printer");
         private FInputBox ProcessingTax = new FInputBox("Processing Tax");
         private FInputBox businessDescription = new FInputBox("Description");
+        private FInputBox invoiceFooter = new FInputBox("Invoice Footer");
+        private FInputBox invoiceTermsOfService = new FInputBox("Terms Of Service");
 
         private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
         private SalesTaxCodeModel SalesTaxModelObj = new SalesTaxCodeModel();
@@ -128,7 +130,6 @@ namespace MJC.forms
                     Messages.ShowError("The Processing Tax Code you entered does not exist.\r\n\r\nPlease make sure that the Tax Code exists and try again.");
                 }
             }
-
              
             // We want to continue to save the settings
 
@@ -211,6 +212,7 @@ namespace MJC.forms
             }
 
         }
+
         // Function to get printer status
         private string GetPrinterStatusText(string status)
         {

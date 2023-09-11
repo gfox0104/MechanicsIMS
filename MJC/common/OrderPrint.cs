@@ -632,7 +632,9 @@ namespace MJC.common
                         }
                         else
                         {
-                            string termsOfService = "PRICES SUBJECT TO CHANGE WITHOUT NOTICE: \nRETURNED GOODS: This shlip must accompany all claims. Goods ordered special, not carried in stock, are not returnable for credit. A 25% charge to cover handling will be made on all returned goods. Parts not claimed within 35 days will be disposed of or sold.\nTERMS: Net 10th of the Month. 1 1/2% per month, 18% per annim will be charged on past due accounts after 30 days.\nWARRANTY: All products, excluding Hi Performance or Heavy Duty Clutches, of our manufacture are under warranty against defective materials or workmanship for a period of 90 days. We will assume no liability beyond the repair or replacement of such parts that may be proven defective. Failure to resurface the flywheel MAY void all warranties.\n \nPROCESSED BY: DR";
+
+                            string termsOfService = SettingsModelObj.Settings.businessTermsOfService;
+                            // "PRICES SUBJECT TO CHANGE WITHOUT NOTICE: \nRETURNED GOODS: This shlip must accompany all claims. Goods ordered special, not carried in stock, are not returnable for credit. A 25% charge to cover handling will be made on all returned goods. Parts not claimed within 35 days will be disposed of or sold.\nTERMS: Net 10th of the Month. 1 1/2% per month, 18% per annim will be charged on past due accounts after 30 days.\nWARRANTY: All products, excluding Hi Performance or Heavy Duty Clutches, of our manufacture are under warranty against defective materials or workmanship for a period of 90 days. We will assume no liability beyond the repair or replacement of such parts that may be proven defective. Failure to resurface the flywheel MAY void all warranties.\n \nPROCESSED BY: DR";
 
                             Font _fontTOS = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
@@ -673,7 +675,9 @@ namespace MJC.common
                   this.paperWidth - 2 * iLeftMargin, currentTimeHeight), strFormat);
 
                 // Footer Name
-                string footerName = "CLUTCH & DRIVERSHAFT SPECIALISTS";
+                string footerName = SettingsModelObj.Settings.businessFooter; 
+                // "CLUTCH & DRIVERSHAFT SPECIALISTS";
+
                 Font _fontFooterName = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
                 int footerNameHeight = (int)e.Graphics.MeasureString(footerName, _fontFooterName, this.paperWidth - 2 * iLeftMargin).Height;
