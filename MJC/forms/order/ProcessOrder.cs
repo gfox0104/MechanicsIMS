@@ -379,7 +379,7 @@ namespace MJC.forms.order
             var index = Customer_ComBo.GetComboBox().SelectedIndex;
             if (index == oldCustomerIndex) return;
 
-            LoadSelectedCustomerData();
+            LoadSelectedCustomerData(); 
 
             //if (!changeDetected || (MessageBox.Show("The current order will be lost. Are you sure you want to change the customer without saving the current changes?", "Change?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
             //{
@@ -472,19 +472,60 @@ namespace MJC.forms.order
 
             _addFormInputs(GridFooterComponents1, 680, 680, 650, 42, 780);
 
-            if (skuId != 0)
-                LoadGridFooterInfo();
+             
+            LoadGridFooterInfo();
         }
 
         public void LoadGridFooterInfo()
         {
+            this.skuId = SubSkuList[0].Id;
+
+            PopulateInformationField();
+        }
+
+        private void PopulateInformationField()
+        {
+            if (this.skuId == 0) return;
+            if (POGridRefer.SelectedRows.Count == 0) return;
+
             int skuId = this.skuId;
             var qtyInfo = SKUModelObj.LoadSkuQty(skuId);
+
+            SKUOrderItem sku = this.SubSkuList.FirstOrDefault(x => x.Id == skuId);
+
+            var items = PriceTiersModelObj.GetPriceTierItems();
+            var priceTierItem = items[sku.PriceTierId];
+
+            var taxRate = 7.25; // TODO: Get the actual tax rate for the SKU and Customer
 
             QtyOnHold.SetContext(qtyInfo.qty.ToString());
             QtyAllocated.SetContext(qtyInfo.qtyAllocated.ToString());
             QtyAvailable.SetContext(qtyInfo.qtyAvailable.ToString());
 
+            DataGridViewRow selectedRow = POGridRefer.SelectedRows[0];
+            
+            var unitPrice = sku.Price;
+            var quantity = selectedRow.Cells["quantity"].Value as int?; 
+
+            selectedRow.Cells["lineTotal"].Value = unitPrice * quantity;
+            var lineTotal = unitPrice * quantity;
+            var taxAmount = lineTotal * (taxRate / 100);
+            var totalAmount = taxAmount + lineTotal;
+
+            TaxPercent = new FlabelConstant($"{taxRate}% Tax:");
+            Subtotal.SetContext(lineTotal.GetValueOrDefault(0).ToString("#,##0.00"));
+            TaxPercent.SetContext(taxAmount.GetValueOrDefault(0).ToString("0.00"));
+            TotalSale.SetContext(totalAmount.GetValueOrDefault(0).ToString("$#,##0.00"));
+
+            var requested = quantity;
+            var filled = requested;
+            if(requested > qtyInfo.qtyAvailable)
+            {
+                filled = qtyInfo.qtyAvailable;
+            }
+
+            Filled.SetContext(filled.ToString());
+            Requested.SetContext(requested.ToString());
         }
 
         public void LoadOrderItemList(string sort = "")
@@ -523,7 +564,7 @@ namespace MJC.forms.order
 
             POGridRefer.Columns[6].HeaderText = "Quantity";
             POGridRefer.Columns[6].DataPropertyName = "quantity";
-            POGridRefer.Columns[6].Width = 200;
+            POGridRefer.Columns[6].Width = 220;
             POGridRefer.Columns[7].HeaderText = "Description";
             POGridRefer.Columns[7].DataPropertyName = "description";
             POGridRefer.Columns[7].Width = 400;
@@ -579,12 +620,26 @@ namespace MJC.forms.order
 
             POGridRefer.CellValueChanged += PoGridRefer_CellValueChanged;
             POGridRefer.CellEndEdit += POGridRefer_CellEndEdit;
-
+            POGridRefer.SelectionChanged += POGridRefer_SelectionChanged;
             InsertItem(null, null);
             POGridRefer.CurrentCell = POGridRefer.Rows[POGridRefer.Rows.Count - 1].Cells[12];
             //POGridRefer.Select();
             //POGridRefer.BeginEdit(true);
 
+        }
+
+        private void POGridRefer_SelectionChanged(object? sender, EventArgs e)
+        {
+            if (POGridRefer.SelectedRows.Count == 0) return;
+            
+
+            var selectedRow = POGridRefer.SelectedRows[0];
+            int selectedValue = int.Parse(selectedRow.Cells["skuId"].Value.ToString());
+
+            var skuId = SKUModelObj.SKUDataList.FirstOrDefault(item => item.Id == selectedValue).Id;
+            this.skuId = skuId;
+
+            PopulateInformationField();
         }
 
         private void POGridRefer_CellEndEdit(object? sender, DataGridViewCellEventArgs e)
@@ -594,6 +649,13 @@ namespace MJC.forms.order
 
         private void PoGridRefer_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            // Quantity changed
+            if(e.ColumnIndex == 6)
+            {
+                PopulateInformationField();
+            }
+            else 
+            // SKU Changed
             if (e.RowIndex >= 0 && e.ColumnIndex == 14)
             {
                 DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -611,6 +673,10 @@ namespace MJC.forms.order
                 selectedRow.Cells["lineTotal"].Value = sku.Price * sku.Qty;
                 selectedRow.Cells["salesCode"].Value = sku.CostCode;
                 selectedRow.Cells["quantity"].Value = 1;
+
+                this.skuId = skuId;
+
+                PopulateInformationField();
             }
 
             changeDetected = true;
@@ -718,8 +784,6 @@ namespace MJC.forms.order
             //}
 
             SKUOrderItem sku = this.SubSkuList[0];
-
-
             var items = PriceTiersModelObj.GetPriceTierItems();
             var priceTierItem = items[sku.PriceTierId];
 
