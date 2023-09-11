@@ -69,7 +69,7 @@ namespace MJC.forms
                 System.Diagnostics.Process.Start(new ProcessStartInfo
                 {
                     FileName = "cmd",
-                    Arguments = $"/c start https://quickbooks.intuit.com/",
+                    Arguments = $"/c start https://app.qbo.intuit.com/",
                     CreateNoWindow = true
                 });
             };
