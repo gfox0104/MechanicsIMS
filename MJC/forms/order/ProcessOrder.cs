@@ -421,8 +421,7 @@ namespace MJC.forms.order
             POGridRefer.EditingControlShowing += POGridRefer_EditingControlShowing;
             POGridRefer.DataError += POGridRefer_DataError;
             this.Controls.Add(POGridRefer);
-            
-            LoadOrderItemList();
+
 
             foreach (DataGridViewRow row in POGridRefer.Rows)
             {
@@ -561,25 +560,25 @@ namespace MJC.forms.order
             POGridRefer.Columns[5].HeaderText = "SKU#";
             POGridRefer.Columns[5].DataPropertyName = "sku";
             POGridRefer.Columns[5].Visible = false;
-
-            POGridRefer.Columns[6].HeaderText = "Quantity";
-            POGridRefer.Columns[6].DataPropertyName = "quantity";
-            POGridRefer.Columns[6].Width = 220;
-            POGridRefer.Columns[7].HeaderText = "Description";
-            POGridRefer.Columns[7].DataPropertyName = "description";
-            POGridRefer.Columns[7].Width = 400;
-
             POGridRefer.Columns[8].HeaderText = "Tax";
             POGridRefer.Columns[8].DataPropertyName = "tax";
             POGridRefer.Columns[8].DefaultCellStyle.Format = "0.00##";
             POGridRefer.Columns[8].Width = 200;
             POGridRefer.Columns[8].Visible = false;
+            POGridRefer.Columns[12].HeaderText = "SC";
+            POGridRefer.Columns[12].Name = "salesCode";
+            POGridRefer.Columns[12].DataPropertyName = "sc";
+            POGridRefer.Columns[12].Width = 200;
+            POGridRefer.Columns[13].Visible = false;
 
-            POGridRefer.Columns[9].HeaderText = "Disc.";
-            POGridRefer.Columns[9].Visible = false;
-            POGridRefer.Columns[9].DataPropertyName = "priceTier";
-            POGridRefer.Columns[9].Width = 200;
+            POGridRefer.Columns[6].HeaderText = "Qty";
+            POGridRefer.Columns[6].DataPropertyName = "quantity";
+            POGridRefer.Columns[6].Width = 200;
 
+            POGridRefer.Columns[7].HeaderText = "Description";
+            POGridRefer.Columns[7].DataPropertyName = "description";
+            POGridRefer.Columns[7].Width = 400;
+            
             POGridRefer.Columns[10].HeaderText = "Unit Price";
             POGridRefer.Columns[10].DataPropertyName = "unitPrice";
             POGridRefer.Columns[10].DefaultCellStyle.Format = "0.00##";
@@ -590,16 +589,12 @@ namespace MJC.forms.order
             POGridRefer.Columns[11].DefaultCellStyle.Format = "0.00##";
             POGridRefer.Columns[11].Width = 200;
 
-            POGridRefer.Columns[12].HeaderText = "SC";
-            POGridRefer.Columns[12].Name = "salesCode";
-            POGridRefer.Columns[12].DataPropertyName = "sc";
-            POGridRefer.Columns[12].Width = 200;
-            POGridRefer.Columns[13].Visible = false;
-
-            POGridRefer.Columns[6].HeaderText = "Price Tier";
+            POGridRefer.Columns[6].HeaderText = "Tier Code";
             POGridRefer.Columns[6].Name = "PriceTierCode";
             POGridRefer.Columns[6].DataPropertyName = "PriceTierCode";
             POGridRefer.Columns[6].Width = 200;
+            
+            POGridRefer.Columns[14].Visible = false;
 
             // DataGrid ComboBox column
             DataGridViewComboBoxColumn skuComboBox = new DataGridViewComboBoxColumn();
@@ -617,35 +612,39 @@ namespace MJC.forms.order
             POGridRefer.Columns.Add(skuComboBox);
             int columnIndex = POGridRefer.Columns.IndexOf(skuComboBox);
 
-            var taxed = new string[] { "Yes", "No" };
+            var taxed = TaxOptions.TaxData;
+            taxed[0].Selected = "No";
+
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
             comboBoxColumn.DataSource = taxed;
-            comboBoxColumn.HeaderText = "Inc. Tax";
             comboBoxColumn.Width = 100;
-            comboBoxColumn.Name = "tax";
-            //comboBoxColumn.DataPropertyName = "taxed";
-            //comboBoxColumn.ValueMember = "Id";
-            //comboBoxColumn.DisplayMember = "Name";
-            comboBoxColumn.DisplayIndex = 9;
-            comboBoxColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
+            comboBoxColumn.Name = "TaxString";
+            comboBoxColumn.HeaderText = "TaxString";
+            comboBoxColumn.DataPropertyName = "TaxString";
+            comboBoxColumn.ValueMember = "TaxString";
+            comboBoxColumn.DisplayMember = "TaxString";
+            comboBoxColumn.DisplayIndex = 14;
+
             POGridRefer.Columns.Add(comboBoxColumn);
+
+            int columnIndex2 = POGridRefer.Columns.IndexOf(comboBoxColumn);
 
             POGridRefer.CellValueChanged += PoGridRefer_CellValueChanged;
             POGridRefer.CellEndEdit += POGridRefer_CellEndEdit;
             POGridRefer.SelectionChanged += POGridRefer_SelectionChanged;
 
             InsertItem(null, null);
+
             POGridRefer.CurrentCell = POGridRefer.Rows[POGridRefer.Rows.Count - 1].Cells[12];
             //POGridRefer.Select();
             //POGridRefer.BeginEdit(true);
-
         }
 
+        
         private void POGridRefer_SelectionChanged(object? sender, EventArgs e)
         {
             if (POGridRefer.SelectedRows.Count == 0) return;
             
-
             var selectedRow = POGridRefer.SelectedRows[0];
             int selectedValue = int.Parse(selectedRow.Cells["skuId"].Value.ToString());
 
@@ -686,6 +685,8 @@ namespace MJC.forms.order
                 selectedRow.Cells["lineTotal"].Value = sku.Price * sku.Qty;
                 selectedRow.Cells["salesCode"].Value = sku.CostCode;
                 selectedRow.Cells["quantity"].Value = 1;
+                selectedRow.Cells["tax"].Value = true;
+                selectedRow.Cells["_taxString"].Value = "Yes";
 
                 this.skuId = skuId;
 
@@ -811,7 +812,8 @@ namespace MJC.forms.order
                 UnitPrice = sku.Price,
                 LineTotal = sku.Price * sku.Qty,
                 SC = sku.CostCode.ToString(),
-                Quantity = sku.Qty > 0 ? sku.Qty : 1
+                Quantity = sku.Qty > 0 ? sku.Qty : 1,
+                Tax = true
             });
 
             BindingList<OrderItem> dataList = new BindingList<OrderItem>(this.OrderItemData);
