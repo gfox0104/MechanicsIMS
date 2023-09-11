@@ -4,6 +4,8 @@ using MJC.forms.qbo;
 using MJC.qbo;
 using MJC.model;
 using Sentry;
+using System.Drawing.Printing;
+
 
 namespace MJC.forms
 {
@@ -23,7 +25,7 @@ namespace MJC.forms
         private FInputBox Fax = new FInputBox("Fax");
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
         private FCheckBox TrainingMode = new FCheckBox("Training Mode");
-        private FInputBox TargetPrinter = new FInputBox("Target Printer");
+        private FComboBox TargetPrinter = new FComboBox("Target Printer");
         private FInputBox ProcessingTax = new FInputBox("Processing Tax");
         private FInputBox businessDescription = new FInputBox("Description");
 
@@ -59,7 +61,7 @@ namespace MJC.forms
             Phone.GetTextBox().Text = SettingsModelObj.Settings.phone;
             Fax.GetTextBox().Text = SettingsModelObj.Settings.fax;
             FederalTax.GetTextBox().Text = SettingsModelObj.Settings.ein;
-            TargetPrinter.GetTextBox().Text = SettingsModelObj.Settings.targetPrinter;
+            TargetPrinter.GetComboBox().Text = SettingsModelObj.Settings.targetPrinter;
             TrainingMode.GetCheckBox().Checked = SettingsModelObj.Settings.trainingEnabled;
             ProcessingTax.GetTextBox().Text = SettingsModelObj.Settings.taxCodeId.GetValueOrDefault().ToString();
         }
@@ -102,7 +104,7 @@ namespace MJC.forms
             var ein = FederalTax.GetTextBox().Text;
             var taxCode = ProcessingTax.GetTextBox().Text;
             var training = TrainingMode.GetCheckBox().Checked;
-            var targetPrinter = TargetPrinter.GetTextBox().Text;
+            var targetPrinter = TargetPrinter.GetComboBox().Text;
             var authorizationCode = string.Empty;
             var refreshToken = string.Empty;
 
@@ -196,6 +198,35 @@ namespace MJC.forms
             FormComponents.Add(ProcessingTax);
 
             _addFormInputs(FormComponents, 30, 150, 500, 50);
+
+            initTargetPrinter();
+        }
+
+        private void initTargetPrinter()
+        {
+            for (int i = 0; i < System.Drawing.Printing.PrinterSettings.InstalledPrinters.Count; i++)
+            {
+                string printer = System.Drawing.Printing.PrinterSettings.InstalledPrinters[i];
+                TargetPrinter.GetComboBox().Items.Add(new FComboBoxItem(i, printer));
+            }
+
+        }
+        // Function to get printer status
+        private string GetPrinterStatusText(string status)
+        {
+            switch (status)
+            {
+                case "2":
+                    return "Ready";
+                case "3":
+                    return "Printing";
+                case "4":
+                    return "Paused";
+                case "5":
+                    return "Offline";
+                default:
+                    return "Unknown";
+            }
         }
     }
 }
