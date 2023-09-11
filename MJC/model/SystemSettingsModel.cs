@@ -57,7 +57,7 @@ namespace MJC.model
                     {
                         var taxCodeId = reader.GetValue(0) as int?;
                         var businessName = reader.GetString(1);
-                        var description = reader.GetValue(2);
+                        var description = reader.GetValue(2)?.ToString();
                         var address1 = reader.GetString(3);
                         var address2 = reader.GetString(4);
                         var city = reader.GetString(5);
@@ -92,7 +92,8 @@ namespace MJC.model
                             refreshToken = refreshToken,
                             businessFooter = invoiceFooter,
                             businessTermsOfService = invoiceTerms,
-                            printOption = invoiceTerms
+                            printOption = printOption,
+                            businessDescription = description
                         };
                     }
 
