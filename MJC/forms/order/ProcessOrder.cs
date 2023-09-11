@@ -568,11 +568,13 @@ namespace MJC.forms.order
             POGridRefer.Columns[7].HeaderText = "Description";
             POGridRefer.Columns[7].DataPropertyName = "description";
             POGridRefer.Columns[7].Width = 400;
+
             POGridRefer.Columns[8].HeaderText = "Tax";
             POGridRefer.Columns[8].DataPropertyName = "tax";
             POGridRefer.Columns[8].DefaultCellStyle.Format = "0.00##";
             POGridRefer.Columns[8].Width = 200;
-            
+            POGridRefer.Columns[8].Visible = false;
+
             POGridRefer.Columns[9].HeaderText = "Disc.";
             POGridRefer.Columns[9].Visible = false;
             POGridRefer.Columns[9].DataPropertyName = "priceTier";
@@ -587,6 +589,7 @@ namespace MJC.forms.order
             POGridRefer.Columns[11].DataPropertyName = "lineTotal";
             POGridRefer.Columns[11].DefaultCellStyle.Format = "0.00##";
             POGridRefer.Columns[11].Width = 200;
+
             POGridRefer.Columns[12].HeaderText = "SC";
             POGridRefer.Columns[12].Name = "salesCode";
             POGridRefer.Columns[12].DataPropertyName = "sc";
@@ -598,29 +601,39 @@ namespace MJC.forms.order
             POGridRefer.Columns[6].DataPropertyName = "PriceTierCode";
             POGridRefer.Columns[6].Width = 200;
 
-            
-
-
             // DataGrid ComboBox column
-            DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
-            comboBoxColumn.DataSource = SKUModelObj.SKUDataList;
-            comboBoxColumn.HeaderText = "SKU#";
-            comboBoxColumn.Width = 300;
-            comboBoxColumn.Name = "skuNumber";
-            comboBoxColumn.DataPropertyName = "skuId";
-            comboBoxColumn.ValueMember = "Id";
-            comboBoxColumn.DisplayMember = "Name";
-            comboBoxColumn.AutoComplete = true;
-
-            comboBoxColumn.DisplayIndex = 6;
-            comboBoxColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
+            DataGridViewComboBoxColumn skuComboBox = new DataGridViewComboBoxColumn();
+            skuComboBox.DataSource = SKUModelObj.SKUDataList;
+            skuComboBox.HeaderText = "SKU#";
+            skuComboBox.Width = 300;
+            skuComboBox.Name = "skuNumber";
+            skuComboBox.DataPropertyName = "skuId";
+            skuComboBox.ValueMember = "Id";
+            skuComboBox.DisplayMember = "Name";
+            skuComboBox.AutoComplete = true;
+            skuComboBox.DisplayIndex = 6;
+            skuComboBox.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
  
+            POGridRefer.Columns.Add(skuComboBox);
+            int columnIndex = POGridRefer.Columns.IndexOf(skuComboBox);
+
+            var taxed = new string[] { "Yes", "No" };
+            DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
+            comboBoxColumn.DataSource = taxed;
+            comboBoxColumn.HeaderText = "Inc. Tax";
+            comboBoxColumn.Width = 100;
+            comboBoxColumn.Name = "tax";
+            //comboBoxColumn.DataPropertyName = "taxed";
+            //comboBoxColumn.ValueMember = "Id";
+            //comboBoxColumn.DisplayMember = "Name";
+            comboBoxColumn.DisplayIndex = 9;
+            comboBoxColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.Nothing;
             POGridRefer.Columns.Add(comboBoxColumn);
-            int columnIndex = POGridRefer.Columns.IndexOf(comboBoxColumn);
 
             POGridRefer.CellValueChanged += PoGridRefer_CellValueChanged;
             POGridRefer.CellEndEdit += POGridRefer_CellEndEdit;
             POGridRefer.SelectionChanged += POGridRefer_SelectionChanged;
+
             InsertItem(null, null);
             POGridRefer.CurrentCell = POGridRefer.Rows[POGridRefer.Rows.Count - 1].Cells[12];
             //POGridRefer.Select();
