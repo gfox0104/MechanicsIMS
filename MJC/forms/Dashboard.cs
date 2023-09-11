@@ -79,6 +79,8 @@ namespace MJC.forms
 
             OpenQuickbooks.GetButton().Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             OpenQuickbooks.GetButton().Location = new System.Drawing.Point(this.Width - hkPicture.Image.Width - 30, hkPicture.Image.Height + 130);
+            OpenQuickbooks.GetButton().TabIndex = 6;
+
             this.Controls.Add(hkPicture);
         }
 
