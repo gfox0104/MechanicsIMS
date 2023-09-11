@@ -61,10 +61,13 @@ namespace MJC.model
                     command.Connection = connection;
                     command.CommandText = @"SELECT TOP 1 id from Orders ORDER BY id  DESC";
 
-                    var orderId = (int)command.ExecuteScalar();
+                    var id = 0;
+                    
+                    var value = command.ExecuteScalar();
+                    if (value != null) id = (int)value;
 
                     // no rows returned
-                    return orderId + 1;
+                    return id + 1;
                 }
             }
         }

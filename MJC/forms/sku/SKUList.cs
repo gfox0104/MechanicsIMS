@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MJC.forms.sales;
 using System.Data.SqlClient;
+using Sentry;
 
 namespace MJC.forms.sku
 {
@@ -95,16 +96,43 @@ namespace MJC.forms.sku
                             selectedSKUId = (int)row.Cells[0].Value;
                         }
                     }
-                    bool refreshData = SKUModelObj.DeleteSKU(selectedSKUId);
-                    if (refreshData)
+
+                    try
                     {
-                        LoadSKUList();
+                        bool refreshData = SKUModelObj.DeleteSKU(selectedSKUId);
+                        if (refreshData)
+                        {
+                            LoadSKUList();
+                        }
+                    }
+                    catch(Exception exc)
+                    {
+                        SentrySdk.CaptureException(exc);
+                        if (exc.Message.Contains("REFERENCE"))
+                        {
+                            ShowError("The SKU cannot be deleted because it is attached to an existing order.");
+                        }
+                        else
+                        {
+                            ShowError("There was a problem deleting the SKU.");
+                        }
                     }
                 }
             };
             hkSelects.GetButton().Click += (sender, e) =>
             {
-                updateSKU(sender, e);
+                try
+                {
+                    updateSKU(sender, e);
+                }
+                catch (Exception exc)
+                {
+                    SentrySdk.CaptureException(exc);
+                    if (exc.Message.Contains("KEY"))
+                    {
+                        ShowError("There was a problem updating the SKU.");
+                    }
+                }
             };
             hkCrossRefLookup.GetButton().Click += (sender, e) =>
             {
@@ -133,6 +161,7 @@ namespace MJC.forms.sku
                 _navigateToForm(sender, e, AllocationsModal);
                 this.Hide();
             };
+
             hkAdjustQty.GetButton().Click += (sender, e) =>
             {
                 int rowIndex = SKUGridRefer.SelectedRows[0].Index;
@@ -145,12 +174,14 @@ namespace MJC.forms.sku
                 this.Enabled = false;
                 AdjustQty AdjustQtyModal = new AdjustQty(skuId, skuName);
                 AdjustQtyModal.Show();
+
                 AdjustQtyModal.FormClosed += (ss, sargs) =>
                 {
                     this.Enabled = true;
                     this.LoadSKUList();
                 };
             };
+
             hkSKUHistory.GetButton().Click += (sender, e) =>
             {
                 this.SKUGridSelectedIndex = SKUGridRefer.SelectedRows[0].Index;
@@ -306,10 +337,13 @@ namespace MJC.forms.sku
                 SKUGridRefer.Columns[2].Width = 300;
                 SKUGridRefer.Columns[3].HeaderText = "Description";
                 SKUGridRefer.Columns[3].Width = 500;
-                SKUGridRefer.Columns[4].HeaderText = "Qty Avail";
+                SKUGridRefer.Columns[4].HeaderText = "Quantity";
                 SKUGridRefer.Columns[4].Width = 300;
-                SKUGridRefer.Columns[5].HeaderText = "Qty Tracking";
+                SKUGridRefer.Columns[5].HeaderText = "Available";
                 SKUGridRefer.Columns[5].Width = 300;
+                SKUGridRefer.Columns[6].HeaderText = "On Hand";
+                SKUGridRefer.Columns[6].Width = 300;
+
             }
 
             if (keepSelection)

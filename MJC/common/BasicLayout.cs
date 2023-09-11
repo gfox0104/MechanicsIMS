@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MJC.model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -36,6 +37,7 @@ namespace MJC.common
         private Label _projectVersion;
 
         private Label _formDescription;
+        private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
 
         public BasicLayout()
         {
@@ -44,16 +46,19 @@ namespace MJC.common
             this._initHeader("Form title");
             this._initFooter("Form Description");
         }
+
         public BasicLayout(string title, string formDescription) : base()
         {
             this._initLayout();
             this._initHeader(title);
             this._initFooter(formDescription);
         }
+
         protected void _initBasicSize()
         {
             this.Size = new System.Drawing.Size(_winHeight, _winWidth);
         }
+
         private void _initLayout()
         {
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(38)))), ((int)(((byte)(77)))), ((int)(((byte)(118)))));
@@ -64,7 +69,10 @@ namespace MJC.common
             this._initBasicSize();
             this.Size = new System.Drawing.Size(_winHeight, _winWidth);
             this.WindowState = FormWindowState.Maximized;
+
+            SettingsModelObj.LoadSettings();
         }
+
         private void _initHeader(string title)
         {
             //header panel
@@ -106,7 +114,7 @@ namespace MJC.common
             this._companyName.BackColor = System.Drawing.Color.Transparent;
             this._companyName.Font = this._fontPoint4_1;
             this._companyName.ForeColor = this._textMainColor;
-            this._companyName.Text = "Marietta Joint && Clutch";
+            this._companyName.Text = !string.IsNullOrEmpty(SettingsModelObj.Settings.businessName) ? SettingsModelObj.Settings.businessName : "DEFAULT COMPANY NAME";
             this._companyName.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this._header.Controls.Add(this._companyName);
             this._companyName.Location = new System.Drawing.Point(this.Width - this._companyName.Width - 30, 15);

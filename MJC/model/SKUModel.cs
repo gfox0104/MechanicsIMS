@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using Antlr4.Runtime.Tree;
+using MJC.common;
 using MJC.config;
 
 namespace MJC.model
@@ -15,17 +16,19 @@ namespace MJC.model
         public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
-        public int QtyAvail { get; set; }
-        public int QtyTracking { get; set; }
+        public int Quantity { get; set; }
+        public int QuantityAvailable { get; set; }
+        public int QuantityOnHand { get; set; }
 
-        public SKUDetail(int id, string name, string category, string description, int qtyAvail, int qtyTracking)
+        public SKUDetail(int id, string name, string category, string description, int quantity, int quantityAvailable, int quantityOnHand)
         {
             Id = id;
             Name = name;
             Category = category;
             Description = description;
-            QtyAvail = qtyAvail;
-            QtyTracking = qtyTracking;
+            QuantityAvailable = quantityAvailable;
+            Quantity = quantity;
+            QuantityOnHand = quantityOnHand;
         }
     }
 
@@ -196,14 +199,14 @@ namespace MJC.model
                     command.Connection = connection;
                     SqlDataReader reader;
 
-                    command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, qtyAvailable, qtyReorder
+                    command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, quantity, qtyAvailable, qtyAllocated
                                             from dbo.SKU as S_Table inner join dbo.Categories C_Table on category = C_Table.id";
 
                     if (archived) command.CommandText += " where S_Table.archived = 1";
 
                     if (filter != "")
                     {
-                        command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, qtyAvailable, qtyReorder
+                        command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, quantity, qtyAvailable, qtyAllocated
                                                 from dbo.SKU as S_Table
                                                 inner join dbo.Categories C_Table on category = C_Table.id 
                                                 where S_Table.description like @filter 
@@ -219,10 +222,11 @@ namespace MJC.model
                         string name = reader[1].ToString();
                         string desc = reader[2].ToString();
                         string category = reader[3].ToString();
-                        int price = (int)reader[4];
-                        int stock = (int)reader[5];
+                        int quantity = (int)reader[4];
+                        int quantityAvailable = (int)reader[5];
+                        int quantityAllocated = (int)reader[6];
 
-                        SKUDetail skuItem = new SKUDetail(id, name, desc, category, price, stock);
+                        SKUDetail skuItem = new SKUDetail(id, name, desc, category, quantity, quantityAvailable, quantityAllocated);
                         SKUDataList.Add(skuItem);
                     }
                     reader.Close();
@@ -400,7 +404,7 @@ namespace MJC.model
                         if (!SKUPricesModelObj.UpdateSKUPrice(id, key, value, active, createdBy, updatedBy)) SKUPricesModelObj.AddSKUPrice(id, key, value);
                     }
 
-                    MessageBox.Show("The SKU updated successfully.");
+                    Messages.ShowInformation("The SKU updated successfully.");
                 }
 
                 return true;
@@ -462,7 +466,7 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("The SKU was deleted.");
+                    Messages.ShowInformation("The SKU was deleted.");
                 }
 
                 return true;
@@ -531,8 +535,7 @@ namespace MJC.model
                 }
             }
         }
-
-        public bool UpdateQuantity(int quantity, int id)
+        public int GetQuantityAvailable(int id)
         {
             using (var connection = GetConnection())
             {
@@ -541,7 +544,56 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"UPDATE dbo.SKU SET quantity = @Value1 WHERE id = @Value2";
+                    command.CommandText = @"select qtyAvailable from dbo.SKU where id = @id";
+                    command.Parameters.AddWithValue("@id", id);
+
+                    // Execute the command and retrieve the quantity value.
+                    object result = command.ExecuteScalar();
+
+                    // Convert the result to an int before returning it.
+                    if (result == null || result == DBNull.Value)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return Convert.ToInt32(result);
+                    }
+                }
+            }
+        }
+
+        public bool UpdateQuantity(int quantity, int availableQuantity, int id)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = @"UPDATE dbo.SKU SET quantity = @Value1, qtyAvailable = @Value3 WHERE id = @Value2";
+                    command.Parameters.AddWithValue("@Value1", quantity);
+                    command.Parameters.AddWithValue("@Value2", id);
+                    command.Parameters.AddWithValue("@Value3", availableQuantity);
+
+                    command.ExecuteNonQuery();
+                }
+
+                return true;
+            }
+        }
+
+        public bool UpdateQuantityAvailable(int quantity, int id)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = @"UPDATE dbo.SKU SET qtyAvailable = @Value1 WHERE id = @Value2";
                     command.Parameters.AddWithValue("@Value1", quantity);
                     command.Parameters.AddWithValue("@Value2", id);
 
@@ -594,7 +646,7 @@ namespace MJC.model
                     SqlDataAdapter sda;
                     DataSet ds;
 
-                    command.CommandText = @"SELECT customerName, tblSKU.* FROM Customers RIGHT JOIN (SELECT SKUPrices.price, tblOrder.* FROM SKUPrices RIGHT JOIN (SELECT invoiceDate, customerId, invoiceNumber, tblOrderItem.* FROM Orders RIGHT JOIN (SELECT OrderItems.quantity, orderId, OrderItems.skuId, tblSKU.sku FROM OrderItems INNER JOIN (SELECT * FROM SKU WHERE id = @Value1) AS tblSKU ON tblSKU.id = OrderItems.skuId) AS tblOrderItem ON tblOrderItem.orderId = Orders.id) AS tblOrder ON tblOrder.skuId = SKUPrices.skuId) AS tblSKU ON tblSKU.customerId = Customers.id";
+                    command.CommandText = @"SELECT displayName, tblSKU.* FROM Customers RIGHT JOIN (SELECT SKUPrices.price, tblOrder.* FROM SKUPrices RIGHT JOIN (SELECT invoiceDate, customerId, invoiceNumber, tblOrderItem.* FROM Orders RIGHT JOIN (SELECT OrderItems.quantity, orderId, OrderItems.skuId, tblSKU.sku FROM OrderItems INNER JOIN (SELECT * FROM SKU WHERE id = @Value1) AS tblSKU ON tblSKU.id = OrderItems.skuId) AS tblOrderItem ON tblOrderItem.orderId = Orders.id) AS tblOrder ON tblOrder.skuId = SKUPrices.skuId) AS tblSKU ON tblSKU.customerId = Customers.id";
                     command.Parameters.AddWithValue("@Value1", skuId);
 
                     sda = new SqlDataAdapter(command);
@@ -606,7 +658,7 @@ namespace MJC.model
                         DateTime? invoiceDate = null;
                         if (!row.IsNull("invoiceDate"))
                             invoiceDate = row.Field<DateTime>("invoiceDate");
-                        string customerName = row["customerName"].ToString();
+                        string customerName = row["displayName"].ToString();
                         string invoiceNumber = row["invoiceNumber"].ToString();
                         int? qty = null;
                         if (!row.IsNull("quantity"))
@@ -1020,7 +1072,7 @@ namespace MJC.model
                     int qtyAvailable = int.Parse(row["qtyAvailable"].ToString());
                     int qtyRecorder = int.Parse(row["qtyReorder"].ToString());
 
-                    SKUDetail skuDetail = new SKUDetail { Id = skuId,Name = skuName, Category = categoryName, Description = description, QtyAvail = qtyAvailable, QtyTracking = qtyRecorder};
+                    SKUDetail skuDetail = new SKUDetail { Id = skuId,Name = skuName, Category = categoryName, Description = description, QuantityOnHand = qtyRecorder};
 
                     return skuDetail;
                 }

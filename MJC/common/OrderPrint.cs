@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Tree;
 using MJC.model;
 using Newtonsoft.Json.Linq;
+using Sentry;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,6 +37,8 @@ namespace MJC.common
         private List<PrintOrderItemInfo> printOrderItemInfoList = new List<PrintOrderItemInfo>();
         private PrintInvoiceModel printInvoiceModelObj = new PrintInvoiceModel();
         private int orderStatus = 0;
+
+        private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
 
         public OrderPrint(int orderId, int orderStatus)
         {
@@ -184,7 +187,7 @@ namespace MJC.common
                     int titleX = 250;
                     int titleY = iTopMargin;
 
-                    string title = "Marietta Joint & Clutch";
+                    string title = SettingsModelObj.Settings.businessName;
 
                     e.Graphics.DrawString(title,
                                     _fontInvoice, Brushes.Black,
@@ -193,7 +196,7 @@ namespace MJC.common
                     titleHeight = (int)e.Graphics.MeasureString(title, _fontInvoice, 320).Height;
 
                     
-                    string address = "18594 SR7, MARIETTA, OH, 45750 (740) 376-9977, FAX(740) 376--9975";
+                    string address = $"{SettingsModelObj.Settings.address1} {SettingsModelObj.Settings.address2}, {SettingsModelObj.Settings.city}, {SettingsModelObj.Settings.state}, {SettingsModelObj.Settings.postalCode} {SettingsModelObj.Settings.phone}, FAX {SettingsModelObj.Settings.fax}";
                     int addressX = 250;
                     int addressY = iTopMargin + titleHeight - 13;
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -281,7 +284,6 @@ namespace MJC.common
 
                     string soldToInfo = printSoldToInfo.customerName + "\n" + printSoldToInfo.address1 + "\n" + printSoldToInfo.address2 + " \n" + printSoldToInfo.city + " " + printSoldToInfo.state + " " + printSoldToInfo.zipcode + " \n" + printSoldToInfo.businessPhone;
 
-                    //string soldToInfo = "HI-VAC CORPORATION \n117 INDUSTRY RD \nFAX # 740-374-2737 \nMARIETTA OH 45750 \n(740) 374-2306";
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
                     int soldToContentX = iLeftMargin + soldToWidth + 16;
                     int soldToContentY = iTopMargin + titleHeight + addressHeight - 13 + 2;
@@ -304,7 +306,7 @@ namespace MJC.common
                                 14, soldToHeight), strFormat);
 
                     string shipToInfo = printShipToInfo.name + "\n" + printShipToInfo.address1 + "\n" + printShipToInfo.address2 + " \n" + printShipToInfo.city + " " + printShipToInfo.state + " " + printShipToInfo.zipcode + " \n" + printShipToInfo.businessPhone;
-                    //string shipToInfo = "HI-VAC CORPORATION \n117 INDUSTRY RD \nFAX # 740-374-2737 \nMARIETTA OH 45750 \n(740) 374-2306";
+
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
                     int shipToContentX = 450 + shipToWidth + 16;
                     int shipToContentY = iTopMargin + titleHeight + addressHeight - 13 + 2;
@@ -692,8 +694,15 @@ namespace MJC.common
             }
             catch (Exception exc)
             {
-                MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK,
-                   MessageBoxIcon.Error);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+                else
+                {
+                    Messages.ShowError(exc.Message);
+                }
             }
         }
 
@@ -713,9 +722,17 @@ namespace MJC.common
                 bFirstPage = true;
                 bNewPage = true;
             }
-            catch (Exception ex)
+            catch (Exception exc)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+                else
+                {
+                    Messages.ShowError(exc.Message);
+                } 
             }
         }
     }

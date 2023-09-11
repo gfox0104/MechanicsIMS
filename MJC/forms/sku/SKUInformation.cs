@@ -232,12 +232,21 @@ namespace MJC.forms.sku
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(quantityTracking);
             FormComponents2.Add(quantity);
+
+            qtyAllocated.GetTextBox().Enabled = false;
+            qtyAvaiable.GetTextBox().Enabled = false;
+
             FormComponents2.Add(qtyAllocated);
             FormComponents2.Add(qtyAvaiable);
+
             FormComponents2.Add(criticalQty);
             FormComponents2.Add(recorderQty);
 
             FormComponents2.Add(sales);
+
+            soldThisMonth.GetTextBox().Enabled = false;
+            soldYTD.GetTextBox().Enabled = false;
+
             FormComponents2.Add(soldThisMonth);
             FormComponents2.Add(soldYTD);
 
@@ -258,6 +267,7 @@ namespace MJC.forms.sku
             recorderQty.GetTextBox().KeyPress += KeyValidateNumber;
             soldThisMonth.GetTextBox().KeyPress += KeyValidateNumber;
             soldYTD.GetTextBox().KeyPress += KeyValidateNumber;
+ 
 
             string filter = "";
             var refreshData = PriceTiersModelObj.LoadPriceTierData(filter);
@@ -319,7 +329,7 @@ namespace MJC.forms.sku
             {
                 for (int i = 0; i < priceTiers.Length; i++)
                     if (priceTiers[i].GetId() == pair.Key)
-                        priceTiers[i].GetTextBox().Text = pair.Value.ToString();
+                        priceTiers[i].GetTextBox().Text = pair.Value.ToString("#0.00");
             }
         }
 
@@ -356,13 +366,13 @@ namespace MJC.forms.sku
             string s_sku_name = SKUName.GetTextBox().Text;
             if (string.IsNullOrWhiteSpace(s_sku_name))
             {
-                MessageBox.Show("please enter SKU Name");
+                Messages.ShowError("Please enter a SKU Name.");
                 this.SKUName.GetTextBox().Select();
                 return;
             }
             if (categoryCombo.GetComboBox().SelectedItem == null)
             {
-                MessageBox.Show("please select a category");
+                Messages.ShowError("Please select a category.");
                 return;
             }
             FComboBoxItem seletedItem = (FComboBoxItem)categoryCombo.GetComboBox().SelectedItem;
@@ -448,7 +458,7 @@ namespace MJC.forms.sku
         {
             if (e.KeyCode == Keys.Escape)
             {
-                DialogResult result = MessageBox.Show("Do you want to save?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
                 if (result == DialogResult.Yes)
                 {

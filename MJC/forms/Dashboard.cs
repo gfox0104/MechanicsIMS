@@ -16,7 +16,7 @@ namespace MJC.forms
 {
     public partial class Dashboard : GlobalLayout
     {
-        private HotkeyButton hkCloseProgramButton = new HotkeyButton("Esc", "Close Program", Keys.Escape);
+        private HotkeyButton hkCloseProgramButton = new HotkeyButton("Esc", "Logout", Keys.Escape);
         private HotkeyButton hkOpenSelection = new HotkeyButton("Enter", "Open Selection", Keys.Enter);
 
         private NavigationButton OrderEntry = new NavigationButton("Order Entry", new OrderEntry());
@@ -59,18 +59,14 @@ namespace MJC.forms
             this.Controls.Add(hkPicture);
         }
 
-        private void Dashboard_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            //if (MessageBox.Show("Are you sure you want to exit the application?", "Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            //{ 
-            //    Application.Exit();
-                System.Diagnostics.Process.GetCurrentProcess().Kill();
-            //}
-        }
-
         private void Dashboard_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void Dashboard_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
         }
     }
 }

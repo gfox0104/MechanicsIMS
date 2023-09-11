@@ -28,6 +28,7 @@
     <PackageReference Include="C1.AdoNet.QuickBooksOnline" Version="1.0.20232.158" />
     <PackageReference Include="IppDotNetSdkForQuickBooksApiV3" Version="14.6.3.6" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1988-prerelease" />
+    <PackageReference Include="Sentry" Version="3.39.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
