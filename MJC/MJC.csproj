@@ -15,12 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Resources\**" />
-    <EmbeddedResource Remove="Resources\**" />
-    <None Remove="Resources\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="imgs\icon.ico" />
   </ItemGroup>
 
@@ -61,6 +55,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>
