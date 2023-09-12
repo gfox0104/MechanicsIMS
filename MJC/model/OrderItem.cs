@@ -158,7 +158,7 @@ namespace MJC.model
             }
         }
 
-        public string TaxString { get { return "Yes"; } } 
+        public string _TaxString { get { return "Yes"; } } 
 
         public event PropertyChangedEventHandler PropertyChanged;
 

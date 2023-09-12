@@ -573,7 +573,7 @@ namespace MJC.forms.order
 
             POGridRefer.Columns[6].HeaderText = "Qty";
             POGridRefer.Columns[6].DataPropertyName = "quantity";
-            POGridRefer.Columns[6].Width = 200;
+            POGridRefer.Columns[6].Width = 300;
 
             POGridRefer.Columns[7].HeaderText = "Description";
             POGridRefer.Columns[7].DataPropertyName = "description";
@@ -618,12 +618,13 @@ namespace MJC.forms.order
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
             comboBoxColumn.DataSource = taxed;
             comboBoxColumn.Width = 100;
-            comboBoxColumn.Name = "TaxString";
-            comboBoxColumn.HeaderText = "TaxString";
-            comboBoxColumn.DataPropertyName = "TaxString";
-            comboBoxColumn.ValueMember = "TaxString";
-            comboBoxColumn.DisplayMember = "TaxString";
-            comboBoxColumn.DisplayIndex = 14;
+            comboBoxColumn.Name = "_TaxString";
+            comboBoxColumn.HeaderText = "Tax";
+            comboBoxColumn.DataPropertyName = "Name";
+            comboBoxColumn.ValueMember = "Name";
+            comboBoxColumn.DisplayMember = "Name";
+            comboBoxColumn.DisplayIndex = 9;
+            comboBoxColumn.DisplayStyle = DataGridViewComboBoxDisplayStyle.DropDownButton;
 
             POGridRefer.Columns.Add(comboBoxColumn);
 
@@ -661,8 +662,16 @@ namespace MJC.forms.order
 
         private void PoGridRefer_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            // Quantity changed
-            if(e.ColumnIndex == 6)
+            // 
+            if (e.ColumnIndex == 15)
+            {
+                DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                var value = comboBoxCell.Value?.ToString();
+
+            }
+            // Quantity Changed
+            else
+            if (e.ColumnIndex == 6)
             {
                 PopulateInformationField();
             }
