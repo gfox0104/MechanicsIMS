@@ -272,12 +272,12 @@ namespace MJC.forms.order
             {
                 if (POGridRefer.RowCount > 0)
                 {
-                    SKUInformation detailModal = new SKUInformation();
+                    SKUInformation detailModal = new SKUInformation(true);
 
                     int rowIndex = POGridRefer.SelectedRows[0].Index;
 
                     DataGridViewRow row = POGridRefer.Rows[rowIndex];
-                    int skuId = (int)row.Cells[2].Value;
+                    int skuId = (int)row.Cells[3].Value;
                     List<dynamic> skuData = new List<dynamic>();
                     skuData = SKUModelObj.GetSKUData(skuId);
                     detailModal.setDetails(skuData, skuData[0].id);
