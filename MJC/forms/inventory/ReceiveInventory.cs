@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MJC.forms.price;
 
 namespace MJC.forms.inventory
 {
@@ -28,10 +29,13 @@ namespace MJC.forms.inventory
         private FGroupLabel PriceGroup = new FGroupLabel("Price");
         private FInputBox NewCost = new FInputBox("Cost:");
         private FlabelConstant LastCost = new FlabelConstant("Last Cost:");
+        private FInputBox[] priceTiers;
+
         private int skuId = 0;
 
         SKUModel SkuModelObj = new SKUModel();
         PriceTiersModel PriceTierModelObj = new PriceTiersModel();
+        SKUPricesModel SkuPriceTierModelObj = new SKUPricesModel();
 
         public ReceiveInventory() : base("Recieve Inventory", "Fill out to receive inventory")
         {
@@ -106,13 +110,12 @@ namespace MJC.forms.inventory
             {
                 List<PriceTierData> PriceTierDataList = PriceTierModelObj.PriceTierDataList;
                 int index = 0;
-                foreach (var priceTier in PriceTierDataList)
+
+                priceTiers = new FInputBox[PriceTierDataList.Count];
+                for (int i = 0; i < PriceTierDataList.Count; i++)
                 {
-                    string labelName = "Price Tier" + (index + 1).ToString() + ":";
-                    FlabelConstant PriceTierLabel = new FlabelConstant(labelName);
-                    PriceTierLabel.SetContext(priceTier.Name);
-                    FormComponents2.Add(PriceTierLabel);
-                    index += 1;
+                    priceTiers[i] = new FInputBox(PriceTierDataList[i].Name.ToString(), 200, PriceTierDataList[i].Id);
+                    FormComponents2.Add(priceTiers[i]);
                 }
             }
 
@@ -161,10 +164,18 @@ namespace MJC.forms.inventory
             int totalQty = int.Parse(NewQtyOnHand.GetConstant().Text);
             double cost = double.Parse(NewCost.GetTextBox().Text);
             DateTime costDate = DateTime.Now;
+            Dictionary<int, double> priceTierDict = new Dictionary<int, double>();
+
+            for (int i = 0; i < priceTiers.Length; i++)
+            {
+                double priceData; bool parse_succeed = double.TryParse(priceTiers[i].GetTextBox().Text, out priceData);
+                if (parse_succeed) priceTierDict.Add(priceTiers[i].GetId(), priceData);
+            }
+
             int createdBy = 1;
             int updatedBy = 1;
 
-            var refreshData = SkuModelObj.InsertSKUCostQty(active, skuId, costDate, qty, cost, createdBy, updatedBy);
+            var refreshData = SkuModelObj.InsertSKUCostQty(active, skuId, costDate, qty, cost, priceTierDict, createdBy, updatedBy);
 
             refreshData = SkuModelObj.UpdateSKUQty(totalQty, skuId);
         }
@@ -189,6 +200,21 @@ namespace MJC.forms.inventory
                 if (skuInfo.cost != null)
                     LastCost.SetContext(skuInfo.cost.ToString());
                 else LastCost.SetContext("N/A");
+
+                List<KeyValuePair<int, double>> skuPriceData = new List<KeyValuePair<int, double>>();
+                skuPriceData = SkuPriceTierModelObj.LoadPriceTierDataBySKUId(skuId);
+
+
+                for (int i = 0; i < priceTiers.Length; i++)
+                {
+                    priceTiers[i].GetTextBox().Text = "0.00";
+                }
+                foreach (KeyValuePair<int, double> pair in skuPriceData)
+                {
+                    for (int i = 0; i < priceTiers.Length; i++)
+                        if (priceTiers[i].GetId() == pair.Key)
+                            priceTiers[i].GetTextBox().Text = pair.Value.ToString("#0.00");
+                }
             }
             else
             {
