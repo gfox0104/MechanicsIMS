@@ -99,6 +99,7 @@ namespace MJC.model
                 OnPropertyChanged();
             }
         }
+
         public bool? Tax
         {
             get => _tax;
@@ -157,6 +158,7 @@ namespace MJC.model
             }
         }
 
+        public string _TaxString { get { return "Yes"; } } 
 
         public event PropertyChangedEventHandler PropertyChanged;
 

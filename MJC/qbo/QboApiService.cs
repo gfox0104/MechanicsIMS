@@ -45,6 +45,8 @@ namespace MJC.qbo
                 {
                     ReadCommentHandling = JsonCommentHandling.Skip
                 }) ?? new();
+
+                // TODO: Push and pull this from the settings model 
                 this.accessToken = Tokens.AccessToken;
                 this.realmId = long.Parse(Tokens.RealmId);
             }
@@ -52,6 +54,10 @@ namespace MJC.qbo
             {
                 throw new Exception("TOKENS");
             }
+        }
+
+        public void RefreshToken()
+        {
         }
 
         async public void CreateAccounting(string accountName, string acctNum, AccountTypeEnum acctType, string subAcctType)

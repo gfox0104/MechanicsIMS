@@ -44,7 +44,7 @@ namespace MJC
 
             Login login = new Login();
             Application.Run(login);
-        }
+       }
 
         private static void ShowSplash()
         {
