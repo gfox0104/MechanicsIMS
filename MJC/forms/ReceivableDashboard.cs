@@ -45,6 +45,8 @@ namespace MJC.forms
 
             NavigationButton[] navButtons = new NavigationButton[9] { CustomerList, ReceivePayment, Invoices, PricerTiers, SalesCostCodes, SalesTaxCode, CreditCodes, CustomerProfiler, Reconcilliation };
             _initiallizeNavButtons(navButtons);
+
+            if (!Program.permissionReceivables) _disableNavButtons(navButtons);
         }
 
         private void AddHKEvents()

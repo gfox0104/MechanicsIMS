@@ -186,5 +186,54 @@ namespace MJC.model
                 return false;
             }
         }
+
+        public UserData getUserDataById(string userName)
+        {
+            UserData userData = new UserData();
+
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    SqlDataReader reader;
+
+                    command.CommandText = @"SELECT id, 
+                                           username, 
+                                           password, 
+                                           permissionOrders, 
+                                           permissionInventory, 
+                                           permissionReceivables, 
+                                           permissionSettings, 
+                                           permissionUsers, 
+                                           permissionQuickbooks
+                                  FROM Accounts WHERE userName = @userName";
+                    command.Parameters.AddWithValue("@userName", userName);
+
+                    reader = command.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        userData = new UserData(
+                            Convert.ToInt32(reader["id"]),
+                            reader["username"].ToString(),
+                            reader["password"].ToString(),
+                            Convert.ToBoolean(reader["permissionOrders"]),
+                            Convert.ToBoolean(reader["permissionInventory"]),
+                            Convert.ToBoolean(reader["permissionReceivables"]),
+                            Convert.ToBoolean(reader["permissionSettings"]),
+                            Convert.ToBoolean(reader["permissionUsers"]),
+                            Convert.ToBoolean(reader["permissionQuickbooks"])
+                        );
+                    }
+                    reader.Close();
+                }
+            }
+
+            return userData;
+        }
+
     }
+
 }
