@@ -14,6 +14,7 @@ using System.Configuration;
 using MJC.forms.vendor;
 using MJC.forms.sku.skuQuantityDiscount;
 using MJC.forms.sales;
+using Sentry.Extensibility;
 
 namespace MJC.forms.sku
 {
@@ -70,13 +71,15 @@ namespace MJC.forms.sku
         private int selectedCategoryId = 0;
         private int skuId = 0;
         private string memo = "";
+        private bool disabled = false;
 
-        public SKUInformation() : base("SKU Information", "Manage details of SKU")
+        public SKUInformation(bool disabled = false) : base("SKU Information", "Manage details of SKU")
         {
             this.Text = "Sku detail";
             InitializeComponent();
             _initBasicSize();
             this.KeyDown += (s, e) => Form_KeyDown(s, e);
+            this.disabled = disabled;
 
             HotkeyButton[] hkButtons = new HotkeyButton[5] { hkSKUMemo, hkQuickCalcPrice, hkMiscManagement, hkResetPrices, hkSetArchived };
             _initializeHKButtons(hkButtons, false);
@@ -228,7 +231,7 @@ namespace MJC.forms.sku
             FormComponents.Add(manufacturer);
             FormComponents.Add(location);
             _addFormInputs(FormComponents, 30, 20, 800, 50, 700, _panel.Controls);
-
+           
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(quantityTracking);
             FormComponents2.Add(quantity);
@@ -280,6 +283,40 @@ namespace MJC.forms.sku
                 {
                     priceTiers[i] = new FInputBox(pDatas[i].Name.ToString(), 200, pDatas[i].Id);
                     FormComponents2.Add(priceTiers[i]);
+                }
+            }
+
+            if (this.disabled)
+            {
+                SKUName.GetTextBox().Enabled = false;
+                categoryCombo.GetComboBox().Enabled = false;
+                description.GetTextBox().Enabled = false;
+                measurementUnit.GetTextBox().Enabled = false;
+                weight.GetTextBox().Enabled = false;
+                costCode.GetTextBox().Enabled = false;
+                assetAcct.GetTextBox().Enabled = false;
+                taxable.GetCheckBox().Enabled = false;
+                maintainQtys.GetCheckBox().Enabled = false;
+                allowDiscount.GetCheckBox().Enabled = false;
+                commissionable.GetCheckBox().Enabled = false;
+                orderForm.GetTextBox().Enabled = false;
+                lastSold.GetDateTimePicker().Enabled = false;
+                manufacturer.GetTextBox().Enabled = false;
+                location.GetTextBox().Enabled = false;
+                quantity.GetTextBox().Enabled = false;
+                qtyAllocated.GetTextBox().Enabled = false;
+                qtyAvaiable.GetTextBox().Enabled = false;
+                criticalQty.GetTextBox().Enabled = false;
+                recorderQty.GetTextBox().Enabled = false;
+                soldThisMonth.GetTextBox().Enabled = false;
+                soldYTD.GetTextBox().Enabled = false;
+                freezePrices.GetCheckBox().Enabled = false;
+                coreCost.GetTextBox().Enabled = false;
+                invValue.GetTextBox().Enabled = false;
+
+                for (int i = 0; i < priceTiers.Length; i++)
+                {
+                    priceTiers[i].GetTextBox().Enabled = false;
                 }
             }
 
