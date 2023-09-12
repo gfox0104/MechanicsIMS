@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Timers;
+using MJC.qbo;
 
 namespace MJC.forms
 {
@@ -40,6 +42,18 @@ namespace MJC.forms
             _initiallizeNavButtons(navButtons);
 
             SetImage();
+
+
+            var qboRefreshTimer = new System.Windows.Forms.Timer();
+            qboRefreshTimer.Tick += QboRefreshTimer_Tick;
+            qboRefreshTimer.Interval = 1000 * 60 * 30;
+            qboRefreshTimer.Start();
+        }
+
+        private void QboRefreshTimer_Tick(object? sender, EventArgs e)
+        {
+            QboApiService qbo = new QboApiService();
+            qbo.RefreshToken();
         }
 
         private void AddHKEvents()

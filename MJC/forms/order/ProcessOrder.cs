@@ -24,6 +24,7 @@ namespace MJC.forms.order
         private FComboBox Customer_ComBo = new FComboBox("Customer#:", 150);
         private FlabelConstant CustomerName = new FlabelConstant("Name:", 150);
         private FlabelConstant Terms = new FlabelConstant("Terms:", 150);
+        private FCheckBox ShipOrder = new FCheckBox("Ship Order");
         //private FlabelConstant Zone = new FlabelConstant("Zone", 150);
         // private FlabelConstant Position = new FlabelConstant("PO#:", 150);
 
@@ -314,6 +315,7 @@ namespace MJC.forms.order
             FormComponents.Add(Customer_ComBo);
             FormComponents.Add(CustomerName);
             FormComponents.Add(Terms);
+            FormComponents.Add(ShipOrder);
             //FormComponents.Add(Zone);
             // FormComponents.Add(Position);
             
