@@ -42,9 +42,11 @@ namespace MJC.forms
             _initiallizeNavButtons(navButtons);
 
             if (!Program.permissionOrders) _disableNavButtons(new NavigationButton[1] { OrderEntry});
-            if (!Program.permissionSetting) _disableNavButtons(new NavigationButton[1] { Users });
-            if (!Program.permissionUsers) _disableNavButtons(new NavigationButton[1] { SystemInformation });
-            //if (!Program.permissionQuickBooks) _disableNavButtons(new NavigationButton[1] { OpenQuickBooks });
+            if (!Program.permissionUsers) _disableNavButtons(new NavigationButton[1] { Users });
+            if (!Program.permissionInventory) _disableNavButtons(new NavigationButton[1] { Inventory });
+            if (!Program.permissionReceivables) _disableNavButtons(new NavigationButton[1] { Receivables });
+            if (!Program.permissionSetting) _disableNavButtons(new NavigationButton[1] { SystemInformation });
+            if (!Program.permissionQuickBooks) { OpenQuickbooks.GetButton().Enabled = false; }
 
             SetImage();
             SetLinkButtion();
