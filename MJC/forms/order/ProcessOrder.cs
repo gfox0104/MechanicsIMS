@@ -19,6 +19,8 @@ namespace MJC.forms.order
         private HotkeyButton hkSKUInfo = new HotkeyButton("F5", "SKU Info", Keys.F5);
         private HotkeyButton hkSortLines = new HotkeyButton("Alt+S", "Sort lines", Keys.S, "alt");
         private HotkeyButton hkCloseOrder = new HotkeyButton("ESC", "Close order", Keys.Escape);
+        private HotkeyButton hkShippingInformation = new HotkeyButton("F6", "Shipping Information", Keys.F6);
+        private FCheckBox ShipOrder = new FCheckBox("Ship Order");
 
         private FComboBox Customer_ComBo = new FComboBox("Customer#:", 150);
         private FlabelConstant CustomerName = new FlabelConstant("Name:", 150);
@@ -103,7 +105,7 @@ namespace MJC.forms.order
             }
 
             // HotkeyButton[] hkButtons = new HotkeyButton[9] { hkAdds, hkDeletes, hkEdit, hkSaveOrder, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
-            HotkeyButton[] hkButtons = new HotkeyButton[] { hkAdds, hkDeletes, hkEdit, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder };
+            HotkeyButton[] hkButtons = new HotkeyButton[] { hkAdds, hkDeletes, hkEdit, hkAddMessage, hkCustomerProfiler, hkSKUInfo, hkSortLines, hkCloseOrder, hkShippingInformation };
 
             _initializeHKButtons(hkButtons, false);
             AddHotKeyEvents();
@@ -307,6 +309,7 @@ namespace MJC.forms.order
             FormComponents.Add(Customer_ComBo);
             FormComponents.Add(CustomerName);
             FormComponents.Add(Terms);
+            FormComponents.Add(ShipOrder);
             //FormComponents.Add(Zone);
             // FormComponents.Add(Position);
 
