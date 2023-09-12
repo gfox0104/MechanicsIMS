@@ -42,6 +42,9 @@ namespace MJC.forms
 
             NavigationButton[] navButtons = new NavigationButton[7] { SKUList, Receive, Deplete, CategoryMargins, Vendors, RecorderReport, ModuleInformation };
             _initiallizeNavButtons(navButtons);
+
+            if (!Program.permissionInventory) _disableNavButtons(navButtons);
+
         }
 
         private void AddHKEvents()

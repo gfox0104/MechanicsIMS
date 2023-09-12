@@ -41,6 +41,11 @@ namespace MJC.forms
             NavigationButton[] navButtons = new NavigationButton[5] { OrderEntry, Inventory, Receivables, Users, SystemInformation };
             _initiallizeNavButtons(navButtons);
 
+            if (!Program.permissionOrders) _disableNavButtons(new NavigationButton[1] { OrderEntry});
+            if (!Program.permissionSetting) _disableNavButtons(new NavigationButton[1] { Users });
+            if (!Program.permissionUsers) _disableNavButtons(new NavigationButton[1] { SystemInformation });
+            //if (!Program.permissionQuickBooks) _disableNavButtons(new NavigationButton[1] { OpenQuickBooks });
+
             SetImage();
             SetLinkButtion();
         }

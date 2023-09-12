@@ -11,6 +11,14 @@ namespace MJC
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
+        /// 
+        public static bool permissionOrders { get; set; }
+        public static bool permissionInventory { get; set; }
+        public static bool permissionReceivables { get; set; }
+        public static bool permissionSetting { get; set; }
+        public static bool permissionUsers { get; set; }
+        public static bool permissionQuickBooks { get; set; }
+
         [STAThread]
         static void Main()
         {

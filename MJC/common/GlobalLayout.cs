@@ -118,6 +118,18 @@ namespace MJC.common
             }
         }
 
+        protected void _disableNavButtons(NavigationButton[] navButtons)
+        {
+            if (navButtons != null)
+            {
+                for (int i = 0; i < navButtons.Length; i++)
+                {
+                    navButtons[i].GetButton().Enabled = false;
+                    navButtons[i].GetButton().ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(124)))), ((int)(((byte)(138)))));
+                }
+            }
+        }
+
         protected void _hotkeyTest(object sender, EventArgs e)
         {
             MessageBox.Show($"Comming Soon.. Hotkey '{sender.ToString()}' clicked!");
