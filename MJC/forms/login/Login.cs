@@ -47,10 +47,18 @@ namespace MJC.forms.login
         {
             if (UserModelObj.Login(Username.GetTextBox().Text, Password.GetTextBox().Text))
             {
+                UserData UserData = UserModelObj.getUserDataById(Username.GetTextBox().Text);
+
+                Session.LoggedIn = true;
+                Program.permissionOrders = UserData.permissionOrders;
+                Program.permissionInventory = UserData.permissionInventory;
+                Program.permissionReceivables = UserData.permissionReceivables;
+                Program.permissionSetting = UserData.permissionSetting;
+                Program.permissionUsers = UserData.permissionUsers;
+                Program.permissionQuickBooks = UserData.permissionReceivables;
+
                 Dashboard dashboard = new Dashboard();
                 dashboard.Show();
-                
-                Session.LoggedIn = true;
 
                 this.Hide();
             }

@@ -26,6 +26,7 @@ namespace MJC.forms
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
         private FCheckBox TrainingMode = new FCheckBox("Training Mode");
         private FComboBox TargetPrinter = new FComboBox("Target Printer");
+        private FComboBox PrintOptions = new FComboBox("Print Options");
         private FComboBox ProcessingTax = new FComboBox("Processing Tax");
         private FInputBox businessDescription = new FInputBox("Description");
         private FInputBox invoiceFooter = new FInputBox("Invoice Footer");
@@ -92,6 +93,9 @@ namespace MJC.forms
 
             TargetPrinter.GetComboBox().Text = SettingsModelObj.Settings.targetPrinter;
             TargetPrinter.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
+
+            PrintOptions.GetComboBox().Text = SettingsModelObj.Settings.printOption;
+            PrintOptions.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
 
             var taxCodes = SalesTaxModelObj.SalesTaxCodeDataList.Select(x => x.name).ToArray();
             ProcessingTax.GetComboBox().Items.AddRange(taxCodes);
@@ -160,6 +164,7 @@ namespace MJC.forms
             var taxCode = ProcessingTax.GetComboBox().Text;
             var training = TrainingMode.GetCheckBox().Checked;
             var targetPrinter = TargetPrinter.GetComboBox().Text;
+            var printOption = PrintOptions.GetComboBox().Text;
             var footerText = invoiceFooter.GetTextBox().Text;
             var termsOfService = invoiceTermsOfService.GetTextBox().Text;
             var authorizationCode = string.Empty;
@@ -177,7 +182,7 @@ namespace MJC.forms
 
             try
             {
-                SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService);
+                SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService, printOption);
             }
             catch(Exception exception) 
             {
@@ -256,6 +261,7 @@ namespace MJC.forms
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(TrainingMode);
             FormComponents2.Add(TargetPrinter);
+            FormComponents2.Add(PrintOptions);
             FormComponents2.Add(ProcessingTax);
             FormComponents2.Add(invoiceFooter);
             FormComponents2.Add(invoiceTermsOfService);
@@ -263,6 +269,7 @@ namespace MJC.forms
             _addFormInputs(FormComponents2, 700, 20, 800, 50, int.MaxValue, _panel.Controls);
 
             initTargetPrinter();
+            initPrintOptions();
         }
 
         private void initTargetPrinter()
@@ -274,23 +281,11 @@ namespace MJC.forms
             }
 
         }
-
-        // Function to get printer status
-        private string GetPrinterStatusText(string status)
+        private void initPrintOptions()
         {
-            switch (status)
-            {
-                case "2":
-                    return "Ready";
-                case "3":
-                    return "Printing";
-                case "4":
-                    return "Paused";
-                case "5":
-                    return "Offline";
-                default:
-                    return "Unknown";
-            }
+            PrintOptions.GetComboBox().Items.Add(new FComboBoxItem(0, "Invoice"));
+            PrintOptions.GetComboBox().Items.Add(new FComboBoxItem(1, "Hold Order"));
+            PrintOptions.GetComboBox().Items.Add(new FComboBoxItem(2, "Quote"));
         }
 
         private void SystemSettings_Load(object sender, EventArgs e)

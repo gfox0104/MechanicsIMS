@@ -783,7 +783,7 @@ namespace MJC.model
         //    }
         //}
 
-        public bool InsertSKUCostQty(bool active, int skuId, DateTime costDate, int qty, double cost, int createdBy, int updatedBy)
+        public bool InsertSKUCostQty(bool active, int skuId, DateTime costDate, int qty, double cost, Dictionary<int, double> priceTierDict,  int createdBy, int updatedBy)
         {
             using (var connection = GetConnection())
             {
@@ -804,6 +804,14 @@ namespace MJC.model
                     command.ExecuteNonQuery();
 
                     MessageBox.Show("SKU Inventory updated successfully.");
+                }
+
+                foreach (KeyValuePair<int, double> pair in priceTierDict)
+                {
+                    int key = pair.Key;
+                    double value = pair.Value;
+
+                    if (!SKUPricesModelObj.UpdateSKUPrice(skuId, key, value, active, createdBy, updatedBy)) SKUPricesModelObj.AddSKUPrice(skuId, key, value);
                 }
 
                 return true;
