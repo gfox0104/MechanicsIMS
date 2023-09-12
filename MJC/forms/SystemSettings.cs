@@ -34,7 +34,9 @@ namespace MJC.forms
 
         private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
         private SalesTaxCodeModel SalesTaxModelObj = new SalesTaxCodeModel();
-        
+
+        private PictureBox RFPicture;
+
         public SystemSettings() : base("System Settings", "Manage system settings")
         {
             InitializeComponent();
@@ -267,6 +269,14 @@ namespace MJC.forms
             FormComponents2.Add(invoiceTermsOfService);
 
             _addFormInputs(FormComponents2, 700, 20, 800, 50, int.MaxValue, _panel.Controls);
+
+            RFPicture = new PictureBox();
+            RFPicture.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            RFPicture.Image = global::MJC.Properties.Resources.hotkeyview;
+            RFPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            RFPicture.TabStop = false;
+            RFPicture.Location = new System.Drawing.Point(TargetPrinter.GetComboBox().Location.X + TargetPrinter.GetComboBox().Width + 30, TargetPrinter.GetComboBox().Location.Y);
+            _panel.Controls.Add(RFPicture);
 
             initTargetPrinter();
             initPrintOptions();
