@@ -127,6 +127,14 @@ namespace MJC.model
         }
     }
 
+    public struct SKUTax
+    {
+        public bool Value { get; set; }
+        public string DisplayName { get; set; }
+
+        public SKUTax(bool value, string displayName) { Value = value; DisplayName = displayName; }
+    }
+
     public class SKUModel : DbConnection
     {
 
