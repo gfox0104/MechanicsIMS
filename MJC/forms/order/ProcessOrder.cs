@@ -495,11 +495,19 @@ namespace MJC.forms.order
             var qtyInfo = SKUModelObj.LoadSkuQty(skuId);
 
             SKUOrderItem sku = this.SubSkuList.FirstOrDefault(x => x.Id == skuId);
-
+            
+            SalesTaxCodeModel salesTaxCodeModel = new SalesTaxCodeModel();
+            salesTaxCodeModel.LoadSalesTaxCodeData("");
+             
             var items = PriceTiersModelObj.GetPriceTierItems();
             var priceTierItem = items[sku.PriceTierId];
 
-            var taxRate = 7.25; // TODO: Get the actual tax rate for the SKU and Customer
+            var settings = new SystemSettingsModel();
+            settings.LoadSettings();
+
+            var taxCodeId = settings.Settings.taxCodeId.GetValueOrDefault(2);
+            var salesTaxCode = salesTaxCodeModel.GetSalesTaxCodeData(taxCodeId);
+            var taxRate = salesTaxCode.rate; // TODO: Get the actual tax rate for the SKU and Customer
 
             QtyOnHold.SetContext(qtyInfo.qty.ToString());
             QtyAllocated.SetContext(qtyInfo.qtyAllocated.ToString());

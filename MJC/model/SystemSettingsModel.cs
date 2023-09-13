@@ -49,7 +49,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter,printOption
+                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter
                                             from dbo.SystemSettings";
 
                     var reader = command.ExecuteReader();
