@@ -5,6 +5,9 @@ using MJC.qbo;
 using System.Windows.Forms;
 using System.Data;
 using System.Diagnostics.Metrics;
+using MJC.forms.creditcard;
+using MJC.forms.sku;
+using System;
 
 namespace MJC.forms.customer
 {
@@ -110,6 +113,13 @@ namespace MJC.forms.customer
                 };
 
             };
+            hkCreditCards.GetButton().Click += (sender, e) =>
+            {
+                CreditCards creditCardModel = new CreditCards(this.customerId);
+                _navigateToForm(sender, e, creditCardModel);
+                this.Hide();
+            };
+
         }
 
         private void InitMBOKButton()
