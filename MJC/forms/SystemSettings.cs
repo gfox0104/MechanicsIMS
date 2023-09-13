@@ -5,6 +5,7 @@ using MJC.qbo;
 using MJC.model;
 using Sentry;
 using System.Drawing.Printing;
+using System.Windows.Forms;
 
 
 namespace MJC.forms
@@ -26,7 +27,9 @@ namespace MJC.forms
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
         private FCheckBox TrainingMode = new FCheckBox("Training Mode");
         private FComboBox TargetPrinter = new FComboBox("Target Printer");
-        private FComboBox PrintOptions = new FComboBox("Print Options");
+        private FInputBox InvoicePrintQty = new FInputBox("Invoice Print Qty", 230);
+        private FInputBox HoldOrdersPrintQty = new FInputBox("Hold Orders Print Qty", 230);
+        private FInputBox QuotePrintQty = new FInputBox("Quote Print Qty", 230);
         private FComboBox ProcessingTax = new FComboBox("Processing Tax");
         private FInputBox businessDescription = new FInputBox("Description");
         private FInputBox invoiceFooter = new FInputBox("Invoice Footer");
@@ -34,7 +37,9 @@ namespace MJC.forms
 
         private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
         private SalesTaxCodeModel SalesTaxModelObj = new SalesTaxCodeModel();
-        
+
+        private PictureBox RFPicture;
+
         public SystemSettings() : base("System Settings", "Manage system settings")
         {
             InitializeComponent();
@@ -43,7 +48,7 @@ namespace MJC.forms
 
             this.KeyDown += (s, e) => Form_KeyDown(s, e);
             this.FormClosing += SystemSettings_FormClosing;
-            HotkeyButton[] hkButtons = new HotkeyButton[3] { hkPreviousScreen, hkOpenQuickBooks , hkSyncQuickBooks};
+            HotkeyButton[] hkButtons = new HotkeyButton[3] { hkPreviousScreen, hkOpenQuickBooks, hkSyncQuickBooks };
             _initializeHKButtons(hkButtons);
             InitInputBox();
 
@@ -94,23 +99,24 @@ namespace MJC.forms
             TargetPrinter.GetComboBox().Text = SettingsModelObj.Settings.targetPrinter;
             TargetPrinter.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
 
-            PrintOptions.GetComboBox().Text = SettingsModelObj.Settings.printOption;
-            PrintOptions.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
+            InvoicePrintQty.GetTextBox().Text = SettingsModelObj.Settings.invoicePrintQty.ToString();
+            HoldOrdersPrintQty.GetTextBox().Text = SettingsModelObj.Settings.holdOrderPrintQty.ToString();
+            QuotePrintQty.GetTextBox().Text = SettingsModelObj.Settings.quotePrintQty.ToString();
 
             var taxCodes = SalesTaxModelObj.SalesTaxCodeDataList.Select(x => x.name).ToArray();
             ProcessingTax.GetComboBox().Items.AddRange(taxCodes);
 
             var taxCodeId = SettingsModelObj.Settings.taxCodeId;
             // Default selection to 0 if possible
-            if(taxCodeId == 0)
+            if (taxCodeId == 0)
             {
-                if(taxCodes.Length > 0)
+                if (taxCodes.Length > 0)
                 {
                     ProcessingTax.GetComboBox().SelectedIndex = 0;
                 }
             }
 
-            for(int i = 0; i < taxCodes.Length; i++)
+            for (int i = 0; i < taxCodes.Length; i++)
             {
                 if (SalesTaxModelObj.SalesTaxCodeDataList[i].id == taxCodeId)
                 {
@@ -118,12 +124,45 @@ namespace MJC.forms
                     break;
                 }
             }
-            
+
 
             ProcessingTax.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
             ProcessingTax.GetComboBox().AutoCompleteMode = AutoCompleteMode.Suggest;
+
+            InvoicePrintQty.GetTextBox().LostFocus += InvoicePrintQty_LostFocus;
+            HoldOrdersPrintQty.GetTextBox().LostFocus += HoldOrdersPrintQty_LostFocus;
+            QuotePrintQty.GetTextBox().LostFocus += QuotePrintQty_LostFocus;
         }
 
+        private void InvoicePrintQty_LostFocus(object sender, EventArgs e)
+        {
+            if (!int.TryParse(InvoicePrintQty.GetTextBox().Text, out int invoicePrintQty))
+            {
+                Messages.ShowError("Please enter a valid InvoicePrintQty.");
+                InvoicePrintQty.GetTextBox().Select();
+                return;
+            }
+        }
+
+        private void HoldOrdersPrintQty_LostFocus(object sender, EventArgs e)
+        {
+            if (!int.TryParse(HoldOrdersPrintQty.GetTextBox().Text, out int holdOrderPrintQty))
+            {
+                Messages.ShowError("Please enter a valid HoldOrdersPrintQty.");
+                HoldOrdersPrintQty.GetTextBox().Select();
+                return;
+            }
+        }
+
+        private void QuotePrintQty_LostFocus(object sender, EventArgs e)
+        {
+            if (!int.TryParse(InvoicePrintQty.GetTextBox().Text, out int quotePrintQty))
+            {
+                Messages.ShowError("Please enter a valid QuotePrintQty.");
+                QuotePrintQty.GetTextBox().Select();
+                return;
+            }
+        }
 
         private void Form_KeyDown(object sender, KeyEventArgs e)
         {
@@ -164,7 +203,10 @@ namespace MJC.forms
             var taxCode = ProcessingTax.GetComboBox().Text;
             var training = TrainingMode.GetCheckBox().Checked;
             var targetPrinter = TargetPrinter.GetComboBox().Text;
-            var printOption = PrintOptions.GetComboBox().Text;
+            int invoicePrintQty;
+            int holdOrderPrintQty;
+            int quotePrintQty;
+
             var footerText = invoiceFooter.GetTextBox().Text;
             var termsOfService = invoiceTermsOfService.GetTextBox().Text;
             var authorizationCode = string.Empty;
@@ -177,18 +219,38 @@ namespace MJC.forms
                 Messages.ShowError("The Processing Tax Code you entered does not exist.\r\n\r\nPlease make sure that the Tax Code exists and try again.");
                 return false;
             }
-             
-            // We want to continue to save the settings
 
+            if (!int.TryParse(InvoicePrintQty.GetTextBox().Text, out invoicePrintQty))
+            {
+                Messages.ShowError("Please enter a valid InvoicePrintQty.");
+                InvoicePrintQty.GetTextBox().Select();
+                return false;
+            }
+
+            if (!int.TryParse(HoldOrdersPrintQty.GetTextBox().Text, out holdOrderPrintQty))
+            {
+                Messages.ShowError("Please enter a valid HoldOrdersPrintQty.");
+                HoldOrdersPrintQty.GetTextBox().Select();
+                return false;
+            }
+
+            if (!int.TryParse(QuotePrintQty.GetTextBox().Text, out quotePrintQty))
+            {
+                Messages.ShowError("Please enter a valid QuotePrintQty.");
+                QuotePrintQty.GetTextBox().Select();
+                return false;
+            }
+
+            // We want to continue to save the settings
             try
             {
-                SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService, printOption);
+                SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService, invoicePrintQty, holdOrderPrintQty, quotePrintQty);
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 SentrySdk.CaptureException(exception);
 
-                if(exception.Message.Contains("FOREIGN KEY constraint"))
+                if (exception.Message.Contains("FOREIGN KEY constraint"))
                 {
                     Messages.ShowError("The Processing Tax Code you entered does not exist.\r\n\r\nPlease make sure that the Tax Code exists and try again.");
                 }
@@ -220,7 +282,7 @@ namespace MJC.forms
 
                     ShowInformation("QuickBooks successfully downloaded.");
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     ShowError("QuickBooks failed to download data.");
                 }
@@ -244,6 +306,11 @@ namespace MJC.forms
             invoiceFooter.GetTextBox().Width = 400;
             TargetPrinter.GetComboBox().Width = 400;
 
+            InvoicePrintQty.GetTextBox().Width = 370;
+            HoldOrdersPrintQty.GetTextBox().Width = 370;
+            QuotePrintQty.GetTextBox().Width = 370;
+            ProcessingTax.GetComboBox().Width = 400;
+
             List<dynamic> FormComponents = new List<dynamic>();
             FormComponents.Add(BusinessName);
             FormComponents.Add(businessDescription);
@@ -261,15 +328,30 @@ namespace MJC.forms
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(TrainingMode);
             FormComponents2.Add(TargetPrinter);
-            FormComponents2.Add(PrintOptions);
+            FormComponents2.Add(InvoicePrintQty);
+            FormComponents2.Add(HoldOrdersPrintQty);
+            FormComponents2.Add(QuotePrintQty);
             FormComponents2.Add(ProcessingTax);
             FormComponents2.Add(invoiceFooter);
             FormComponents2.Add(invoiceTermsOfService);
 
             _addFormInputs(FormComponents2, 700, 20, 800, 50, int.MaxValue, _panel.Controls);
 
+            RFPicture = new PictureBox();
+            RFPicture.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            RFPicture.Image = global::MJC.Properties.Resources.refresh_white;
+            RFPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            RFPicture.TabStop = false;
+            RFPicture.Location = new System.Drawing.Point(TargetPrinter.GetComboBox().Location.X + TargetPrinter.GetComboBox().Width, TargetPrinter.GetComboBox().Location.Y + 2);
+            RFPicture.Cursor = Cursors.Hand;
+            RFPicture.Click += (s, e) => {
+                TargetPrinter.GetComboBox().Items.Clear();
+                initTargetPrinter();
+            };
+
+            _panel.Controls.Add(RFPicture);
+
             initTargetPrinter();
-            initPrintOptions();
         }
 
         private void initTargetPrinter()
@@ -280,12 +362,6 @@ namespace MJC.forms
                 TargetPrinter.GetComboBox().Items.Add(new FComboBoxItem(i, printer));
             }
 
-        }
-        private void initPrintOptions()
-        {
-            PrintOptions.GetComboBox().Items.Add(new FComboBoxItem(0, "Invoice"));
-            PrintOptions.GetComboBox().Items.Add(new FComboBoxItem(1, "Hold Order"));
-            PrintOptions.GetComboBox().Items.Add(new FComboBoxItem(2, "Quote"));
         }
 
         private void SystemSettings_Load(object sender, EventArgs e)

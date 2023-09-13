@@ -27,7 +27,9 @@ namespace MJC.model
         public string businessDescription { get; set; }
         public string businessFooter { get; set; }
         public string businessTermsOfService { get; set; }
-        public string printOption { get; set; }
+        public int? invoicePrintQty { get; set; }
+        public int? holdOrderPrintQty { get; set; }
+        public int? quotePrintQty { get; set; }
     }
 
     public class SystemSettingsModel : DbConnection
@@ -92,7 +94,9 @@ namespace MJC.model
                             refreshToken = refreshToken,
                             businessFooter = invoiceFooter,
                             businessTermsOfService = invoiceTerms,
-                            printOption = printOption,
+                            invoicePrintQty = invoicePrintQty,
+                            holdOrderPrintQty = holdOrderPrintQty,
+                            quotePrintQty = quotePrintQty,
                             businessDescription = description
                         };
                     }
@@ -104,7 +108,7 @@ namespace MJC.model
             return true;
         }
 
-        public bool SaveSetting(int? taxCodeId, string companyName, string description, string address1, string address2, string city, string state, string zipcode, string phone, string fax, string federalTaxNumber, bool trainingMode, string targetPrinter, string accessToken, string refreshToken, string invoiceFooter, string invoiceTermsOfService, string printOption)
+        public bool SaveSetting(int? taxCodeId, string companyName, string description, string address1, string address2, string city, string state, string zipcode, string phone, string fax, string federalTaxNumber, bool trainingMode, string targetPrinter, string accessToken, string refreshToken, string invoiceFooter, string invoiceTermsOfService, int invoicePrintQty, int holdOrderPrintQty, int quotePrintQty)
         {
             using (var connection = GetConnection())
             {
@@ -116,25 +120,28 @@ namespace MJC.model
                     command.CommandText = @"TRUNCATE TABLE dbo.SystemSettings";
                     command.ExecuteNonQuery();
 
-                    command.CommandText = @"INSERT INTO dbo.SystemSettings (companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,taxCodeId,invoiceFooter,invoiceTermsOfService,printOption) Values(@Value1,@description,@Value2,@Value3,@Value4,@Value5,@Value6,@Value7,@Value8,@Value9,@Value10,@Value11,@Value12,@Value13,@Value14,@Value15,@Value16,@printOption)";
-                    command.Parameters.AddWithValue("@Value1", companyName);
-                    command.Parameters.AddWithValue("@description", description);
-                    command.Parameters.AddWithValue("@Value2", address1);
-                    command.Parameters.AddWithValue("@Value3", address2);
-                    command.Parameters.AddWithValue("@Value4", city);
-                    command.Parameters.AddWithValue("@Value5", state);
-                    command.Parameters.AddWithValue("@Value6", zipcode);
-                    command.Parameters.AddWithValue("@Value7", phone);
-                    command.Parameters.AddWithValue("@Value8", fax);
-                    command.Parameters.AddWithValue("@Value9", federalTaxNumber);
-                    command.Parameters.AddWithValue("@Value10", trainingMode);
-                    command.Parameters.AddWithValue("@Value11", targetPrinter);
-                    command.Parameters.AddWithValue("@Value12", accessToken);
-                    command.Parameters.AddWithValue("@Value13", refreshToken);
-                    command.Parameters.AddWithValue("@Value14", taxCodeId != null ? taxCodeId : DBNull.Value );
-                    command.Parameters.AddWithValue("@Value15", invoiceFooter);
-                    command.Parameters.AddWithValue("@Value16", invoiceTermsOfService);
-                    command.Parameters.AddWithValue("@printOption", printOption);
+                    command.CommandText = @"INSERT INTO dbo.SystemSettings (taxCodeId, companyName,address1,address2, description,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,authorizationCode,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter,InvoicePrintQty, HoldOrderPrintQty, QuotePrintQty) Values(@Value1,@Value2,@Value3,@Value4,@Value5,@Value6,@Value7,@Value8,@Value9,@Value10,@Value11,@Value12,@Value13,@Value14,@Value15,@Value16,@Value17,@Value18,@Value19,@Value20,@Value21)";
+                    command.Parameters.AddWithValue("@Value1", taxCodeId);
+                    command.Parameters.AddWithValue("@Value2", companyName);
+                    command.Parameters.AddWithValue("@Value3", address1);
+                    command.Parameters.AddWithValue("@Value4", address2);
+                    command.Parameters.AddWithValue("@Value5", description);
+                    command.Parameters.AddWithValue("@Value6", city);
+                    command.Parameters.AddWithValue("@Value7", state);
+                    command.Parameters.AddWithValue("@Value8", zipcode);
+                    command.Parameters.AddWithValue("@Value9", phone);
+                    command.Parameters.AddWithValue("@Value10", fax);
+                    command.Parameters.AddWithValue("@Value11", federalTaxNumber);
+                    command.Parameters.AddWithValue("@Value12", trainingMode);
+                    command.Parameters.AddWithValue("@Value13", targetPrinter);
+                    command.Parameters.AddWithValue("@Value14", "");
+                    command.Parameters.AddWithValue("@Value15", accessToken);
+                    command.Parameters.AddWithValue("@Value16", refreshToken);
+                    command.Parameters.AddWithValue("@Value17", invoiceTermsOfService);
+                    command.Parameters.AddWithValue("@Value18", invoiceFooter);
+                    command.Parameters.AddWithValue("@Value19", invoicePrintQty);
+                    command.Parameters.AddWithValue("@Value20", holdOrderPrintQty);
+                    command.Parameters.AddWithValue("@Value21", quotePrintQty);
                     command.ExecuteScalar();
                 }
 
