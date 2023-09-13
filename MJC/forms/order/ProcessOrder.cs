@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using MJC.forms.sku;
 using MJC.qbo;
+using System;
 
 namespace MJC.forms.order
 {
@@ -510,14 +511,32 @@ namespace MJC.forms.order
             var quantity = selectedRow.Cells["quantity"].Value as int?;
 
             selectedRow.Cells["lineTotal"].Value = unitPrice * quantity;
-            var lineTotal = unitPrice * quantity;
-            var taxAmount = lineTotal * (taxRate / 100);
-            var totalAmount = taxAmount + lineTotal;
 
-            TaxPercent = new FlabelConstant($"{taxRate}% Tax:");
-            Subtotal.SetContext(lineTotal.GetValueOrDefault(0).ToString("#,##0.00"));
-            TaxPercent.SetContext(taxAmount.GetValueOrDefault(0).ToString("0.00"));
-            TotalSale.SetContext(totalAmount.GetValueOrDefault(0).ToString("$#,##0.00"));
+            var total = 0.00;
+            var tax = 0.00;
+
+            foreach(var item in OrderItemData)
+            {
+                var _lineTotal = (item?.UnitPrice * item?.Quantity) ?? 0.00;
+                var _taxAmount = _lineTotal * (taxRate / 100);
+                var _totalAmount = _taxAmount + _lineTotal;
+
+                total += _lineTotal;
+                if (item?.Tax.GetValueOrDefault() ?? false)
+                {
+                    tax += _taxAmount;
+                }
+            }
+
+            //var lineTotal = unitPrice * quantity;
+            //var taxAmount = lineTotal * (taxRate / 100);
+            var totalAmount = tax + total;
+
+            TaxPercent.GetLabel().Text = $"{taxRate}% Tax:";
+
+            Subtotal.SetContext(total.ToString("#,##0.00"));
+            TaxPercent.SetContext(tax.ToString("0.00"));
+            TotalSale.SetContext(totalAmount.ToString("$#,##0.00"));
 
             var requested = quantity;
             var filled = requested;
@@ -564,7 +583,7 @@ namespace MJC.forms.order
             POGridRefer.Columns[5].DataPropertyName = "sku";
             POGridRefer.Columns[5].Visible = false;
 
-            POGridRefer.Columns[6].HeaderText = "Quantity";
+            POGridRefer.Columns[6].HeaderText = "Qty";
             POGridRefer.Columns[6].DataPropertyName = "quantity";
             POGridRefer.Columns[6].Width = 250;
             POGridRefer.Columns[7].HeaderText = "Description";
@@ -669,6 +688,26 @@ namespace MJC.forms.order
 
         private void PoGridRefer_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            if (POGridRefer.SelectedRows.Count == 0) return;
+
+            if (e.ColumnIndex == 8)
+            {
+                DataGridViewRow selectedRow = POGridRefer.SelectedRows[0];
+                DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                var selectedValue = comboBoxCell.Value?.ToString();
+
+                if (selectedValue == "True")
+                {
+                    this.OrderItemData[e.RowIndex].Tax = true;
+                }
+                else
+                {
+                    this.OrderItemData[e.RowIndex].Tax = false;
+                }
+
+                PopulateInformationField();
+            }
+            else
             // Quantity changed
             if (e.ColumnIndex == 6)
             {
