@@ -1,6 +1,8 @@
 ﻿using MJC.common.components;
 using MJC.common;
 using MJC.model;
+using Sentry;
+using MJC.forms.sku;
 
 namespace MJC.forms.inventory
 {
@@ -14,6 +16,7 @@ namespace MJC.forms.inventory
         private FlabelConstant Description = new FlabelConstant("Description:");
 
         private FGroupLabel QuantityGroup = new FGroupLabel("Quantity");
+        private FlabelConstant Quantity = new FlabelConstant("Quantity:");
         private FlabelConstant QtyAvailable = new FlabelConstant("Qty Available:");
         private FInputBox QtyDeplete = new FInputBox("Qty to Deplete:");
         private int skuId = 0;
@@ -68,6 +71,7 @@ namespace MJC.forms.inventory
 
             List<dynamic> FormComponents1 = new List<dynamic>();
             FormComponents1.Add(QuantityGroup);
+            FormComponents1.Add(Quantity);
             FormComponents1.Add(QtyAvailable);
             FormComponents1.Add(QtyDeplete);
 
@@ -76,25 +80,54 @@ namespace MJC.forms.inventory
 
         private void UpdateInventory()
         {
-            int qtyAvailable = 0;
-            if (!string.IsNullOrEmpty(QtyAvailable.GetConstant().Text))
-                qtyAvailable = int.Parse(QtyAvailable.GetConstant().Text);
-            int qtyDeplete = int.Parse(QtyDeplete.GetTextBox().Text);
+            int.TryParse(Quantity.GetConstant().Text, out int currentQuantity);
+            int.TryParse(QtyAvailable.GetConstant().Text, out int availableQuantity);
 
-            if (qtyDeplete <= qtyAvailable)
+            int depleteQty;
+            if (!int.TryParse(QtyDeplete.GetTextBox().Text, out depleteQty))
             {
-                int skuId = this.skuId;
-                int qty = qtyAvailable - qtyDeplete;
-                var refreshData = SkuModelObj.UpdateSKUQty(qty, skuId);
-
-                //if (refreshData)
-                //{
-                //    UpdateSkuInfo();
-                //}
+                Messages.ShowError("Please enter a valid quantity.");
+                QtyDeplete.GetTextBox().Select();
+                return;
             }
-            else
+
+
+            int newCurrentQuantity = currentQuantity - depleteQty;
+            int newAvailableQuantity = availableQuantity - depleteQty;
+
+            try
             {
-                MessageBox.Show("Deplete Count must be less than Qty Available");
+                if (depleteQty > currentQuantity)
+                {
+                    // Current quantity brings our available quantity down.
+                    if (MessageBox.Show("The new quantity will bring your current and available quantity to a negative. Are you sure you want to continue?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        SkuModelObj.UpdateQuantity(newCurrentQuantity, newAvailableQuantity, this.skuId);
+                    }
+                }
+                else if (depleteQty < availableQuantity)
+                {
+                    // Increase both quantities when depleteQty is added.
+                    SkuModelObj.UpdateQuantity(newCurrentQuantity, newAvailableQuantity, this.skuId);
+                }
+                else
+                {
+                    // Available Quantity is sufficient with our current quantity
+                    // Lower the current quantity but don't touch the available quantity.
+                    if (MessageBox.Show("The new quantity will bring your available quantity to a negative. Are you sure you want to continue?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        SkuModelObj.UpdateQuantity(newCurrentQuantity, newAvailableQuantity, this.skuId);
+                    }
+                }
+                Messages.ShowInformation("The quantity has been updated.");
+                Quantity.SetContext(newCurrentQuantity.ToString());
+                QtyAvailable.SetContext(newAvailableQuantity.ToString());
+                QtyDeplete.GetTextBox().Text = "0";
+            }
+            catch (Exception e)
+            {
+                SentrySdk.CaptureException(e);
+                Messages.ShowError("There was a problem updating the quantity.");
             }
         }
 
@@ -109,6 +142,9 @@ namespace MJC.forms.inventory
             {
                 this.skuId = skuInfo.skuId;
                 Description.SetContext(skuInfo.desc);
+                if (skuInfo.qty != null)
+                    Quantity.SetContext(skuInfo.qty.ToString());
+                else Quantity.SetContext("N/A");
                 if (skuInfo.qtyAvailable != null)
                     QtyAvailable.SetContext(skuInfo.qtyAvailable.ToString());
                 else QtyAvailable.SetContext("N/A");

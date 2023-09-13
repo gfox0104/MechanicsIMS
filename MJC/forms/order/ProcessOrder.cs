@@ -596,8 +596,8 @@ namespace MJC.forms.order
             POGridRefer.Columns[8].Visible = false;
 
             POGridRefer.Columns[9].HeaderText = "Disc.";
-            POGridRefer.Columns[9].Visible = false;
-            POGridRefer.Columns[9].DataPropertyName = "priceTier";
+            POGridRefer.Columns[9].Name = "PriceTierCode";
+            POGridRefer.Columns[9].DataPropertyName = "priceTierCode";
             POGridRefer.Columns[9].Width = 200;
 
             POGridRefer.Columns[10].HeaderText = "Unit Price";
@@ -616,12 +616,10 @@ namespace MJC.forms.order
             POGridRefer.Columns[13].Visible = false;
 
             POGridRefer.Columns[6].HeaderText = "Price Tier";
-            POGridRefer.Columns[6].Name = "PriceTierCode";
-            POGridRefer.Columns[6].DataPropertyName = "PriceTierCode";
+            POGridRefer.Columns[6].Name = "PriceTier";
+            POGridRefer.Columns[6].DataPropertyName = "priceTier";
             POGridRefer.Columns[6].Width = 200;
-
-
-
+            POGridRefer.Columns[6].Visible = false;
 
             // DataGrid ComboBox column
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
