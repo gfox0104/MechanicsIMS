@@ -29,7 +29,7 @@ variables:
   NUGET_PACKAGES_DIRECTORY: '.nuget'
   # 3) A relative path to the source code from project repository root.
   # NOTE: Please edit this path so it matches the structure of your project!
-  SOURCE_CODE_PATH: 'MJC/*/'
+  SOURCE_CODE_PATH: '*/*/'
 
 # ### Define global cache rule
 #
@@ -99,10 +99,10 @@ build:
   # path to the directory where it is located (e.g. 'dotnet build ./src/ConsoleApp').
   # Only one project path can be passed as a parameter to 'dotnet build' command.
   script:
-    - 'dotnet publish MJC.sln -c Release -o bin/release'
+    - 'dotnet build MJC/MJC.csproj -c Release -o bin/release'
 
 tests:
-  stage: test
+  # stage: test
   # ### Run the tests
   #
   # You can either run tests for all test projects that are defined in your solution
