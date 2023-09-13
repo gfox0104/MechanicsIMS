@@ -40,7 +40,7 @@ namespace MJC.forms.sku
         private FCheckBox allowDiscount = new FCheckBox("Allow discount");
         private FCheckBox commissionable = new FCheckBox("Commissionable");
 
-        private FInputBox orderForm = new FInputBox("Order Form");
+        private FInputBox orderForm = new FInputBox("Order From");
         private FDateTime lastSold = new FDateTime("Last Sold");
         private FInputBox manufacturer = new FInputBox("Manufacturer");
         private FInputBox location = new FInputBox("Location");
