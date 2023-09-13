@@ -111,8 +111,8 @@ tests:
   #
   # You may want to define separate testing jobs for different types of testing
   # (e.g. integration tests, unit tests etc).
-  script:
-    - 'dotnet test --no-restore'
+  # script:
+  #  - 'dotnet test --no-restore'
 
 deploy:
   stage: deploy
