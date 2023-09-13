@@ -48,7 +48,7 @@ namespace MJC.forms
 
             this.KeyDown += (s, e) => Form_KeyDown(s, e);
             this.FormClosing += SystemSettings_FormClosing;
-            HotkeyButton[] hkButtons = new HotkeyButton[3] { hkPreviousScreen, hkOpenQuickBooks , hkSyncQuickBooks};
+            HotkeyButton[] hkButtons = new HotkeyButton[3] { hkPreviousScreen, hkOpenQuickBooks, hkSyncQuickBooks };
             _initializeHKButtons(hkButtons);
             InitInputBox();
 
@@ -108,15 +108,15 @@ namespace MJC.forms
 
             var taxCodeId = SettingsModelObj.Settings.taxCodeId;
             // Default selection to 0 if possible
-            if(taxCodeId == 0)
+            if (taxCodeId == 0)
             {
-                if(taxCodes.Length > 0)
+                if (taxCodes.Length > 0)
                 {
                     ProcessingTax.GetComboBox().SelectedIndex = 0;
                 }
             }
 
-            for(int i = 0; i < taxCodes.Length; i++)
+            for (int i = 0; i < taxCodes.Length; i++)
             {
                 if (SalesTaxModelObj.SalesTaxCodeDataList[i].id == taxCodeId)
                 {
@@ -124,12 +124,45 @@ namespace MJC.forms
                     break;
                 }
             }
-            
+
 
             ProcessingTax.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
             ProcessingTax.GetComboBox().AutoCompleteMode = AutoCompleteMode.Suggest;
+
+            InvoicePrintQty.GetTextBox().LostFocus += InvoicePrintQty_LostFocus;
+            HoldOrdersPrintQty.GetTextBox().LostFocus += HoldOrdersPrintQty_LostFocus;
+            QuotePrintQty.GetTextBox().LostFocus += QuotePrintQty_LostFocus;
         }
 
+        private void InvoicePrintQty_LostFocus(object sender, EventArgs e)
+        {
+            if (!int.TryParse(InvoicePrintQty.GetTextBox().Text, out int invoicePrintQty))
+            {
+                Messages.ShowError("Please enter a valid InvoicePrintQty.");
+                InvoicePrintQty.GetTextBox().Select();
+                return;
+            }
+        }
+
+        private void HoldOrdersPrintQty_LostFocus(object sender, EventArgs e)
+        {
+            if (!int.TryParse(HoldOrdersPrintQty.GetTextBox().Text, out int holdOrderPrintQty))
+            {
+                Messages.ShowError("Please enter a valid HoldOrdersPrintQty.");
+                HoldOrdersPrintQty.GetTextBox().Select();
+                return;
+            }
+        }
+
+        private void QuotePrintQty_LostFocus(object sender, EventArgs e)
+        {
+            if (!int.TryParse(InvoicePrintQty.GetTextBox().Text, out int quotePrintQty))
+            {
+                Messages.ShowError("Please enter a valid QuotePrintQty.");
+                QuotePrintQty.GetTextBox().Select();
+                return;
+            }
+        }
 
         private void Form_KeyDown(object sender, KeyEventArgs e)
         {
@@ -170,11 +203,10 @@ namespace MJC.forms
             var taxCode = ProcessingTax.GetComboBox().Text;
             var training = TrainingMode.GetCheckBox().Checked;
             var targetPrinter = TargetPrinter.GetComboBox().Text;
-            int invoicePrintQty; int.TryParse(InvoicePrintQty.GetTextBox().Text, out invoicePrintQty);
-            int holdOrderPrintQty; int.TryParse(HoldOrdersPrintQty.GetTextBox().Text, out holdOrderPrintQty);
-            int quotePrintQty; int.TryParse(QuotePrintQty.GetTextBox().Text, out quotePrintQty);
-//            var holdOrderPrintQty = HoldOrdersPrintQty.GetTextBox().Text;
-//            var quotePrintQty = QuotePrintQty.GetTextBox().Text;
+            int invoicePrintQty;
+            int holdOrderPrintQty;
+            int quotePrintQty;
+
             var footerText = invoiceFooter.GetTextBox().Text;
             var termsOfService = invoiceTermsOfService.GetTextBox().Text;
             var authorizationCode = string.Empty;
@@ -187,17 +219,38 @@ namespace MJC.forms
                 Messages.ShowError("The Processing Tax Code you entered does not exist.\r\n\r\nPlease make sure that the Tax Code exists and try again.");
                 return false;
             }
-             
+
+            if (!int.TryParse(InvoicePrintQty.GetTextBox().Text, out invoicePrintQty))
+            {
+                Messages.ShowError("Please enter a valid InvoicePrintQty.");
+                InvoicePrintQty.GetTextBox().Select();
+                return false;
+            }
+
+            if (!int.TryParse(HoldOrdersPrintQty.GetTextBox().Text, out holdOrderPrintQty))
+            {
+                Messages.ShowError("Please enter a valid HoldOrdersPrintQty.");
+                HoldOrdersPrintQty.GetTextBox().Select();
+                return false;
+            }
+
+            if (!int.TryParse(QuotePrintQty.GetTextBox().Text, out quotePrintQty))
+            {
+                Messages.ShowError("Please enter a valid QuotePrintQty.");
+                QuotePrintQty.GetTextBox().Select();
+                return false;
+            }
+
             // We want to continue to save the settings
             try
             {
                 SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService, invoicePrintQty, holdOrderPrintQty, quotePrintQty);
             }
-            catch(Exception exception) 
+            catch (Exception exception)
             {
                 SentrySdk.CaptureException(exception);
 
-                if(exception.Message.Contains("FOREIGN KEY constraint"))
+                if (exception.Message.Contains("FOREIGN KEY constraint"))
                 {
                     Messages.ShowError("The Processing Tax Code you entered does not exist.\r\n\r\nPlease make sure that the Tax Code exists and try again.");
                 }
@@ -229,7 +282,7 @@ namespace MJC.forms
 
                     ShowInformation("QuickBooks successfully downloaded.");
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     ShowError("QuickBooks failed to download data.");
                 }
@@ -299,7 +352,6 @@ namespace MJC.forms
             _panel.Controls.Add(RFPicture);
 
             initTargetPrinter();
-            initInvoicePrintQty();
         }
 
         private void initTargetPrinter()
@@ -311,12 +363,6 @@ namespace MJC.forms
             }
 
         }
-        private void initInvoicePrintQty()
-        {
-            //InvoicePrintQty.GetTextBox().Items.Add(new FComboBoxItem(0, "Invoice"));
-            //InvoicePrintQty.GetTextBox().Items.Add(new FComboBoxItem(1, "Hold Order"));
-            //InvoicePrintQty.GetTextBox().Items.Add(new FComboBoxItem(2, "Quote"));
-        } 
 
         private void SystemSettings_Load(object sender, EventArgs e)
         {
