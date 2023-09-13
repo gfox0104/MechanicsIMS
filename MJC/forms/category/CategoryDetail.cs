@@ -19,7 +19,7 @@ namespace MJC.forms.category
         private Button MBOk_button;
 
         private FInputBox categoryName = new FInputBox("Name");
-        private FInputBox calculateAs = new FInputBox("calculateAs");
+        private FComboBox calculateAs = new FComboBox("Calculate As");
         private FInputBox[] priceTiers;
 
         private PriceTiersModel PriceTiersModelObj = new PriceTiersModel();
@@ -60,9 +60,19 @@ namespace MJC.forms.category
 
             calculateAs.SetPosition(new Point(30, 80));
             this.Controls.Add(calculateAs.GetLabel());
-            this.Controls.Add(calculateAs.GetTextBox());
+            this.Controls.Add(calculateAs.GetComboBox());
 
-            calculateAs.GetTextBox().KeyPress += KeyValidateNumber;
+            calculateAs.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
+            calculateAs.GetComboBox().Items.Add(new FComboBoxItem(1, "Markup"));
+            calculateAs.GetComboBox().Items.Add(new FComboBoxItem(2, "Margin"));
+            foreach (FComboBoxItem item in calculateAs.GetComboBox().Items)
+            {
+                if (item.Id == 1)
+                {
+                    calculateAs.GetComboBox().SelectedItem = item;
+                    break;
+                }
+            }
 
             string filter = "";
             var refreshData = PriceTiersModelObj.LoadPriceTierData(filter);
@@ -94,13 +104,7 @@ namespace MJC.forms.category
                 this.categoryName.GetTextBox().Select();
                 return;
             }
-            if (!int.TryParse(this.calculateAs.GetTextBox().Text, out int calculateAs))
-            {
-                MessageBox.Show("please enter a number");
-                this.calculateAs.GetTextBox().Text = "";
-                this.calculateAs.GetTextBox().Select();
-                return;
-            }
+            int calculateAs = this.calculateAs.GetComboBox().SelectedItem.ToString() == "Markup" ? 1 : 2;
 
             Dictionary<int, double> priceTierDict = new Dictionary<int, double>();
 
@@ -124,10 +128,21 @@ namespace MJC.forms.category
             }
             else MessageBox.Show("An Error occured while " + modeText + " the category.");
         }
-        public void setDetails(string categoryName, string calculateAs, int category_id)
+        public void setDetails(string categoryName, string calculateas, int category_id)
         {
             this.categoryName.GetTextBox().Text = categoryName;
-            this.calculateAs.GetTextBox().Text = calculateAs.ToString();
+
+            int itemIndex = calculateas == "Markup" ? 1 : 2;
+
+            foreach (FComboBoxItem item in calculateAs.GetComboBox().Items)
+            {
+                if (item.Id == itemIndex)
+                {
+                    calculateAs.GetComboBox().SelectedItem = item;
+                    break;
+                }
+            }
+
             this.categoryId = category_id;
 
             List<KeyValuePair<string, double>> priceTierData = new List<KeyValuePair<string, double>>();
@@ -138,14 +153,6 @@ namespace MJC.forms.category
                 for (int i = 0; i < priceTiers.Length; i++)
                     if (priceTiers[i].GetLabel().Text == pair.Key)
                         priceTiers[i].GetTextBox().Text = pair.Value.ToString();
-            }
-        }
-
-        private void KeyValidateNumber(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
             }
         }
     }
