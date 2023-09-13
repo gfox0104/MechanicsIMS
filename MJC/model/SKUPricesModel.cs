@@ -155,7 +155,7 @@ namespace MJC.model
             }
             else if (calculateAs == 2)
             {
-                price = (inventoryValue * (1 + categoryMargin)) * (1 + profitMargin);
+                price = (inventoryValue) * (1 + profitMargin) * (1 + profitMargin);
             }
             return price;
         }
