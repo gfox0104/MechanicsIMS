@@ -24,7 +24,7 @@ namespace MJC.forms
         private HotkeyButton hkSearchCustomers = new HotkeyButton("F2", "Search Customers", Keys.F2);
 
         //private FInputBox CustomerName = new FInputBox("Name#:");
-        private FComboBox CustomerName = new FComboBox("Customer#:", 200);
+        private FComboBox CustomerName = new FComboBox("Customer:", 200);
         private FDateTime DateReceived = new FDateTime("Date Received:");
         private FInputBox AmtReceived = new FInputBox("Amt Received:");
         private FlabelConstant AccountBalance = new FlabelConstant("Account Balance:");
