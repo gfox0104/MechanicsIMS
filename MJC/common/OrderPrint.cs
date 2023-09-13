@@ -38,8 +38,6 @@ namespace MJC.common
         private PrintInvoiceModel printInvoiceModelObj = new PrintInvoiceModel();
         private int orderStatus = 0;
 
-        private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
-
         public OrderPrint(int orderId, int orderStatus)
         {
             //printOrderItemList = new List<PrintOrderItem>();
@@ -188,7 +186,7 @@ namespace MJC.common
                     int titleX = 250;
                     int titleY = iTopMargin;
 
-                    string title = SettingsModelObj.Settings.businessName;
+                    string title = Session.SettingsModelObj.Settings.businessName;
 
                     e.Graphics.DrawString(title,
                                     _fontInvoice, Brushes.Black,
@@ -197,7 +195,7 @@ namespace MJC.common
                     titleHeight = (int)e.Graphics.MeasureString(title, _fontInvoice, 320).Height;
 
                     
-                    string address = $"{SettingsModelObj.Settings.address1} {SettingsModelObj.Settings.address2}, {SettingsModelObj.Settings.city}, {SettingsModelObj.Settings.state}, {SettingsModelObj.Settings.postalCode} {SettingsModelObj.Settings.phone}, FAX {SettingsModelObj.Settings.fax}";
+                    string address = $"{Session.SettingsModelObj.Settings.address1} {Session.SettingsModelObj.Settings.address2}, {Session.SettingsModelObj.Settings.city}, {Session.SettingsModelObj.Settings.state}, {Session.SettingsModelObj.Settings.postalCode} {Session.SettingsModelObj.Settings.phone}, FAX {Session.SettingsModelObj.Settings.fax}";
                     int addressX = 250;
                     int addressY = iTopMargin + titleHeight - 13;
                     _fontInvoice = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -529,7 +527,7 @@ namespace MJC.common
                         else
                         {
                             // Footer
-                            string desc = SettingsModelObj.Settings.businessDescription;
+                            string desc = Session.SettingsModelObj.Settings.businessDescription;
                             strFormat.Alignment = StringAlignment.Center;
                             Font _fontDesc = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
@@ -633,7 +631,7 @@ namespace MJC.common
                         else
                         {
 
-                            string termsOfService = SettingsModelObj.Settings.businessTermsOfService;
+                            string termsOfService = Session.SettingsModelObj.Settings.businessTermsOfService;
                             // "PRICES SUBJECT TO CHANGE WITHOUT NOTICE: \nRETURNED GOODS: This shlip must accompany all claims. Goods ordered special, not carried in stock, are not returnable for credit. A 25% charge to cover handling will be made on all returned goods. Parts not claimed within 35 days will be disposed of or sold.\nTERMS: Net 10th of the Month. 1 1/2% per month, 18% per annim will be charged on past due accounts after 30 days.\nWARRANTY: All products, excluding Hi Performance or Heavy Duty Clutches, of our manufacture are under warranty against defective materials or workmanship for a period of 90 days. We will assume no liability beyond the repair or replacement of such parts that may be proven defective. Failure to resurface the flywheel MAY void all warranties.\n \nPROCESSED BY: DR";
 
                             Font _fontTOS = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -675,7 +673,7 @@ namespace MJC.common
                   this.paperWidth - 2 * iLeftMargin, currentTimeHeight), strFormat);
 
                 // Footer Name
-                string footerName = SettingsModelObj.Settings.businessFooter; 
+                string footerName = Session.SettingsModelObj.Settings.businessFooter; 
                 // "CLUTCH & DRIVERSHAFT SPECIALISTS";
 
                 Font _fontFooterName = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

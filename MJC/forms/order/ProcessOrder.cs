@@ -52,12 +52,7 @@ namespace MJC.forms.order
         private bool changeDetected = true;
         private string searchKey;
 
-        private CustomersModel CustomersModelObj = new CustomersModel();
-        private SKUModel SKUModelObj = new SKUModel();
-        private OrderItemsModel OrderItemsModalObj = new OrderItemsModel();
-        private OrderModel OrderModelObj = new OrderModel();
-        private PriceTiersModel PriceTiersModelObj = new PriceTiersModel();
-
+        
         private List<OrderItem> OrderItemData = new List<OrderItem>();
         private List<SKUOrderItem> TotalSkuList = new List<SKUOrderItem>();
         private List<SKUOrderItem> SubSkuList = new List<SKUOrderItem>();
@@ -82,12 +77,12 @@ namespace MJC.forms.order
 
             if (this.orderId == 0)
             {
-                this.orderId = OrderModelObj.GetNextOrderId();
+                this.orderId = Session.OrderModelObj.GetNextOrderId();
             }
 
-            dynamic customer = CustomersModelObj.GetCustomerDataById(customerId);
-            this.TotalSkuList = SKUModelObj.LoadSkuOrderItems();
-            SKUModelObj.LoadSKUData("", false);
+            dynamic customer = Session.CustomersModelObj.GetCustomerDataById(customerId);
+            this.TotalSkuList = Session.SKUModelObj.LoadSkuOrderItems();
+            Session.SKUModelObj.LoadSKUData("", false);
 
             // Default customer to the first priceTierId
             if (customer?.priceTierId == null)
@@ -147,7 +142,7 @@ namespace MJC.forms.order
                     int saveFlag = CloseOrderActionsModal.GetSaveFlage();
                     if (saveFlag == 7)
                     {
-                        OrderModelObj.DeleteOrder(orderId);
+                        Session.OrderModelObj.DeleteOrder(orderId);
 
                         _navigateToPrev(sender, e);
                     }
@@ -169,7 +164,7 @@ namespace MJC.forms.order
                                     {
 
                                         status = 3;
-                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        Session.OrderModelObj.UpdateOrderStatus(status, orderId);
                                         printInvoice(orderId, status);
                                         _navigateToPrev(sender, e);
                                     }
@@ -180,7 +175,7 @@ namespace MJC.forms.order
                                     {
 
                                         status = 3;
-                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        Session.OrderModelObj.UpdateOrderStatus(status, orderId);
                                         printInvoice(orderId, status);
 
                                         _navigateToPrev(sender, e);
@@ -189,7 +184,7 @@ namespace MJC.forms.order
                                 else if (saveFlag == 3)
                                 {
                                     status = 2;
-                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    Session.OrderModelObj.UpdateOrderStatus(status, orderId);
                                     printInvoice(orderId, status);
 
                                     _navigateToPrev(sender, e);
@@ -200,7 +195,7 @@ namespace MJC.forms.order
                                     {
 
                                         status = 2;
-                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        Session.OrderModelObj.UpdateOrderStatus(status, orderId);
                                         printInvoice(orderId, status);
 
                                         _navigateToPrev(sender, e);
@@ -209,7 +204,7 @@ namespace MJC.forms.order
                                 else if (saveFlag == 5)
                                 {
                                     status = 1;
-                                    OrderModelObj.UpdateOrderStatus(status, orderId);
+                                    Session.OrderModelObj.UpdateOrderStatus(status, orderId);
                                     _navigateToPrev(sender, e);
                                 }
                                 else if (saveFlag == 6)
@@ -217,7 +212,7 @@ namespace MJC.forms.order
                                     if (await CreateInvoice())
                                     {
                                         status = 1;
-                                        OrderModelObj.UpdateOrderStatus(status, orderId);
+                                        Session.OrderModelObj.UpdateOrderStatus(status, orderId);
                                         printInvoice(orderId, status);
                                         _navigateToPrev(sender, e);
                                     }
@@ -274,7 +269,7 @@ namespace MJC.forms.order
                     DataGridViewRow row = POGridRefer.Rows[rowIndex];
                     int skuId = (int)row.Cells[3].Value;
                     List<dynamic> skuData = new List<dynamic>();
-                    skuData = SKUModelObj.GetSKUData(skuId);
+                    skuData = Session.SKUModelObj.GetSKUData(skuId);
                     detailModal.setDetails(skuData, skuData[0].id);
 
                     this.Hide();
@@ -316,9 +311,9 @@ namespace MJC.forms.order
 
             _addFormInputs(FormComponents, 30, 110, 650, 42, 180);
 
-            var refreshData = CustomersModelObj.LoadCustomerData("", false);
+            var refreshData = Session.CustomersModelObj.LoadCustomerData("", false);
 
-            Customer_ComBo.GetComboBox().DataSource = CustomersModelObj.CustomerDataList;
+            Customer_ComBo.GetComboBox().DataSource = Session.CustomersModelObj.CustomerDataList;
             Customer_ComBo.GetComboBox().DisplayMember = "Num";
             Customer_ComBo.GetComboBox().ValueMember = "Id";
 
@@ -347,7 +342,7 @@ namespace MJC.forms.order
             int customerId = selectedItem.Id;
             this.customerId = customerId;
 
-            var customerData = CustomersModelObj.GetCustomerData(customerId);
+            var customerData = Session.CustomersModelObj.GetCustomerData(customerId);
             if (customerData != null)
             {
                 if (customerData.customerName != "") CustomerName.SetContext(customerData.customerName);
@@ -367,7 +362,7 @@ namespace MJC.forms.order
                 //}
                 //else Position.SetContext("N/A");
 
-                this.TotalSkuList = SKUModelObj.LoadSkuOrderItems();
+                this.TotalSkuList = Session.SKUModelObj.LoadSkuOrderItems();
 
             }
 
@@ -492,22 +487,20 @@ namespace MJC.forms.order
             if (POGridRefer.SelectedRows.Count == 0) return;
 
             int skuId = this.skuId;
-            var qtyInfo = SKUModelObj.LoadSkuQty(skuId);
+            var qtyInfo = Session.SKUModelObj.LoadSkuQty(skuId);
 
             SKUOrderItem sku = this.SubSkuList.FirstOrDefault(x => x.Id == skuId);
             
             SalesTaxCodeModel salesTaxCodeModel = new SalesTaxCodeModel();
             salesTaxCodeModel.LoadSalesTaxCodeData("");
              
-            var items = PriceTiersModelObj.GetPriceTierItems();
+            var items = Session.PriceTiersModelObj.GetPriceTierItems();
             var priceTierItem = items[sku.PriceTierId];
 
-            var settings = new SystemSettingsModel();
-            settings.LoadSettings();
-
-            var taxCodeId = settings.Settings.taxCodeId.GetValueOrDefault(2);
+            // Make sure we have the default SKU #2 for tax code
+            var taxCodeId = Session.SettingsModelObj.Settings.taxCodeId.GetValueOrDefault(2);
             var salesTaxCode = salesTaxCodeModel.GetSalesTaxCodeData(taxCodeId);
-            var taxRate = salesTaxCode.rate; // TODO: Get the actual tax rate for the SKU and Customer
+            var taxRate = salesTaxCode.rate;
 
             QtyOnHold.SetContext(qtyInfo.qty.ToString());
             QtyAllocated.SetContext(qtyInfo.qtyAllocated.ToString());
@@ -563,7 +556,7 @@ namespace MJC.forms.order
 
             if (!isAddNewOrderItem)
             {
-                OrderItemData = OrderItemsModalObj.GetOrderItemsListByCustomerId(this.customerId, 0, sort);
+                OrderItemData = Session.OrderItemModelObj.GetOrderItemsListByCustomerId(this.customerId, 0, sort);
             }
 
             POGridRefer.Columns.Clear();
@@ -632,7 +625,7 @@ namespace MJC.forms.order
 
             // DataGrid ComboBox column
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
-            comboBoxColumn.DataSource = SKUModelObj.SKUDataList;
+            comboBoxColumn.DataSource = Session.SKUModelObj.SKUDataList;
             comboBoxColumn.HeaderText = "SKU#";
             comboBoxColumn.Width = 300;
             comboBoxColumn.Name = "skuNumber";
@@ -683,7 +676,7 @@ namespace MJC.forms.order
             var selectedRow = POGridRefer.SelectedRows[0];
             int selectedValue = int.Parse(selectedRow.Cells["skuId"].Value.ToString());
 
-            var skuId = SKUModelObj.SKUDataList.FirstOrDefault(item => item.Id == selectedValue).Id;
+            var skuId = Session.SKUModelObj.SKUDataList.FirstOrDefault(item => item.Id == selectedValue).Id;
             this.skuId = skuId;
 
             PopulateInformationField();
@@ -729,7 +722,7 @@ namespace MJC.forms.order
                 int selectedValue = int.Parse(comboBoxCell.Value?.ToString());
                 DataGridViewRow selectedRow = POGridRefer.SelectedRows[0];
 
-                var skuId = SKUModelObj.SKUDataList.FirstOrDefault(item => item.Id == selectedValue).Id;
+                var skuId = Session.SKUModelObj.SKUDataList.FirstOrDefault(item => item.Id == selectedValue).Id;
 
                 SKUOrderItem sku = this.SubSkuList.Where(item => item.Id == skuId).ToList()[0];
                 selectedRow.Cells["sku"].Value = sku.Name;
@@ -809,7 +802,7 @@ namespace MJC.forms.order
                 else
                 {
                     orderItems = orderItems.Where(item => item.OrderId == selectedOrderId).ToList();
-                    dynamic selectedOrder = OrderModelObj.GetOrderById(this.selectedOrderId);
+                    dynamic selectedOrder = Session.OrderModelObj.GetOrderById(this.selectedOrderId);
                     var m_test = selectedOrder.qboOrderId;
                     bool res = await qboApiService.UpdateInvoice(customer, orderItems, selectedOrder);
                     if (res)
@@ -851,7 +844,7 @@ namespace MJC.forms.order
             //}
 
             SKUOrderItem sku = this.SubSkuList[0];
-            var items = PriceTiersModelObj.GetPriceTierItems();
+            var items = Session.PriceTiersModelObj.GetPriceTierItems();
             var priceTierItem = items[sku.PriceTierId];
 
             this.OrderItemData.Add(new OrderItem

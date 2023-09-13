@@ -25,12 +25,21 @@ namespace MJC.common
         {
             InitializeComponent();
             _initBasicSize();
+
+            this.Activated += GlobalLayout_Activated;
         }
+
 
         public GlobalLayout(string title, string formDescription) : base(title, formDescription)
         {
             InitializeComponent();
             _initBasicSize();
+            this.Activated += GlobalLayout_Activated;
+        }
+
+        private void GlobalLayout_Activated(object? sender, EventArgs e)
+        {
+            base.Refresh();
         }
 
         protected void _initializeHKButtons(HotkeyButton[] hkButtons, bool DefaultEscEvent = true, HotkeyButton[] onEventhkButtons = null)

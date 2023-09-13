@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MJC.forms.sales;
 using System.Data.SqlClient;
-using Sentry;
 
 namespace MJC.forms.sku
 {
@@ -35,7 +34,6 @@ namespace MJC.forms.sku
         private string searchKey = "";
         private bool archievedView = false;
 
-        private SKUModel SKUModelObj = new SKUModel();
 
         public SKUList(bool ArchivedView = false) : base("SKU List", "List of SKUs")
         {
@@ -99,7 +97,7 @@ namespace MJC.forms.sku
 
                     try
                     {
-                        bool refreshData = SKUModelObj.DeleteSKU(selectedSKUId);
+                        bool refreshData = Session.SKUModelObj.DeleteSKU(selectedSKUId);
                         if (refreshData)
                         {
                             LoadSKUList();
@@ -107,7 +105,7 @@ namespace MJC.forms.sku
                     }
                     catch(Exception exc)
                     {
-                        SentrySdk.CaptureException(exc);
+                        Sentry.SentrySdk.CaptureException(exc);
                         if (exc.Message.Contains("REFERENCE"))
                         {
                             ShowError("The SKU cannot be deleted because it is attached to an existing order.");
@@ -127,7 +125,7 @@ namespace MJC.forms.sku
                 }
                 catch (Exception exc)
                 {
-                    SentrySdk.CaptureException(exc);
+                    Sentry.SentrySdk.CaptureException(exc);
                     if (exc.Message.Contains("KEY"))
                     {
                         ShowError("There was a problem updating the SKU.");
@@ -271,10 +269,10 @@ namespace MJC.forms.sku
                             this.searchKey = searchInputModal.GetSearchKey();
                             this.LoadSKUList(false, false);
 
-                            int skuCount = SKUModelObj.SKUDataList.Count;
+                            int skuCount = Session.SKUModelObj.SKUDataList.Count;
                             SKUDetail exactSkuDetail = new SKUDetail();
                             int exactSkuDetailIndex = 0;
-                            foreach(SKUDetail skuDetail in SKUModelObj.SKUDataList)
+                            foreach(SKUDetail skuDetail in Session.SKUModelObj.SKUDataList)
                             {
                                 bool isExactMatch = false;
                                 if (skuDetail.Name.Equals(this.searchKey, StringComparison.OrdinalIgnoreCase))
@@ -303,7 +301,7 @@ namespace MJC.forms.sku
                                 SKUInformation detailModal = new SKUInformation();
 
                                 List<dynamic> skuData = new List<dynamic>();
-                                skuData = SKUModelObj.GetSKUData(exactSkuDetail.Id);
+                                skuData = Session.SKUModelObj.GetSKUData(exactSkuDetail.Id);
                                 detailModal.setDetails(skuData, skuData[0].id);
 
                                 this.Hide();
@@ -326,10 +324,10 @@ namespace MJC.forms.sku
             {
                 this._changeFormText("SKU List searched by " + this.searchKey);
             }
-            var refreshData = SKUModelObj.LoadSKUData(this.searchKey, archivedView);
+            var refreshData = Session.SKUModelObj.LoadSKUData(this.searchKey, archivedView);
             if (refreshData)
             {
-                SKUGridRefer.DataSource = SKUModelObj.SKUDataList;
+                SKUGridRefer.DataSource = Session.SKUModelObj.SKUDataList;
                 SKUGridRefer.Columns[0].Visible = false;
                 SKUGridRefer.Columns[1].HeaderText = "SKU#";
                 SKUGridRefer.Columns[1].Width = 300;
@@ -369,7 +367,7 @@ namespace MJC.forms.sku
             int skuId = (int)row.Cells[0].Value;
 
             List<dynamic> skuData = new List<dynamic>();
-            skuData = SKUModelObj.GetSKUData(skuId);
+            skuData = Session.SKUModelObj.GetSKUData(skuId);
             detailModal.setDetails(skuData, skuData[0].id);
 
             this.Hide();

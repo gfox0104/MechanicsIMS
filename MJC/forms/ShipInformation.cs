@@ -23,8 +23,6 @@ namespace MJC.forms
         private GridViewOrigin shipCustListGrid = new GridViewOrigin();
         private DataGridView CLGridRefer;
 
-        private CustomersModel CustomersModelObj = new CustomersModel();
-
         public ShipInformation(int customerId = 0) : base("Ship to Cust#", "Enter a customer ship to information")
         {
             InitializeComponent();

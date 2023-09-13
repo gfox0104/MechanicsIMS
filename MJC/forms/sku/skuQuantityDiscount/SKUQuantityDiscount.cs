@@ -15,9 +15,7 @@ namespace MJC.forms.sku.skuQuantityDiscount
 
         private GridViewOrigin SkuQtyDiscountGrid = new GridViewOrigin();
         private DataGridView SkuQtyDiscountGridRefer;
-        private SKUQtyDiscountModel SKUQtyDiscountModelObj = new SKUQtyDiscountModel();
-        private SKUModel SKUModelObj = new SKUModel();
-
+        
         private int skuId = 0;
 
         public SKUQuantityDiscount(int skuId) : base("Quantity Discounts for SKU#", "Set discounts for buying a SKU in bulk")
@@ -33,7 +31,7 @@ namespace MJC.forms.sku.skuQuantityDiscount
             InitSkuQtyDiscount();
             if (skuId != 0)
             {
-                string skuName = SKUModelObj.GetSkuNameById(skuId);
+                string skuName = Session.SKUModelObj.GetSkuNameById(skuId);
                 this._changeFormText("Quantity Discounts for SKU# " + skuName);
             }
 
@@ -83,7 +81,7 @@ namespace MJC.forms.sku.skuQuantityDiscount
                     DataGridViewRow row = SkuQtyDiscountGridRefer.Rows[rowIndex];
                     int skuCostQtyId = (int)row.Cells[0].Value;
 
-                    var refreshData = SKUQtyDiscountModelObj.DeleteSKUCostQty(skuCostQtyId);
+                    var refreshData = Session.SKUQtyDiscountModelObj.DeleteSKUCostQty(skuCostQtyId);
                     if (refreshData)
                     {
                         LoadSKUQtyDiscount();
@@ -94,11 +92,11 @@ namespace MJC.forms.sku.skuQuantityDiscount
 
         private void LoadSKUQtyDiscount()
         {
-            var refreshData = SKUQtyDiscountModelObj.LoadSKUQtyDiscount();
+            var refreshData = Session.SKUQtyDiscountModelObj.LoadSKUQtyDiscount();
 
             if (refreshData)
             {
-                SkuQtyDiscountGridRefer.DataSource = SKUQtyDiscountModelObj.SkuQtyDiscountList;
+                SkuQtyDiscountGridRefer.DataSource = Session.SKUQtyDiscountModelObj.SkuQtyDiscountList;
                 SkuQtyDiscountGridRefer.Columns[0].HeaderText = "id";
                 SkuQtyDiscountGridRefer.Columns[0].Visible = false;
                 SkuQtyDiscountGridRefer.Columns[1].HeaderText = "skuId";
@@ -128,7 +126,7 @@ namespace MJC.forms.sku.skuQuantityDiscount
             int skuCostQtyId = (int)row.Cells[0].Value;
 
             SKUQtyDiscount tempSkuQtyDiscount = new SKUQtyDiscount();
-            foreach (SKUQtyDiscount skuQtyDiscount in SKUQtyDiscountModelObj.SkuQtyDiscountList)
+            foreach (SKUQtyDiscount skuQtyDiscount in Session.SKUQtyDiscountModelObj.SkuQtyDiscountList)
             {
                 if (skuQtyDiscount.id == skuCostQtyId)
                 {

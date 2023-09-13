@@ -33,9 +33,6 @@ namespace MJC.forms.order
 
         private string searchKey;
 
-        private CustomersModel CustomersModelObj = new CustomersModel();
-        private SKUModel SKUModelObj = new SKUModel();
-        private OrderItemsModel OrderItemsModalObj = new OrderItemsModel();
 
         public OrderEntry() : base("Order Entry - Select a Customer", "Select a customer to start an order for")
         {
@@ -175,7 +172,7 @@ namespace MJC.forms.order
         {
             OEGridRefer.Rows.Clear();
 
-            DataTable dataTable = CustomersModelObj.LoadCustomerTable();
+            DataTable dataTable = Session.CustomersModelObj.LoadCustomerTable();
 
             foreach (DataRow row in dataTable.Rows)
             {

@@ -22,7 +22,6 @@ namespace MJC.forms.sku
         private GridViewOrigin profileInfoGrid = new GridViewOrigin();
         private DataGridView ProfileInfoGridRefer;
 
-        private SKUModel SKUModelObj = new SKUModel();
         private int skuId = 0;
 
         public SKUProfile(int skuId = 0, string skuNumber = "") : base("Profile Info", "Review SKU history of invoices")
@@ -70,11 +69,11 @@ namespace MJC.forms.sku
 
         public void LoadProfileHistory()
         {
-            var refreshData = SKUModelObj.LoadSkuProfile(this.skuId);
+            var refreshData = Session.SKUModelObj.LoadSkuProfile(this.skuId);
 
             if (refreshData)
             {
-                ProfileInfoGridRefer.DataSource = SKUModelObj.SKUProfileList;
+                ProfileInfoGridRefer.DataSource = Session.SKUModelObj.SKUProfileList;
                 ProfileInfoGridRefer.Columns[0].Visible = false;
                 ProfileInfoGridRefer.Columns[1].HeaderText = "Date";
                 ProfileInfoGridRefer.Columns[1].Width = 200;

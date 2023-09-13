@@ -28,20 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SuspendLayout();
+            SuspendLayout();
             // 
             // BasicLayout
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Name = "BasicLayout";
-            this.Text = "BasicLayout";
-            this.Activated += new System.EventHandler(this.BasicLayout_Activated);
-            this.Load += new System.EventHandler(this.BasicLayout_Load);
-            this.Enter += new System.EventHandler(this.BasicLayout_Enter);
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Name = "BasicLayout";
+            Text = "BasicLayout";
+            Activated += BasicLayout_Activated;
+            Load += BasicLayout_Load;
+            Paint += BasicLayout_Paint;
+            Enter += BasicLayout_Enter;
+            ResumeLayout(false);
         }
 
         #endregion

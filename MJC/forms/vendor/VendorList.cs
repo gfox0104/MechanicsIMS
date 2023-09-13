@@ -24,7 +24,6 @@ namespace MJC.forms.vendor
 
         private GridViewOrigin VendorListGrid = new GridViewOrigin();
         private DataGridView VGridRefer;
-        private VendorsModel VendorsModelObj = new VendorsModel();
 
         private bool archievedView = false;
 
@@ -68,7 +67,7 @@ namespace MJC.forms.vendor
                             selectedVendorId = (int)row.Cells[0].Value;
                         }
                     }
-                    bool refreshData = VendorsModelObj.DeleteVendor(selectedVendorId);
+                    bool refreshData = Session.VendorsModelObj.DeleteVendor(selectedVendorId);
                     if (refreshData)
                     {
                         LoadVendorList();
@@ -115,10 +114,10 @@ namespace MJC.forms.vendor
         private void LoadVendorList(bool archivedView = false)
         {
             string filter = "";
-            var refreshData = VendorsModelObj.LoadVendorData(filter, archievedView);
+            var refreshData = Session.VendorsModelObj.LoadVendorData(filter, archievedView);
             if (refreshData)
             {
-                VGridRefer.DataSource = VendorsModelObj.VendorDataList;
+                VGridRefer.DataSource = Session.VendorsModelObj.VendorDataList;
                 VGridRefer.Columns[0].HeaderText = "ID";
                 VGridRefer.Columns[0].Visible = false;
 
@@ -149,7 +148,7 @@ namespace MJC.forms.vendor
 
             int vendorId = (int)row.Cells[0].Value;
             List<dynamic> vendorData = new List<dynamic>();
-            vendorData = VendorsModelObj.GetVendorData(vendorId);
+            vendorData = Session.VendorsModelObj.GetVendorData(vendorId);
             detailModal.setDetails(vendorData, vendorData[0].id);
 
             if (detailModal.ShowDialog() == DialogResult.OK)

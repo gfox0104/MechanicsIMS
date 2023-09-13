@@ -34,10 +34,7 @@ namespace MJC.forms
         private DataGridView ReceivePymtGridRefer;
 
         private int customerId = 0;
-        private InvoicesModel InvoicesModelObj = new InvoicesModel();
-        private CustomersModel CustomersModelObj = new CustomersModel();
-        private PaymentDetailModel PymtDetailModelObj = new PaymentDetailModel();
-
+        
         public ReceivePayment(int customerId = 0) : base("Receive Payment", "Fill out to receive payment")
         {
             InitializeComponent();
@@ -105,12 +102,12 @@ namespace MJC.forms
             _addFormInputs(FormComponents, 30, 110, 800, 42, 200);
 
 
-            var refreshData = CustomersModelObj.LoadCustomerData("", false);
+            var refreshData = Session.CustomersModelObj.LoadCustomerData("", false);
 
 
             CustomerName.GetComboBox().DisplayMember = "Name";
             CustomerName.GetComboBox().ValueMember = "Id";
-            CustomerName.GetComboBox().DataSource = CustomersModelObj.CustomerDataList;
+            CustomerName.GetComboBox().DataSource = Session.CustomersModelObj.CustomerDataList;
 
             CustomerName.GetComboBox().SelectedValueChanged += CustomerChanged;
         }
@@ -144,7 +141,7 @@ namespace MJC.forms
 
         private void LoadPaymentList(int customerId = 0)
         {
-            List<InvoiceData> InvoiceDataList = InvoicesModelObj.LoadInvoiceData(customerId);
+            List<InvoiceData> InvoiceDataList = Session.InvoicesModelObj.LoadInvoiceData(customerId);
 
             ReceivePymtGridRefer.DataSource = InvoiceDataList;
             ReceivePymtGridRefer.Columns[0].Visible = false;

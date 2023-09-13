@@ -43,9 +43,6 @@ namespace MJC.forms.invoice
         private FlabelConstant TotalPayments = new FlabelConstant("Total Payments:");
         private FlabelConstant InvoiceBalance = new FlabelConstant("Invoice Balance:");
 
-        private InvoicesModel InvoicesModelObj = new InvoicesModel();
-        private CustomersModel CustomersModelObj = new CustomersModel();
-
         private int customerId = 0;
         private int orderId = 0;
 
@@ -142,7 +139,7 @@ namespace MJC.forms.invoice
             if (orderId == 0)
                 refreshData = true;
             else
-                refreshData = InvoicesModelObj.UpdateInvoice(invoiceNumber, invoiceDate, description, terms, paymentDate, lastPayment, interestRate, interestApplied, discountAllowed, coreCharge, dateShipped, poNumber, shipVia, fob, salesman, this.orderId);
+                refreshData = Session.InvoicesModelObj.UpdateInvoice(invoiceNumber, invoiceDate, description, terms, paymentDate, lastPayment, interestRate, interestApplied, discountAllowed, coreCharge, dateShipped, poNumber, shipVia, fob, salesman, this.orderId);
 
             string modeText = orderId == 0 ? "creating" : "updating";
 
@@ -221,7 +218,7 @@ namespace MJC.forms.invoice
         {
             this.customerId = _id;
             List<dynamic> data = new List<dynamic>();
-            data = InvoicesModelObj.GetInvoiceDataById(_id);
+            data = Session.InvoicesModelObj.GetInvoiceDataById(_id);
 
             var invoiceData = data[0];
             this.orderId = invoiceData.orderId;
