@@ -3,7 +3,6 @@ using MJC.common;
 using MJC.forms.qbo;
 using MJC.qbo;
 using MJC.model;
-using Sentry;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 
@@ -34,9 +33,6 @@ namespace MJC.forms
         private FInputBox businessDescription = new FInputBox("Description");
         private FInputBox invoiceFooter = new FInputBox("Invoice Footer");
         private FInputBox invoiceTermsOfService = new FInputBox("Terms Of Service");
-
-        private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
-        private SalesTaxCodeModel SalesTaxModelObj = new SalesTaxCodeModel();
 
         private PictureBox RFPicture;
 
@@ -78,35 +74,35 @@ namespace MJC.forms
 
         private void GetSettings()
         {
-            SalesTaxModelObj.LoadSalesTaxCodeData();
-            SettingsModelObj.LoadSettings();
+            Session.SalesTaxModelObj.LoadSalesTaxCodeData();
+            Session.SettingsModelObj.LoadSettings();
 
-            BusinessName.GetTextBox().Text = SettingsModelObj.Settings.businessName;
-            businessDescription.GetTextBox().Text = SettingsModelObj.Settings.businessDescription;
-            AddressLine1.GetTextBox().Text = SettingsModelObj.Settings.address1;
-            AddressLine2.GetTextBox().Text = SettingsModelObj.Settings.address2;
-            City.GetTextBox().Text = SettingsModelObj.Settings.city;
-            State.GetTextBox().Text = SettingsModelObj.Settings.state;
-            Zipcode.GetTextBox().Text = SettingsModelObj.Settings.postalCode;
-            Phone.GetTextBox().Text = SettingsModelObj.Settings.phone;
-            Fax.GetTextBox().Text = SettingsModelObj.Settings.fax;
-            FederalTax.GetTextBox().Text = SettingsModelObj.Settings.ein;
-            TrainingMode.GetCheckBox().Checked = SettingsModelObj.Settings.trainingEnabled;
+            BusinessName.GetTextBox().Text = Session.SettingsModelObj.Settings.businessName;
+            businessDescription.GetTextBox().Text = Session.SettingsModelObj.Settings.businessDescription;
+            AddressLine1.GetTextBox().Text = Session.SettingsModelObj.Settings.address1;
+            AddressLine2.GetTextBox().Text = Session.SettingsModelObj.Settings.address2;
+            City.GetTextBox().Text = Session.SettingsModelObj.Settings.city;
+            State.GetTextBox().Text = Session.SettingsModelObj.Settings.state;
+            Zipcode.GetTextBox().Text = Session.SettingsModelObj.Settings.postalCode;
+            Phone.GetTextBox().Text = Session.SettingsModelObj.Settings.phone;
+            Fax.GetTextBox().Text = Session.SettingsModelObj.Settings.fax;
+            FederalTax.GetTextBox().Text = Session.SettingsModelObj.Settings.ein;
+            TrainingMode.GetCheckBox().Checked = Session.SettingsModelObj.Settings.trainingEnabled;
 
-            invoiceTermsOfService.GetTextBox().Text = SettingsModelObj.Settings.businessTermsOfService;
-            invoiceFooter.GetTextBox().Text = SettingsModelObj.Settings.businessFooter;
+            invoiceTermsOfService.GetTextBox().Text = Session.SettingsModelObj.Settings.businessTermsOfService;
+            invoiceFooter.GetTextBox().Text = Session.SettingsModelObj.Settings.businessFooter;
 
-            TargetPrinter.GetComboBox().Text = SettingsModelObj.Settings.targetPrinter;
+            TargetPrinter.GetComboBox().Text = Session.SettingsModelObj.Settings.targetPrinter;
             TargetPrinter.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
 
-            InvoicePrintQty.GetTextBox().Text = SettingsModelObj.Settings.invoicePrintQty.ToString();
-            HoldOrdersPrintQty.GetTextBox().Text = SettingsModelObj.Settings.holdOrderPrintQty.ToString();
-            QuotePrintQty.GetTextBox().Text = SettingsModelObj.Settings.quotePrintQty.ToString();
+            InvoicePrintQty.GetTextBox().Text = Session.SettingsModelObj.Settings.invoicePrintQty.ToString();
+            HoldOrdersPrintQty.GetTextBox().Text = Session.SettingsModelObj.Settings.holdOrderPrintQty.ToString();
+            QuotePrintQty.GetTextBox().Text = Session.SettingsModelObj.Settings.quotePrintQty.ToString();
 
-            var taxCodes = SalesTaxModelObj.SalesTaxCodeDataList.Select(x => x.name).ToArray();
+            var taxCodes = Session.SalesTaxModelObj.SalesTaxCodeDataList.Select(x => x.name).ToArray();
             ProcessingTax.GetComboBox().Items.AddRange(taxCodes);
 
-            var taxCodeId = SettingsModelObj.Settings.taxCodeId;
+            var taxCodeId = Session.SettingsModelObj.Settings.taxCodeId;
             // Default selection to 0 if possible
             if (taxCodeId == 0)
             {
@@ -118,7 +114,7 @@ namespace MJC.forms
 
             for (int i = 0; i < taxCodes.Length; i++)
             {
-                if (SalesTaxModelObj.SalesTaxCodeDataList[i].id == taxCodeId)
+                if (Session.SalesTaxModelObj.SalesTaxCodeDataList[i].id == taxCodeId)
                 {
                     ProcessingTax.GetComboBox().SelectedIndex = i;
                     break;
@@ -212,7 +208,7 @@ namespace MJC.forms
             var authorizationCode = string.Empty;
             var refreshToken = string.Empty;
 
-            var selectedTaxCode = SalesTaxModelObj.SalesTaxCodeDataList.FirstOrDefault(x => x.name == taxCode);
+            var selectedTaxCode = Session.SalesTaxModelObj.SalesTaxCodeDataList.FirstOrDefault(x => x.name == taxCode);
             if (selectedTaxCode.id == 0)
             {
                 // This should never happen
@@ -244,11 +240,12 @@ namespace MJC.forms
             // We want to continue to save the settings
             try
             {
-                SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService, invoicePrintQty, holdOrderPrintQty, quotePrintQty);
+                Session.SettingsModelObj.SaveSetting(selectedTaxCode.id, businessName, description, address1, address2, city, state, zipCode, phone, fax, ein, training, targetPrinter, authorizationCode, refreshToken, footerText, termsOfService, invoicePrintQty, holdOrderPrintQty, quotePrintQty);
+
             }
             catch (Exception exception)
             {
-                SentrySdk.CaptureException(exception);
+                Sentry.SentrySdk.CaptureException(exception);
 
                 if (exception.Message.Contains("FOREIGN KEY constraint"))
                 {
@@ -259,6 +256,8 @@ namespace MJC.forms
                     Messages.ShowError("There was an error while saving the settings.");
                 }
             }
+
+            GetSettings();
 
             return true;
         }

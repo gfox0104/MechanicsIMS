@@ -40,7 +40,7 @@ namespace MJC.forms.sku
         private FCheckBox allowDiscount = new FCheckBox("Allow discount");
         private FCheckBox commissionable = new FCheckBox("Commissionable");
 
-        private FInputBox orderForm = new FInputBox("Order Form");
+        private FInputBox orderForm = new FInputBox("Order From");
         private FDateTime lastSold = new FDateTime("Last Sold");
         private FInputBox manufacturer = new FInputBox("Manufacturer");
         private FInputBox location = new FInputBox("Location");
@@ -62,12 +62,6 @@ namespace MJC.forms.sku
         private FInputBox invValue = new FInputBox("Inv Value");
 
         private FInputBox[] priceTiers;
-
-        private PriceTiersModel PriceTiersModelObj = new PriceTiersModel();
-        private CategoriesModel CategoriesModelObj = new CategoriesModel();
-        private SKUPricesModel SKUPricesModelObj = new SKUPricesModel();
-        private SKUModel SKUModelObj = new SKUModel();
-
         private int selectedCategoryId = 0;
         private int skuId = 0;
         private string memo = "";
@@ -170,11 +164,11 @@ namespace MJC.forms.sku
                 {
                     if (selectedCategoryId != 0)
                     {
-                        CategoryData category = CategoriesModelObj.LoadCategoryById(selectedCategoryId);
+                        CategoryData category = Session.CategoriesModelObj.LoadCategoryById(selectedCategoryId);
                         int categoryId = selectedCategoryId;
                         int calculateAs = category.calculateAs;
 
-                        SKUModelObj.SetPrice(categoryId, calculateAs);
+                        Session.SKUModelObj.SetPrice(categoryId, calculateAs);
                     }
                 }
             };
@@ -183,11 +177,11 @@ namespace MJC.forms.sku
                 DialogResult result = MessageBox.Show("Do you want to reset archived?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    SKUModelObj.UpdateSKUArchived(true, this.skuId);
+                    Session.SKUModelObj.UpdateSKUArchived(true, this.skuId);
                 }
                 else if (result == DialogResult.No)
                 {
-                    SKUModelObj.UpdateSKUArchived(false, this.skuId);
+                    Session.SKUModelObj.UpdateSKUArchived(false, this.skuId);
                 }
             };
         }
@@ -273,10 +267,10 @@ namespace MJC.forms.sku
  
 
             string filter = "";
-            var refreshData = PriceTiersModelObj.LoadPriceTierData(filter);
+            var refreshData = Session.PriceTiersModelObj.LoadPriceTierData(filter);
             if (refreshData)
             {
-                List<PriceTierData> pDatas = PriceTiersModelObj.PriceTierDataList;
+                List<PriceTierData> pDatas = Session.PriceTiersModelObj.PriceTierDataList;
 
                 priceTiers = new FInputBox[pDatas.Count];
                 for (int i = 0; i < pDatas.Count; i++)
@@ -360,7 +354,7 @@ namespace MJC.forms.sku
             this.invValue.GetTextBox().Text = data[0].inventoryValue.ToString();
 
             List<KeyValuePair<int, double>> skuPriceData = new List<KeyValuePair<int, double>>();
-            skuPriceData = SKUPricesModelObj.LoadPriceTierDataBySKUId(id);
+            skuPriceData = Session.SKUPricesModelObj.LoadPriceTierDataBySKUId(id);
 
             foreach (KeyValuePair<int, double> pair in skuPriceData)
             {
@@ -375,7 +369,7 @@ namespace MJC.forms.sku
             bool initFlag = true;
             categoryCombo.GetComboBox().Items.Clear();
             List<KeyValuePair<int, string>> CategoryList = new List<KeyValuePair<int, string>>();
-            CategoryList = CategoriesModelObj.GetCategoryItems();
+            CategoryList = Session.CategoriesModelObj.GetCategoryItems();
             foreach (KeyValuePair<int, string> item in CategoryList)
             {
                 int id = item.Key;
@@ -479,9 +473,9 @@ namespace MJC.forms.sku
             bool refreshData = false;
             if (skuId == 0)
             {
-                refreshData = SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict);
+                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict);
             }
-            else refreshData = SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, skuId);
+            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, skuId);
             string modeText = skuId == 0 ? "creating" : "updating";
             if (refreshData)
             {

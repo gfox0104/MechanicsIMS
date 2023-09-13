@@ -22,8 +22,7 @@ namespace MJC.forms.taxcode
         private FInputBox Rate = new FInputBox("Rate");
 
         private int salesTaxCodeId = 0;
-        private SalesTaxCodeModel SalesTaxCodeModelObj = new SalesTaxCodeModel();
-
+        
         public SalesTaxCodesDetail() : base("Add SalesTaxCode")
         {
             InitializeComponent();
@@ -68,7 +67,7 @@ namespace MJC.forms.taxcode
         public void setDetails(int _id)
         {
             salesTaxCodeId = _id;
-            var salesTaxCodeData = SalesTaxCodeModelObj.GetSalesTaxCodeData(_id);
+            var salesTaxCodeData = Session.SalesTaxCodeModelObj.GetSalesTaxCodeData(_id);
 
             this.Name.GetTextBox().Text = salesTaxCodeData.name;
             this.Classification.GetTextBox().Text = salesTaxCodeData.classification;
@@ -100,8 +99,8 @@ namespace MJC.forms.taxcode
 
             bool refreshData = false;
             if (salesTaxCodeId == 0)
-                refreshData = SalesTaxCodeModelObj.AddSalesTaxCode(name, classification, rate);
-            else refreshData = SalesTaxCodeModelObj.UpdateSalesTaxCode(name, classification, rate, salesTaxCodeId);
+                refreshData = Session.SalesTaxCodeModelObj.AddSalesTaxCode(name, classification, rate);
+            else refreshData = Session.SalesTaxCodeModelObj.UpdateSalesTaxCode(name, classification, rate, salesTaxCodeId);
 
             string modeText = salesTaxCodeId == 0 ? "creating" : "updating";
 

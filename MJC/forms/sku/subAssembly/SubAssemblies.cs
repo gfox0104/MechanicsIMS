@@ -19,9 +19,7 @@ namespace MJC.forms.sku
 
         private GridViewOrigin SubAssembliesGrid = new GridViewOrigin();
         private DataGridView SubAssembliesGridRefer;
-        private SubAssemblyModel SubAssemblyModelObj = new SubAssemblyModel();
-        private SKUModel SKUModelObj = new SKUModel();
-
+        
         private FlabelConstant Status = new FlabelConstant("Status:");
         private FlabelConstant PrintInvoice = new FlabelConstant("Print on Invoice:");
 
@@ -42,7 +40,7 @@ namespace MJC.forms.sku
             InitSubAssembly();
             if (skuId != 0)
             {
-                this.targetSKU = SKUModelObj.GetSkuNameById(skuId);
+                this.targetSKU = Session.SKUModelObj.GetSkuNameById(skuId);
                 this._changeFormText("Sub-assemblies for SKU# " + this.targetSKU);
             }
         }
@@ -114,7 +112,7 @@ namespace MJC.forms.sku
                     DataGridViewRow row = SubAssembliesGridRefer.Rows[rowIndex];
                     int id = (int)row.Cells[0].Value;
 
-                    var refreshData = SubAssemblyModelObj.DeleteSubAssembly(id);
+                    var refreshData = Session.SubAssemblyModelObj.DeleteSubAssembly(id);
                     if (refreshData)
                     {
                         LoadSubAssemblies();
@@ -147,7 +145,7 @@ namespace MJC.forms.sku
                 {
                     printInvoiceState = 1;
                 }
-                var refreshData = SubAssemblyModelObj.UpdatePrintInvoice(printInvoiceState, this.skuId);
+                var refreshData = Session.SubAssemblyModelObj.UpdatePrintInvoice(printInvoiceState, this.skuId);
                 if (refreshData)
                 {
                     LoadSubAssemblies();
@@ -156,7 +154,7 @@ namespace MJC.forms.sku
 
             hkCalculateCot.GetButton().Click += (sender, e) =>
             {
-                var refreshData = SubAssemblyModelObj.UpdateTargetSKUCost(this.skuId);
+                var refreshData = Session.SubAssemblyModelObj.UpdateTargetSKUCost(this.skuId);
                 if (refreshData)
                 {
                     LoadSubAssemblies();
@@ -166,7 +164,7 @@ namespace MJC.forms.sku
 
         private void LoadSubAssemblies()
         {
-            List<SubAssembly> subAssemblyList = SubAssemblyModelObj.LoadSubAssemblies();
+            List<SubAssembly> subAssemblyList = Session.SubAssemblyModelObj.LoadSubAssemblies();
 
             SubAssembliesGridRefer.DataSource = subAssemblyList;
             SubAssembliesGridRefer.Columns[0].HeaderText = "SubAssemblyId";
@@ -214,7 +212,7 @@ namespace MJC.forms.sku
             DataGridViewRow row = SubAssembliesGridRefer.Rows[rowIndex];
             int id = (int)row.Cells[0].Value;
 
-            SubAssembly subAssembly = SubAssemblyModelObj.GetSubAssemblyId(id);                
+            SubAssembly subAssembly = Session.SubAssemblyModelObj.GetSubAssemblyId(id);                
 
             detailModal.setDetails(subAssembly);
 

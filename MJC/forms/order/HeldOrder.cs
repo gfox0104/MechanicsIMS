@@ -22,7 +22,6 @@ namespace MJC.forms.order
         private GridViewOrigin heldOrderGrid = new GridViewOrigin();
         private DataGridView HeldOrderRefer;
 
-        private OrderItemsModel OrderItemModelObj = new OrderItemsModel();
         private int customerId = 0;
         private string customerName = "";
 
@@ -64,7 +63,7 @@ namespace MJC.forms.order
                 DataGridViewRow row = HeldOrderRefer.Rows[rowIndex];
                 int selectedOrderId = (int)row.Cells[0].Value;
 
-                bool refreshData = OrderItemModelObj.DeleteOrder(selectedOrderId);
+                bool refreshData = Session.OrderItemModelObj.DeleteOrder(selectedOrderId);
                 if (refreshData)
                 {
                     LoadHeldOrderList();
@@ -121,7 +120,7 @@ namespace MJC.forms.order
 
         private void LoadHeldOrderList()
         {
-            List<Order> OrdersList = OrderItemModelObj.LoadOrdersDataByStatus(2, this.customerId);
+            List<Order> OrdersList = Session.OrderItemModelObj.LoadOrdersDataByStatus(2, this.customerId);
             HeldOrderRefer.Rows.Clear();
 
             foreach (Order OrderItem in OrdersList)

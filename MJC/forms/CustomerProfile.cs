@@ -24,8 +24,6 @@ namespace MJC.forms
         private string searchKey = "";
         private int customerId = 0;
 
-        private OrderItemsModel OrderItemsModalObj = new OrderItemsModel();
-        private CustomersModel CustomersModelObj = new CustomersModel();
         public CustomerProfile(int customerId = 0) : base("Customer Profiler", "Profile view of customers and their history of purchases")
         {
             InitializeComponent();
@@ -54,7 +52,7 @@ namespace MJC.forms
             _addFormInputs(FormComponents, 30, 110, 650, 42, 180);
 
             List<KeyValuePair<int, string>> CustomerList = new List<KeyValuePair<int, string>>();
-            CustomerList = CustomersModelObj.GetCustomerNumberList();
+            CustomerList = Session.CustomersModelObj.GetCustomerNumberList();
             foreach (KeyValuePair<int, string> item in CustomerList)
             {
                 int id = item.Key;
@@ -87,7 +85,7 @@ namespace MJC.forms
             {
                 this.customerId = selectedItem.Id;
 
-                var customerData = CustomersModelObj.GetCustomerData(this.customerId);
+                var customerData = Session.CustomersModelObj.GetCustomerData(this.customerId);
                 if (customerData != null)
                 {
                     if (customerData.customerName != "") CustomerName.SetContext(customerData.customerName);
@@ -124,10 +122,10 @@ namespace MJC.forms
             {
                 this._changeFormText("Customer Profiler searched by " + this.searchKey);
             }
-            var refreshData = OrderItemsModalObj.LoadCustomerProfiler(this.searchKey, this.customerId);
+            var refreshData = Session.OrderItemModelObj.LoadCustomerProfiler(this.searchKey, this.customerId);
             if (refreshData)
             {
-                POGridRefer.DataSource = OrderItemsModalObj.ProcessOIList;
+                POGridRefer.DataSource = Session.OrderItemModelObj.ProcessOIList;
                 POGridRefer.ReadOnly = true;
             }
 

@@ -37,8 +37,7 @@ namespace MJC.common
         private Label _projectVersion;
 
         private Label _formDescription;
-        private SystemSettingsModel SettingsModelObj = new SystemSettingsModel();
-
+        
         public BasicLayout()
         {
             InitializeComponent();
@@ -72,7 +71,7 @@ namespace MJC.common
             this.Size = new System.Drawing.Size(_winHeight, _winWidth);
             this.WindowState = FormWindowState.Maximized;
 
-            SettingsModelObj.LoadSettings();
+            Session.SettingsModelObj.LoadSettings();
         }
 
         private void _initHeader(string title)
@@ -116,7 +115,7 @@ namespace MJC.common
             this._companyName.BackColor = System.Drawing.Color.Transparent;
             this._companyName.Font = this._fontPoint4_1;
             this._companyName.ForeColor = this._textMainColor;
-            this._companyName.Text = !string.IsNullOrEmpty(SettingsModelObj.Settings.businessName) ? SettingsModelObj.Settings.businessName : "DEFAULT COMPANY NAME";
+            this._companyName.Text = !string.IsNullOrEmpty(Session.SettingsModelObj.Settings.businessName) ? Session.SettingsModelObj.Settings.businessName : "DEFAULT COMPANY NAME";
             this._companyName.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this._header.Controls.Add(this._companyName);
             this._companyName.Location = new System.Drawing.Point(this.Width - this._companyName.Width - 30, 15);
@@ -161,8 +160,6 @@ namespace MJC.common
 
         private void BasicLayout_Activated(object sender, EventArgs e)
         {
-            SettingsModelObj.LoadSettings();
-            this._companyName.Text = !string.IsNullOrEmpty(SettingsModelObj.Settings.businessName) ? SettingsModelObj.Settings.businessName : "DEFAULT COMPANY NAME";
         }
 
         private void BasicLayout_Load(object sender, EventArgs e)
@@ -173,6 +170,16 @@ namespace MJC.common
         private void BasicLayout_Enter(object sender, EventArgs e)
         {
 
+        }
+
+        private void BasicLayout_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        public void Refresh()
+        {
+            this._companyName.Text = !string.IsNullOrEmpty(Session.SettingsModelObj.Settings.businessName) ? Session.SettingsModelObj.Settings.businessName : "DEFAULT COMPANY NAME";
         }
     }
 }

@@ -23,8 +23,7 @@ namespace MJC.forms.salescostcode
 
         private GridViewOrigin salesCostCodeListGrid = new GridViewOrigin();
         private DataGridView SCCLGridRefer;
-        private SalesCostCodeModel SalesCostCodesModelObj = new SalesCostCodeModel();
-
+        
         public SalesCostCodes() : base("Sales/Cost Codes", "Sales/cost codes on record")
         {
             InitializeComponent();
@@ -66,7 +65,7 @@ namespace MJC.forms.salescostcode
                             selectedSalesCostCodeId = (int)row.Cells[0].Value;
                         }
                     }
-                    bool refreshData = SalesCostCodesModelObj.DeleteSalesCostCode(selectedSalesCostCodeId);
+                    bool refreshData = Session.SalesCostCodesModelObj.DeleteSalesCostCode(selectedSalesCostCodeId);
                     if (refreshData)
                     {
                         LoadSalesCostCodeList();
@@ -95,10 +94,10 @@ namespace MJC.forms.salescostcode
         private void LoadSalesCostCodeList()
         {
             string filter = "";
-            var refreshData = SalesCostCodesModelObj.LoadSalesCostCodeData(filter);
+            var refreshData = Session.SalesCostCodesModelObj.LoadSalesCostCodeData(filter);
             if (refreshData)
             {
-                SCCLGridRefer.DataSource = SalesCostCodesModelObj.SalesCostCodeDataList;
+                SCCLGridRefer.DataSource = Session.SalesCostCodesModelObj.SalesCostCodeDataList;
                 SCCLGridRefer.Columns[0].Visible = false;
                 SCCLGridRefer.Columns[1].HeaderText = "SC Code";
                 SCCLGridRefer.Columns[1].Width = 300;

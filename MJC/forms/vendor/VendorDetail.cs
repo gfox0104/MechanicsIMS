@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Sentry;
 
 namespace MJC.forms.vendor
 {
@@ -29,7 +28,6 @@ namespace MJC.forms.vendor
         private FMaskedTextBox BusPhone = new FMaskedTextBox("Bus.Phone");
         private FMaskedTextBox Fax = new FMaskedTextBox("Fax");
 
-        private VendorsModel VendorsModelObj = new VendorsModel();
         private int vendorId = 0;
 
         public VendorDetail() : base("Add Vendor")
@@ -111,8 +109,8 @@ namespace MJC.forms.vendor
 
             try
             {
-                if (vendorId == 0) refreshData = VendorsModelObj.AddVendor(vendorName, vendorNumber, address1, address2, city, state, zipcode, busphone, fax);
-                else refreshData = VendorsModelObj.UpdateVendor(vendorName, vendorNumber, address1, address2, city, state, zipcode, busphone, fax, vendorId);
+                if (vendorId == 0) refreshData = Session.VendorsModelObj.AddVendor(vendorName, vendorNumber, address1, address2, city, state, zipcode, busphone, fax);
+                else refreshData = Session.VendorsModelObj.UpdateVendor(vendorName, vendorNumber, address1, address2, city, state, zipcode, busphone, fax, vendorId);
 
                 string modeText = vendorId == 0 ? "creating" : "updating";
 
@@ -125,7 +123,7 @@ namespace MJC.forms.vendor
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");

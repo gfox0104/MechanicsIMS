@@ -23,7 +23,6 @@ namespace MJC.forms
 
         private GridViewOrigin reconcilliationGrid = new GridViewOrigin();
         private DataGridView ReconcilGridRefer;
-        private InvoicesModel InvoicesModelObj = new InvoicesModel();
 
         public Reconcilliation() : base("Reconcilliation Report", "Reconcilliation report to compare posted/validated sales with Quickbooks")
         {
@@ -56,7 +55,7 @@ namespace MJC.forms
                         int rowIndex = ReconcilGridRefer.SelectedRows[0].Index;
                         DataGridViewRow row = ReconcilGridRefer.Rows[rowIndex];
                         int orderId = (int)row.Cells[0].Value;
-                        var refreshData = InvoicesModelObj.UpdateOrderStatus(status, orderId);
+                        var refreshData = Session.InvoicesModelObj.UpdateOrderStatus(status, orderId);
                         if (refreshData)
                         {
                             LoadReconcilliationList();
@@ -93,7 +92,7 @@ namespace MJC.forms
 
         private void LoadReconcilliationList()
         {
-            List<InvoiceData> invoiceData = InvoicesModelObj.LoadInvoiceData(0, 3);
+            List<InvoiceData> invoiceData = Session.InvoicesModelObj.LoadInvoiceData(0, 3);
   
             ReconcilGridRefer.DataSource = invoiceData;
             ReconcilGridRefer.Columns[0].HeaderText = "id";

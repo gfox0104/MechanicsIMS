@@ -30,9 +30,6 @@ namespace MJC.forms.sku.subAssembly
         private FlabelConstant Status = new FlabelConstant("Status");
         private FlabelConstant InvoicePrint = new FlabelConstant("Invoice Print");
 
-        private SubAssemblyModel SubAssemblyModelObj = new SubAssemblyModel();
-        private SKUModel SKUModelObj = new SKUModel();
-
         private int subAssemblyId = 0;
         private int targetSkuId = 0;
         private int subAssemblySkuId = 0;
@@ -55,7 +52,7 @@ namespace MJC.forms.sku.subAssembly
 
             if (skuId != 0)
             {
-                SKUDetail skuDetail = SKUModelObj.GetSKUById(skuId);
+                SKUDetail skuDetail = Session.SKUModelObj.GetSKUById(skuId);
                 this.targetSKUName = skuDetail.Name;
             }
 
@@ -84,7 +81,7 @@ namespace MJC.forms.sku.subAssembly
             this.Controls.Add(SubAssembly.GetComboBox());
 
             List<KeyValuePair<int, string>> CustomerList = new List<KeyValuePair<int, string>>();
-            CustomerList = SKUModelObj.GetSKUNameList();
+            CustomerList = Session.SKUModelObj.GetSKUNameList();
             foreach (KeyValuePair<int, string> item in CustomerList)
             {
                 int id = item.Key;
@@ -121,8 +118,8 @@ namespace MJC.forms.sku.subAssembly
 
             bool refreshData = false;
 
-            if (this.subAssemblyId == 0) refreshData = SubAssemblyModelObj.AddSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty);
-            else refreshData = SubAssemblyModelObj.UpdateSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty, this.subAssemblyId);
+            if (this.subAssemblyId == 0) refreshData = Session.SubAssemblyModelObj.AddSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty);
+            else refreshData = Session.SubAssemblyModelObj.UpdateSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty, this.subAssemblyId);
 
             string modeText = this.subAssemblyId == 0 ? "creating" : "updating";
 
@@ -158,7 +155,7 @@ namespace MJC.forms.sku.subAssembly
         {
             FComboBoxItem selectedItem = (FComboBoxItem)SubAssembly.GetComboBox().SelectedItem;
             int skuId = selectedItem.Id;
-            var skuInfo = SKUModelObj.LoadSkuInfoById(skuId);
+            var skuInfo = Session.SKUModelObj.LoadSkuInfoById(skuId);
             
             if (skuInfo != null)
             {

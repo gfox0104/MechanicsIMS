@@ -22,8 +22,6 @@ namespace MJC.forms
         private GridViewOrigin recorderGrid = new GridViewOrigin();
         private DataGridView RecorderRefer;
 
-        private SKUModel SKUModelObj = new SKUModel();
-
         public Reorder() : base("Reorder - SKU List", "SKUs that are below critical quantity and need replenished")
         {
             InitializeComponent();
@@ -59,7 +57,7 @@ namespace MJC.forms
 
         private void LoadRecorderList()
         {
-            List<SKURecorder> RecorderList = SKUModelObj.LoadSKURecorderList();
+            List<SKURecorder> RecorderList = Session.SKUModelObj.LoadSKURecorderList();
 
             RecorderRefer.DataSource = RecorderList;
             RecorderRefer.Columns[0].Visible = false;

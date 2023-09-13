@@ -23,8 +23,6 @@ namespace MJC.forms.sku
 
         private GridViewOrigin SerialLotGrid = new GridViewOrigin();
         private DataGridView SerialLotGridRefer;
-        private SKUSerialLotsModel SKUSerialLotsModelObj = new SKUSerialLotsModel();
-        private SKUModel SKUModelObj = new SKUModel();
 
         private int skuId = 0;
 
@@ -41,7 +39,7 @@ namespace MJC.forms.sku
             InitSerialLots();
             if (skuId != 0)
             {
-                string skuName = SKUModelObj.GetSkuNameById(skuId);
+                string skuName = Session.SKUModelObj.GetSkuNameById(skuId);
                 this._changeFormText("Serial/Lot for SKU# " + skuName);
             }
 
@@ -91,7 +89,7 @@ namespace MJC.forms.sku
                     DataGridViewRow row = SerialLotGridRefer.Rows[rowIndex];
                     int skuSerialLotId = (int)row.Cells[0].Value;
 
-                    var refreshData = SKUSerialLotsModelObj.DeleteSKUSerialLots(skuSerialLotId);
+                    var refreshData = Session.SKUSerialLotsModelObj.DeleteSKUSerialLots(skuSerialLotId);
                     if (refreshData)
                     {
                         LoadSKUSerialLosts();
@@ -102,11 +100,11 @@ namespace MJC.forms.sku
 
         private void LoadSKUSerialLosts()
         {
-            var refreshData = SKUSerialLotsModelObj.LoadSKUSerialLot();
+            var refreshData = Session.SKUSerialLotsModelObj.LoadSKUSerialLot();
 
             if (refreshData)
             {
-                SerialLotGridRefer.DataSource = SKUSerialLotsModelObj.SKUSerialLotsList;
+                SerialLotGridRefer.DataSource = Session.SKUSerialLotsModelObj.SKUSerialLotsList;
                 SerialLotGridRefer.Columns[0].HeaderText = "id";
                 SerialLotGridRefer.Columns[0].Visible = false;
                 SerialLotGridRefer.Columns[1].HeaderText = "skuId";
@@ -136,7 +134,7 @@ namespace MJC.forms.sku
             int skuSerialLotId = (int)row.Cells[0].Value;
 
             SKUSerialLot tempSkuSerialLot = new SKUSerialLot();
-            foreach (SKUSerialLot skuSerialLot in SKUSerialLotsModelObj.SKUSerialLotsList)
+            foreach (SKUSerialLot skuSerialLot in Session.SKUSerialLotsModelObj.SKUSerialLotsList)
             {
                 if (skuSerialLot.id == skuSerialLotId)
                 {

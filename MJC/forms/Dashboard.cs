@@ -50,6 +50,14 @@ namespace MJC.forms
 
             SetImage();
             SetLinkButtion();
+
+            this.Activated += Dashboard_Activated;
+        }
+
+        private void Dashboard_Activated(object? sender, EventArgs e)
+        {
+            base.Activate();
+
         }
 
         private void AddHKEvents()

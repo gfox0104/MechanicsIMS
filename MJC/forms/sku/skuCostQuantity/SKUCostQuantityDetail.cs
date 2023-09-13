@@ -27,8 +27,7 @@ namespace MJC.forms.sku
         private FInputBox Cost = new FInputBox("Cost");
         private FInputBox Core = new FInputBox("Core");
 
-        private SKUCostQtyModel SKUCostQtyModelObj = new SKUCostQtyModel();
-
+        
         private int skuId = 0;
         private int skuCostQtyId = 0;
 
@@ -92,8 +91,8 @@ namespace MJC.forms.sku
 
             bool refreshData = false;
 
-            if (this.skuCostQtyId == 0) refreshData = SKUCostQtyModelObj.AddSKUCostQty(skuId, costDate, method, qty, cost, core);
-            else refreshData = SKUCostQtyModelObj.UpdateSKUCostQty(skuId, costDate, method, qty, cost, core, this.skuCostQtyId);
+            if (this.skuCostQtyId == 0) refreshData = Session.SKUCostQtyModelObj.AddSKUCostQty(skuId, costDate, method, qty, cost, core);
+            else refreshData = Session.SKUCostQtyModelObj.UpdateSKUCostQty(skuId, costDate, method, qty, cost, core, this.skuCostQtyId);
 
             string modeText = skuCostQtyId == 0 ? "creating" : "updating";
 

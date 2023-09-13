@@ -27,9 +27,10 @@ namespace MJC.model
         public string businessDescription { get; set; }
         public string businessFooter { get; set; }
         public string businessTermsOfService { get; set; }
-        public int? invoicePrintQty { get; set; }
-        public int? holdOrderPrintQty { get; set; }
-        public int? quotePrintQty { get; set; }
+        public int? invoicePrintQty;
+        public int? holdOrderPrintQty;
+        public int? quotePrintQty;
+
     }
 
     public class SystemSettingsModel : DbConnection
@@ -51,7 +52,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter
+                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter, InvoicePrintQty, HoldOrderPrintQty, QuotePrintQty
                                             from dbo.SystemSettings";
 
                     var reader = command.ExecuteReader();
@@ -74,7 +75,9 @@ namespace MJC.model
                         var refreshToken = reader.GetValue(14)?.ToString();
                         var invoiceTerms = reader.GetValue(15)?.ToString();
                         var invoiceFooter = reader.GetValue(16)?.ToString();
-                        var printOption = "reader.GetValue(17)?.ToString()";
+                        var invoicePrintQty = reader.GetValue(17) as int?;
+                        var holdOrderPrintQty = reader.GetValue(18) as int?;
+                        var quotePrintQty = reader.GetValue(19) as int?;
 
                         Settings = new SystemSettings()
                         {
@@ -109,6 +112,7 @@ namespace MJC.model
         }
 
         public bool SaveSetting(int? taxCodeId, string companyName, string description, string address1, string address2, string city, string state, string zipcode, string phone, string fax, string federalTaxNumber, bool trainingMode, string targetPrinter, string accessToken, string refreshToken, string invoiceFooter, string invoiceTermsOfService, int invoicePrintQty, int holdOrderPrintQty, int quotePrintQty)
+
         {
             using (var connection = GetConnection())
             {

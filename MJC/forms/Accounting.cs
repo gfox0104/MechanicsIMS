@@ -16,8 +16,6 @@ namespace MJC.forms
         private GridViewOrigin accountingGrid = new GridViewOrigin();
         private DataGridView AccountingGridRefer;
 
-        private AccountingModel accountingModelObj = new AccountingModel();
-
         public Accounting() : base("Accounting", "Manage accounts on the system")
         {
             InitializeComponent();
@@ -98,7 +96,7 @@ namespace MJC.forms
 
         private void LoadAccountingList()
         {
-            List<model.Accounting> accountingList = accountingModelObj.LoadAccountingList();
+            List<model.Accounting> accountingList = Session.accountingModelObj.LoadAccountingList();
             int index = 0;
             
             foreach (model.Accounting accountData in accountingList)

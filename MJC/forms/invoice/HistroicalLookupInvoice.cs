@@ -29,9 +29,7 @@ namespace MJC.forms.invoice
 
         private GridViewOrigin InvoiceLookupGrid = new GridViewOrigin();
         private DataGridView ILGridRefer;
-        private InvoicesModel InvoiceModelObj = new InvoicesModel();
-        private CustomersModel CustomersModelObj = new CustomersModel();
-
+        
         private int customerId;
 
         public HistroicalLookupInvoice(int customerId) : base("Historical Invoice Lookup", "Displays invoices of a customer")
@@ -143,10 +141,10 @@ namespace MJC.forms.invoice
 
         private void LoadInvoiceList()
         {
-            var refreshData = InvoiceModelObj.LoadHistoricalInvoiceData(this.customerId);
+            var refreshData = Session.InvoicesModelObj.LoadHistoricalInvoiceData(this.customerId);
             if (refreshData)
             {
-                ILGridRefer.DataSource = InvoiceModelObj.HistoricalInvoiceDataList;
+                ILGridRefer.DataSource = Session.InvoicesModelObj.HistoricalInvoiceDataList;
                 ILGridRefer.Columns[0].Visible = false;
                 ILGridRefer.Columns[1].HeaderText = "Customer id";
                 ILGridRefer.Columns[1].Visible = false;
@@ -165,7 +163,7 @@ namespace MJC.forms.invoice
 
         public void setDetails(int customerId)
         {
-            var customerData = CustomersModelObj.GetCustomerData(customerId);
+            var customerData = Session.CustomersModelObj.GetCustomerData(customerId);
             if (customerData != null)
             {
                 if (!string.IsNullOrEmpty(customerData.customerNumber)) CustomerNumber.SetContext(customerData.customerNumber.ToString());

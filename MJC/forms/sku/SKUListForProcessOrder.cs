@@ -28,8 +28,6 @@ namespace MJC.forms.sku
         private int selectedSKUId;
         private string selectedSKUName;
 
-        private SKUModel SKUModelObj = new SKUModel();
-
         public SKUListForProcessOrder() : base("SKU List", "Select a SKU to open")
         {
             InitializeComponent();
@@ -110,10 +108,10 @@ namespace MJC.forms.sku
             {
                 this._changeFormText("SKU List searched by " + this.searchKey);
             }
-            var refreshData = SKUModelObj.LoadSKUData(this.searchKey, archivedView);
+            var refreshData = Session.SKUModelObj.LoadSKUData(this.searchKey, archivedView);
             if (refreshData)
             {
-                SKUGridRefer.DataSource = SKUModelObj.SKUDataList;
+                SKUGridRefer.DataSource = Session.SKUModelObj.SKUDataList;
                 SKUGridRefer.Columns[0].Visible = false;
                 SKUGridRefer.Columns[1].HeaderText = "SKU#";
                 SKUGridRefer.Columns[1].Width = 300;
