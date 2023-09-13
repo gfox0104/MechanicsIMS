@@ -37,6 +37,8 @@ namespace MJC.forms.category
             AddHotKeyEvents();
 
             InitCategoryListGrid();
+            //this.VisibleChanged += CategoryMargin_VisibleChanged(object sender, EventArgs e);
+            this.VisibleChanged += this.CategoryMargin_VisibleChanged;
         }
 
         private void AddHotKeyEvents()
