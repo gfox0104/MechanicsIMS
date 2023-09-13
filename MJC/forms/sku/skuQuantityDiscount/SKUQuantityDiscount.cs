@@ -17,16 +17,26 @@ namespace MJC.forms.sku.skuQuantityDiscount
         private DataGridView SkuQtyDiscountGridRefer;
         
         private int skuId = 0;
+        private bool readOnly = false;
 
-        public SKUQuantityDiscount(int skuId) : base("Quantity Discounts for SKU#", "Set discounts for buying a SKU in bulk")
+        public SKUQuantityDiscount(int skuId, bool readOnly = false) : base("Quantity Discounts for SKU#", "Set discounts for buying a SKU in bulk")
         {
             InitializeComponent();
             _initBasicSize();
 
-            HotkeyButton[] hkButtons = new HotkeyButton[4] { hkAdds, hkDeletes, hkEdits, hkPreviousScreen };
+            HotkeyButton[] hkButtons;
+            if (readOnly)
+            {
+                hkButtons = new HotkeyButton[1] { hkPreviousScreen };
+            } else
+            {
+                hkButtons = new HotkeyButton[4] { hkAdds, hkDeletes, hkEdits, hkPreviousScreen };
+            }
+
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
             this.skuId = skuId;
+            this.readOnly = readOnly;
 
             InitSkuQtyDiscount();
             if (skuId != 0)

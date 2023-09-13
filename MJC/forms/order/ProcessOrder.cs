@@ -267,7 +267,7 @@ namespace MJC.forms.order
                     int rowIndex = POGridRefer.SelectedRows[0].Index;
 
                     DataGridViewRow row = POGridRefer.Rows[rowIndex];
-                    int skuId = (int)row.Cells[3].Value;
+                    int skuId = (int)row.Cells[2].Value;
                     List<dynamic> skuData = new List<dynamic>();
                     skuData = Session.SKUModelObj.GetSKUData(skuId);
                     detailModal.setDetails(skuData, skuData[0].id);

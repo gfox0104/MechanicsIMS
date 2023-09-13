@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,13 +31,15 @@ namespace MJC.forms.sku.skuQuantityDiscount
 
         private int skuId = 0;
         private int skuQtyDiscountId = 0;
+        private bool readOnly = false;
 
-        public SKUQuantityDiscountDetail(int skuId = 0) : base("Add SKU Quantity Discount")
+        public SKUQuantityDiscountDetail(int skuId, bool readOnly = false) : base("Add SKU Quantity Discount")
         {
             InitializeComponent();
             this.Size = new Size(600, 450);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.skuId = skuId;
+            this.readOnly = readOnly;
 
             InitMBOKButton();
             InitInputBox();
@@ -76,6 +79,16 @@ namespace MJC.forms.sku.skuQuantityDiscount
             Discount1.SetPosition(new Point(30, 280));
             this.Controls.Add(Discount1.GetLabel());
             this.Controls.Add(Discount1.GetTextBox());
+
+            if(this.readOnly)
+            {
+                FromQty.GetTextBox().Enabled = false;
+                ToQty.GetTextBox().Enabled = false;
+                PriceTier.GetTextBox().Enabled = false;
+                DiscountType.GetTextBox().Enabled = false;
+                Discount0.GetTextBox().Enabled = false;
+                Discount1.GetTextBox().Enabled = false;
+            }
         }
 
         private void ok_button_Click(object sender, EventArgs e)

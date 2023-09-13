@@ -40,15 +40,15 @@ namespace MJC.forms.sku.subAssembly
 
         private bool status = false;
         private bool invoicePrint = false;
+        private bool readOnly = false;
 
-
-        public SubAssemblyDetail(int skuId = 0) : base("Add Sub Assembly")
+        public SubAssemblyDetail(int skuId, bool readOnly = false) : base("Add Sub Assembly")
         {
             InitializeComponent();
             this.Size = new Size(600, 550);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.targetSkuId = skuId;
-            
+            this.readOnly = readOnly;
 
             if (skuId != 0)
             {
@@ -103,6 +103,12 @@ namespace MJC.forms.sku.subAssembly
             Quantity.SetPosition(new Point(30, 280));
             this.Controls.Add(Quantity.GetLabel());
             this.Controls.Add(Quantity.GetTextBox());
+
+            if (this.readOnly)
+            {
+                SubAssembly.GetComboBox().Enabled = false;
+                Quantity.GetTextBox().Enabled = false;
+            }
         }
 
         private void ok_button_Click(object sender, EventArgs e)

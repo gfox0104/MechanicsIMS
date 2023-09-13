@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,13 +31,15 @@ namespace MJC.forms.sku
         
         private int skuId = 0;
         private int skuCostQtyId = 0;
+        private bool readOnly = false;
 
-        public SKUCostQuantityDetail(int skuId = 0) : base("Add SKU Cost Qty")
+        public SKUCostQuantityDetail(int skuId, bool readOnly = false) : base("Add SKU Cost Qty")
         {
             InitializeComponent();
             this.Size = new Size(600, 450);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.skuId = skuId;
+            this.readOnly = readOnly;
 
             InitMBOKButton();
             InitInputBox();
@@ -72,6 +75,15 @@ namespace MJC.forms.sku
             Core.SetPosition(new Point(30, 280));
             this.Controls.Add(Core.GetLabel());
             this.Controls.Add(Core.GetTextBox());
+
+            if (this.readOnly)
+            {
+                CostDate.GetDateTimePicker().Enabled = false;
+                Method.GetTextBox().Enabled = false;
+                Qty.GetTextBox().Enabled = false;
+                Cost.GetTextBox().Enabled = false;
+                Core.GetTextBox().Enabled = false;
+            }
         }
 
         private void ok_button_Click(object sender, EventArgs e)

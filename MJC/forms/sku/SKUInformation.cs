@@ -25,6 +25,9 @@ namespace MJC.forms.sku
         private HotkeyButton hkMiscManagement = new HotkeyButton("F4", "Misc Management", Keys.F4);
         private HotkeyButton hkResetPrices = new HotkeyButton("F5", "Reset Prices", Keys.F5);
         private HotkeyButton hkSetArchived = new HotkeyButton("F9", "Set Archived", Keys.F9);
+        private HotkeyButton hkSubAssembly = new HotkeyButton("F4", "Sub-assebmlies", Keys.F4);
+        private HotkeyButton hkCrossReference = new HotkeyButton("F5", "Cross-references", Keys.F5);
+        private HotkeyButton hkQuantityDiscount = new HotkeyButton("F6", "Quantity discounts", Keys.F6);
 
         private FGroupLabel SKUInfo = new FGroupLabel("SKU Info");
         private FInputBox SKUName = new FInputBox("SKU#");
@@ -73,16 +76,24 @@ namespace MJC.forms.sku
             this.Text = "Sku detail";
             InitializeComponent();
             _initBasicSize();
+            this.disabled = disabled;
             this.KeyDown += (s, e) => Form_KeyDown(s, e);
             this.disabled = disabled;
 
-            HotkeyButton[] hkButtons = new HotkeyButton[5] { hkSKUMemo, hkQuickCalcPrice, hkMiscManagement, hkResetPrices, hkSetArchived };
+            HotkeyButton[] hkButtons;
+            if (disabled)
+            {
+                hkButtons = new HotkeyButton[4] { hkSKUMemo, hkSubAssembly, hkCrossReference, hkQuantityDiscount };
+            } else
+            {
+                hkButtons = new HotkeyButton[5] { hkSKUMemo, hkQuickCalcPrice, hkMiscManagement, hkResetPrices, hkSetArchived };
+            }
+            
             _initializeHKButtons(hkButtons, false);
             AddHotKeyEvents();
             allowDiscount.GetCheckBox().Width = 200;
             InitForm();
             this.Load += new System.EventHandler(this.Add_Load);
-            
         }
 
         private void AddHotKeyEvents()
@@ -108,6 +119,24 @@ namespace MJC.forms.sku
                     this.Enabled = true;
                 };
             };
+            hkSubAssembly.GetButton().Click += (sender, e) =>
+            {
+                SubAssemblies subAssemblies = new SubAssemblies(skuId, this.disabled);
+                _navigateToForm(sender, e, subAssemblies);
+                this.Hide();
+            };
+            hkCrossReference.GetButton().Click += (sender, e) =>
+            {
+                CrossReference crossRefModal = new CrossReference(skuId, this.disabled);
+                _navigateToForm(sender, e, crossRefModal);
+                this.Hide();
+            };
+            hkQuantityDiscount.GetButton().Click += (sender, e) =>
+            {
+                SKUQuantityDiscount sKUQuantityDiscountModal = new SKUQuantityDiscount(skuId, this.disabled);
+                _navigateToForm(sender, e, sKUQuantityDiscountModal);
+                this.Hide();
+            };
             hkMiscManagement.GetButton().Click += (sender, e) =>
             {
                 MiscManagement MiscManagementActionsModal = new MiscManagement();
@@ -125,17 +154,17 @@ namespace MJC.forms.sku
                             this.Hide();
                             break;
                         case 2:
-                            CrossReference crossRefModal = new CrossReference(skuId);
+                            CrossReference crossRefModal = new CrossReference(skuId, this.disabled);
                             _navigateToForm(sender, e, crossRefModal);
                             this.Hide();
                             break;
                         case 3:
-                            SubAssemblies subAssemblies = new SubAssemblies(skuId);
+                            SubAssemblies subAssemblies = new SubAssemblies(skuId, this.disabled);
                             _navigateToForm(sender, e, subAssemblies);
                             this.Hide();
                             break;
                         case 4:
-                            SKUCostQuantity skuCostQuantityModal = new SKUCostQuantity(skuId);
+                            SKUCostQuantity skuCostQuantityModal = new SKUCostQuantity(skuId, this.disabled);
                             _navigateToForm(sender, e, skuCostQuantityModal);
                             this.Hide();
                             break;
@@ -145,7 +174,7 @@ namespace MJC.forms.sku
                             this.Hide();
                             break;
                         case 6:
-                            SKUQuantityDiscount sKUQuantityDiscountModal = new SKUQuantityDiscount(skuId);
+                            SKUQuantityDiscount sKUQuantityDiscountModal = new SKUQuantityDiscount(skuId, this.disabled);
                             _navigateToForm(sender, e, sKUQuantityDiscountModal);
                             this.Hide();
                             break;
@@ -226,7 +255,7 @@ namespace MJC.forms.sku
             FormComponents.Add(manufacturer);
             FormComponents.Add(location);
             _addFormInputs(FormComponents, 30, 20, 800, 50, 700, _panel.Controls);
-           
+
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(quantityTracking);
             FormComponents2.Add(quantity);
@@ -241,9 +270,6 @@ namespace MJC.forms.sku
             FormComponents2.Add(recorderQty);
 
             FormComponents2.Add(sales);
-
-            soldThisMonth.GetTextBox().Enabled = false;
-            soldYTD.GetTextBox().Enabled = false;
 
             FormComponents2.Add(soldThisMonth);
             FormComponents2.Add(soldYTD);
@@ -493,13 +519,19 @@ namespace MJC.forms.sku
         {
             if (e.KeyCode == Keys.Escape)
             {
-                DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
+                if(this.disabled == false)
                 {
-                    saveSKU(sender, e);
-                }
-                else if (result == DialogResult.No)
+                    DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        saveSKU(sender, e);
+                    }
+                    else if (result == DialogResult.No)
+                    {
+                        _navigateToPrev(sender, e);
+                    }
+                } else
                 {
                     _navigateToPrev(sender, e);
                 }
