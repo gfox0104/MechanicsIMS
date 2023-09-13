@@ -480,6 +480,32 @@ namespace MJC.model
                 return true;
             }
         }
+        public double GetInventoryValue(int id)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    SqlDataReader reader;
+                    double inventoryValue = 0;
+
+                    command.Connection = connection;
+
+                    command.CommandText = @"select inventoryValue from dbo.SKU where id = @id";
+                    command.Parameters.AddWithValue("@id", id);
+
+                    object result = command.ExecuteScalar();
+                    if (result != null)
+                    {
+                        inventoryValue = Convert.ToDouble(result);
+                    }
+
+                    return inventoryValue;
+                }
+            }
+        }
 
         public List<dynamic> GetSKUData(int id)
         {
@@ -791,7 +817,7 @@ namespace MJC.model
         //    }
         //}
 
-        public bool InsertSKUCostQty(bool active, int skuId, DateTime costDate, int qty, double cost, Dictionary<int, double> priceTierDict,  int createdBy, int updatedBy)
+        public bool InsertSKUCostQty(bool active, int skuId, DateTime costDate, int qty, double cost, Dictionary<int, double> priceTierDict, int createdBy, int updatedBy)
         {
             using (var connection = GetConnection())
             {
@@ -1091,7 +1117,7 @@ namespace MJC.model
                     int qtyAvailable = int.Parse(row["qtyAvailable"].ToString());
                     int qtyRecorder = int.Parse(row["qtyReorder"].ToString());
 
-                    SKUDetail skuDetail = new SKUDetail { Id = skuId,Name = skuName, Category = categoryName, Description = description, QuantityOnHand = qtyRecorder};
+                    SKUDetail skuDetail = new SKUDetail { Id = skuId, Name = skuName, Category = categoryName, Description = description, QuantityOnHand = qtyRecorder };
 
                     return skuDetail;
                 }
