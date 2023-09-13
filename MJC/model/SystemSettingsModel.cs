@@ -51,7 +51,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter,InvoicePrintQty, HoldOrderPrintQty, QuotePrintQty
+                    command.CommandText = @"select taxCodeId,companyName,description,address1,address2,city,state,zipcode,phone,fax,federalTaxNumber,trainingMode,targetPrinter,accessToken,refreshToken,invoiceTermsOfService,invoiceFooter
                                             from dbo.SystemSettings";
 
                     var reader = command.ExecuteReader();
@@ -74,9 +74,7 @@ namespace MJC.model
                         var refreshToken = reader.GetValue(14)?.ToString();
                         var invoiceTerms = reader.GetValue(15)?.ToString();
                         var invoiceFooter = reader.GetValue(16)?.ToString();
-                        var invoicePrintQty = reader.GetValue(17) as int?;
-                        var holdOrderPrintQty = reader.GetValue(18) as int?;
-                        var quotePrintQty = reader.GetValue(19) as int?;
+                        var printOption = "reader.GetValue(17)?.ToString()";
 
                         Settings = new SystemSettings()
                         {
