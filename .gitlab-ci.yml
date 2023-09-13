@@ -101,7 +101,7 @@ build:
   script:
     - 'dotnet build MJC/MJC.csproj -c Release -o bin/release'
 
-tests:
+#tests:
   # stage: test
   # ### Run the tests
   #
