@@ -58,6 +58,7 @@ namespace MJC.forms.sku
 
         private FGroupLabel prices = new FGroupLabel("Prices");
         private FCheckBox freezePrices = new FCheckBox("Freeze prices");
+        private FCheckBox billAsLabor = new FCheckBox("Bill as Labor");
         private FInputBox coreCost = new FInputBox("Core Cost");
         private FInputBox invValue = new FInputBox("Inv Value");
 
@@ -249,6 +250,7 @@ namespace MJC.forms.sku
 
             FormComponents2.Add(prices);
             FormComponents2.Add(freezePrices);
+            FormComponents2.Add(billAsLabor);
             FormComponents2.Add(coreCost);
             FormComponents2.Add(invValue);
 
@@ -346,6 +348,7 @@ namespace MJC.forms.sku
             this.recorderQty.GetTextBox().Text = data[0].qtyReorder.ToString();
 
             this.freezePrices.GetCheckBox().Checked = (bool)data[0].freezePrices;
+            this.billAsLabor.GetCheckBox().Checked = (bool)data[0].billAsLabor;
 
             this.soldThisMonth.GetTextBox().Text = data[0].soldMonthToDate.ToString();
             this.soldYTD.GetTextBox().Text = data[0].soldYearToDate.ToString();
@@ -450,6 +453,7 @@ namespace MJC.forms.sku
             if (!is_i_sold_ytd) i_sold_ytd = 0;
 
             bool b_freeze_prices = freezePrices.GetCheckBox().Checked;
+            bool b_bill_as_Labor = billAsLabor.GetCheckBox().Checked;
 
             double i_core_cost; bool is_i_core_cost = double.TryParse(coreCost.GetTextBox().Text, out i_core_cost);
             if (!is_i_core_cost) i_core_cost = 0;
@@ -473,9 +477,9 @@ namespace MJC.forms.sku
             bool refreshData = false;
             if (skuId == 0)
             {
-                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict);
+                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor);
             }
-            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, skuId);
+            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, skuId);
             string modeText = skuId == 0 ? "creating" : "updating";
             if (refreshData)
             {
