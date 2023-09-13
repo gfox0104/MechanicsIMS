@@ -342,7 +342,7 @@ namespace MJC.forms.sku
                 SKUGridRefer.Columns[5].HeaderText = "Available";
                 SKUGridRefer.Columns[5].Width = 300;
                 SKUGridRefer.Columns[6].HeaderText = "On Hand";
-                SKUGridRefer.Columns[6].Width = 300;
+                SKUGridRefer.Columns[6].Visible = false;
 
             }
 
