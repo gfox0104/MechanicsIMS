@@ -25,6 +25,7 @@ namespace MJC.qbo
         private OrderModel orderModelObj = new OrderModel();
         private OrderItemsModel orderItemModelObj = new OrderItemsModel();
         private PaymentDetailModel PymtDetailModelObj = new PaymentDetailModel();
+        private SKUModel skuModelObj = new SKUModel();
 
         public QboApiService()
         {
@@ -584,6 +585,7 @@ namespace MJC.qbo
 
                 Console.WriteLine("Customer is synchorized");
                 LoadInvoices();
+                LoadSKU();
 
             }
             catch (Exception exc)
@@ -734,7 +736,10 @@ namespace MJC.qbo
         {
             bool? active = customer.Active;
             string customerNumber = customer.DisplayName;
-            string customerName = customer.CompanyName;
+            string customerName = "";
+            if (!string.IsNullOrEmpty(customer.CompanyName))
+                customerName = customer.CompanyName;
+            else customerName = customer.FullyQualifiedName;
             string? address1 = null;
             string? address2 = null;
             string? city = null;
@@ -944,6 +949,66 @@ namespace MJC.qbo
                 }
 
 
+            }
+            catch (Exception exc)
+            {
+                Sentry.SentrySdk.CaptureException(exc);
+                if (exc.Message.Contains("KEY"))
+                {
+                    Messages.ShowError("There was a problem updating the SKU.");
+                }
+
+                throw;
+            }
+
+        }
+
+        async public void LoadSKU()
+        {
+            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: true);
+            try
+            {
+                var result = await dataService.QueryAsync<Item>("select * from Item");
+                var items = result.Response.Entities;
+                foreach (var item in items)
+                {
+                    string itemId = item.Id;
+                    string skuName = item.Name;
+                    int category = 1;
+                    string desc = item.Description;
+                    string measurementUnit = "";
+                    int weight = 0;
+                    int costCode = 1;
+                    int assetAccount = 1;
+                    if (item.AssetAccountRef?.value != null)
+                        assetAccount = int.Parse(item.AssetAccountRef.value);
+                    bool taxable = item.Taxable ?? false;
+                    bool maintain_qty = item.TrackQtyOnHand ?? false;
+                    bool allow_discount = false;
+                    bool commissionable = false;
+                    int order_from = 1;
+                    DateTime last_sold = DateTime.Now;
+                    string manufacturer = "";
+                    string location = "";
+                    int quantity = Convert.ToInt32(item.QtyOnHand);
+                    int qty_allocated = Convert.ToInt32(item.QtyOnSalesOrder);
+                    int qty_available = Convert.ToInt32(item.QtyOnHand - item.QtyOnSalesOrder);
+                    int critical_qty = 0;
+                    int reorder_qty = Convert.ToInt32(item.QtyOnPurchaseOrder);
+                    int sold_this_month = 11;
+                    int sold_ytd = 2022;
+                    bool freeze_prices = false;
+                    double core_cost = Convert.ToDouble(item.UnitPrice);
+                    double inv_value = Convert.ToDouble(item.PurchaseCost);
+                    string memo = item.PurchaseDesc;
+                    Dictionary< int, double> priceTierDict = new Dictionary< int, double>();
+                    bool hidden = false;
+                    bool billAslabor = false;
+                    string? syncToken = item.SyncToken;
+                   
+                    skuModelObj.AddSKU(skuName, category, desc, measurementUnit, weight, costCode, assetAccount, taxable, maintain_qty, allow_discount, commissionable, order_from, last_sold, manufacturer, location, quantity, qty_allocated, qty_available, critical_qty, reorder_qty, sold_this_month, sold_ytd, freeze_prices, core_cost, inv_value, memo, priceTierDict, billAslabor, syncToken, itemId, hidden);
+                }
+                MessageBox.Show("Load QB data is finished");
             }
             catch (Exception exc)
             {

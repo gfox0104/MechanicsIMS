@@ -406,7 +406,9 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value14", lineNum);
                     command.Parameters.AddWithValue("@Value15", createdBy);
                     command.Parameters.AddWithValue("@Value16", updatedBy);
-                    command.Parameters.AddWithValue("@message", message);
+                    if(!string.IsNullOrEmpty(message))
+                        command.Parameters.AddWithValue("@message", message);
+                    else command.Parameters.AddWithValue("@message", DBNull.Value);
 
                     orderItemId = (int)command.ExecuteScalar();
  

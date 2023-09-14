@@ -207,8 +207,7 @@ namespace MJC.model
                     command.Connection = connection;
                     SqlDataReader reader;
 
-                    command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, quantity, qtyAvailable, qtyAllocated
-                                            from dbo.SKU as S_Table inner join dbo.Categories C_Table on category = C_Table.id";
+                    command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, quantity, qtyAvailable, qtyAllocated from dbo.SKU as S_Table LEFT join dbo.Categories C_Table on category = C_Table.id";
 
                     if (archived) command.CommandText += " where S_Table.archived = 1";
 
@@ -216,7 +215,7 @@ namespace MJC.model
                     {
                         command.CommandText = @"select S_Table.id, sku, C_Table.categoryName, description, quantity, qtyAvailable, qtyAllocated
                                                 from dbo.SKU as S_Table
-                                                inner join dbo.Categories C_Table on category = C_Table.id 
+                                                LEFT join dbo.Categories C_Table on category = C_Table.id 
                                                 where S_Table.description like @filter 
                                                 or S_Table.sku like @filter
                                                 or C_Table.categoryName like @filter";
@@ -271,7 +270,10 @@ namespace MJC.model
             double inv_value,
             string memo,
             Dictionary<int, double> priceTierDict,
-            bool billAslabor
+            bool billAslabor,
+            string syncToken,
+            string qboSkuId,
+            bool hidden
             )
         {
 
@@ -283,11 +285,13 @@ namespace MJC.model
                 {
                     command.Connection = connection;
                     //Get Total Number of Customers
-                    command.CommandText = "INSERT INTO dbo.SKU (active, sku, category, description, measurementUnit, weight, costCode, assetAccount, taxable, manageStock, allowDiscounts, commissionable, orderFrom, lastSold, manufacturer, location, quantity, qtyAllocated, qtyAvailable, qtyCritical, qtyReorder, soldMonthToDate, soldYearToDate, freezePrices, coreCost, inventoryValue, createdAt, createdBy, updatedAt, updatedBy, subassemblyStatus, subassemblyPrint, memo, billAsLabor) OUTPUT INSERTED.ID VALUES (@active, @Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31, @memo,  @billAsLabor)";
+                    command.CommandText = "INSERT INTO dbo.SKU (active, sku, category, description, measurementUnit, weight, costCode, assetAccount, taxable, manageStock, allowDiscounts, commissionable, orderFrom, lastSold, manufacturer, location, quantity, qtyAllocated, qtyAvailable, qtyCritical, qtyReorder, soldMonthToDate, soldYearToDate, freezePrices, coreCost, inventoryValue, createdAt, createdBy, updatedAt, updatedBy, subassemblyStatus, subassemblyPrint, memo, billAsLabor, syncToken, qboSkuId, hidden) OUTPUT INSERTED.ID VALUES (@active, @Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31, @memo,  @billAsLabor, @syncToken, @qboSkuId, @hidden)";
                     command.Parameters.AddWithValue("@active", true);
                     command.Parameters.AddWithValue("@Value1", sku__name);
                     command.Parameters.AddWithValue("@Value2", category);
-                    command.Parameters.AddWithValue("@Value3", description);
+                    if(!string.IsNullOrEmpty(description))
+                        command.Parameters.AddWithValue("@Value3", description);
+                    else command.Parameters.AddWithValue("@Value3", DBNull.Value);
                     command.Parameters.AddWithValue("@Value4", measurement_unit);
                     command.Parameters.AddWithValue("@Value5", weight);
                     command.Parameters.AddWithValue("@Value6", cost_code);
@@ -316,8 +320,13 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value29", 1);
                     command.Parameters.AddWithValue("@Value30", false);
                     command.Parameters.AddWithValue("@Value31", false);
-                    command.Parameters.AddWithValue("@memo", memo);
+                    if(!string.IsNullOrEmpty(memo))
+                        command.Parameters.AddWithValue("@memo", memo);
+                    else command.Parameters.AddWithValue("@memo", DBNull.Value);
                     command.Parameters.AddWithValue("@billAsLabor", billAslabor);
+                    command.Parameters.AddWithValue("@syncToken", syncToken);
+                    command.Parameters.AddWithValue("@qboSkuId", qboSkuId);
+                    command.Parameters.AddWithValue("@hidden", hidden);
 
                     int newId = (int)command.ExecuteScalar();
 
@@ -329,7 +338,7 @@ namespace MJC.model
                         SKUPricesModelObj.AddSKUPrice(newId, key, value);
                     }
 
-                    MessageBox.Show("New SKU is added successfully.");
+                    //MessageBox.Show("New SKU is added successfully.");
                 }
 
                 return true;
