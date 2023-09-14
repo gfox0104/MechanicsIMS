@@ -485,7 +485,6 @@ namespace MJC.forms.sku
             if (!is_i_core_cost) i_core_cost = 0;
             double i_inv_value; bool is_i_inv_value = double.TryParse(invValue.GetTextBox().Text, out i_inv_value);
             if (!is_i_inv_value) i_inv_value = 0;
-
             if (s_sku_name == "")
             {
                 MessageBox.Show("Please fill String field.");
@@ -499,11 +498,14 @@ namespace MJC.forms.sku
                 double priceData; bool parse_succeed = double.TryParse(priceTiers[i].GetTextBox().Text, out priceData);
                 if (parse_succeed) priceTierDict.Add(priceTiers[i].GetId(), priceData);
             }
+            string syncToken = "1";
+            string qboSkuId = "3";
+            bool hidden = false;
 
             bool refreshData = false;
             if (skuId == 0)
             {
-                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor);
+                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, syncToken, qboSkuId, hidden);
             }
             else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, skuId);
             string modeText = skuId == 0 ? "creating" : "updating";
