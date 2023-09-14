@@ -23,7 +23,7 @@ namespace MJC.forms.taxcode
 
         private GridViewOrigin salesTaxCodeListGrid = new GridViewOrigin();
         private DataGridView STCLGridRefer;
-        private SalesTaxCodeModel SalesTaxCodesModelObj = new SalesTaxCodeModel();
+
         public SalesTaxCodes() : base("Sales Tax Codes", "Manage sales tax codes used by the system")
         {
             InitializeComponent();
@@ -65,7 +65,7 @@ namespace MJC.forms.taxcode
                             selectedSalesTaxCodeId = (int)row.Cells[0].Value;
                         }
                     }
-                    bool refreshData = SalesTaxCodesModelObj.DeleteSalesTaxCode(selectedSalesTaxCodeId);
+                    bool refreshData = Session.SalesTaxCodeModelObj.DeleteSalesTaxCode(selectedSalesTaxCodeId);
                     if (refreshData)
                     {
                         LoadSalesTaxCodeList();
@@ -94,10 +94,10 @@ namespace MJC.forms.taxcode
         private void LoadSalesTaxCodeList()
         {
             string filter = "";
-            var refreshData = SalesTaxCodesModelObj.LoadSalesTaxCodeData(filter);
+            var refreshData = Session.SalesTaxCodeModelObj.LoadSalesTaxCodeData(filter);
             if (refreshData)
             {
-                STCLGridRefer.DataSource = SalesTaxCodesModelObj.SalesTaxCodeDataList;
+                STCLGridRefer.DataSource = Session.SalesTaxCodeModelObj.SalesTaxCodeDataList;
                 STCLGridRefer.Columns[0].Visible = false;
                 STCLGridRefer.Columns[1].HeaderText = "Tax Identifier";
                 STCLGridRefer.Columns[1].Width = 400;

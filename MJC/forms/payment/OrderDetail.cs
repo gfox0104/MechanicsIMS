@@ -14,8 +14,7 @@ namespace MJC.forms.payment
         private FInputBox discount = new FInputBox("Discount");
 
         private int paymentId;
-        private PaymentDetailModel paymentDetailModelObj = new PaymentDetailModel();
-
+        
         public OrderDetail() : base("Edit PaymentDetail")
         {
             InitializeComponent();
@@ -116,7 +115,7 @@ namespace MJC.forms.payment
 
             if (paymentId == 0)
                 Console.WriteLine("Create payment");
-            else refreshData = paymentDetailModelObj.UpdatePayment(checkNumber, amount, discount, paymentId);
+            else refreshData = Session.paymentDetailModelObj.UpdatePayment(checkNumber, amount, discount, paymentId);
 
             string modeText = paymentId == 0 ? "creating" : "updating";
 

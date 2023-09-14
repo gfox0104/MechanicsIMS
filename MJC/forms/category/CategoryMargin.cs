@@ -37,6 +37,8 @@ namespace MJC.forms.category
             AddHotKeyEvents();
 
             InitCategoryListGrid();
+            //this.VisibleChanged += CategoryMargin_VisibleChanged(object sender, EventArgs e);
+            this.VisibleChanged += this.CategoryMargin_VisibleChanged;
         }
 
         private void AddHotKeyEvents()
@@ -52,7 +54,7 @@ namespace MJC.forms.category
             hkDeletes.GetButton().Click += (sender, e) =>
             {
                 int selectedCategoryId = 0;
-                
+
                 int rowIndex = CLGridRefer.SelectedRows[0].Index;
                 DataGridViewRow row = CLGridRefer.Rows[rowIndex];
                 selectedCategoryId = (int)row.Cells[0].Value;
@@ -69,7 +71,7 @@ namespace MJC.forms.category
             };
             hkSetsPrices.GetButton().Click += (sender, e) =>
             {
-                if(CLGridRefer.Rows.Count > 0)
+                if (CLGridRefer.Rows.Count > 0)
                 {
                     int rowIndex = CLGridRefer.SelectedRows[0].Index;
 
@@ -96,6 +98,7 @@ namespace MJC.forms.category
             CLGridRefer.Height = this.Height - 295;
             CLGridRefer.AllowUserToAddRows = false;
 
+            CLGridRefer.Columns.Clear();
             CLGridRefer.Columns.Add("id", "id");
             CLGridRefer.Columns[0].Visible = false;
             CLGridRefer.Columns.Add("category", "Category");
@@ -119,7 +122,7 @@ namespace MJC.forms.category
             string filter = "";
             CLGridRefer.Rows.Clear();
             List<CategoryData> categoryDataList = CategoriesModelObj.LoadCategoryData(filter);
-           
+
             foreach (CategoryData categoryData in categoryDataList)
             {
                 List<KeyValuePair<string, double>> priceTierData = new List<KeyValuePair<string, double>>();
@@ -128,9 +131,9 @@ namespace MJC.forms.category
                 DataGridViewRow newRow = CLGridRefer.Rows[rowIndex];
                 newRow.Cells["id"].Value = categoryData.id;
                 newRow.Cells["category"].Value = categoryData.categoryName;
-                newRow.Cells["calculateAs"].Value = categoryData.calculateAs;
+                newRow.Cells["calculateAs"].Value = categoryData.calculateAs == 1 ? "Markup" : "Margin";
 
-                foreach(KeyValuePair<string, double> pair in priceTierData)
+                foreach (KeyValuePair<string, double> pair in priceTierData)
                 {
                     newRow.Cells[pair.Key].Value = pair.Value;
                 }
@@ -164,13 +167,18 @@ namespace MJC.forms.category
         private void addcategory_btn_Click(object sender, DataGridViewCellEventArgs e)
         {
             DataGridViewRow selectedRow = CLGridRefer.SelectedRows[0];
-            if (selectedRow.Cells[0].Value !=null)
+            if (selectedRow.Cells[0].Value != null)
                 updateCategory();
         }
 
         private void updatePrices(int categoryId, int calculateAs)
         {
             SKUModelObj.SetPrice(categoryId, calculateAs);
+        }
+
+        private void CategoryMargin_VisibleChanged(object sender, EventArgs e)
+        {
+            InitCategoryListGrid();
         }
     }
 }

@@ -18,9 +18,7 @@ namespace MJC.forms.payment
         private GridViewOrigin PaymentHistoryGrid = new GridViewOrigin();
         private DataGridView PHGridRefer;
 
-        private PaymentHistoryModel PymtHistoryModelObj = new PaymentHistoryModel();
-        private CustomersModel CustomerModelObj = new CustomersModel();
-
+        
         private string customerNumber = "";
         private string customerName = "";
         private int customerId = 0;
@@ -34,7 +32,7 @@ namespace MJC.forms.payment
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
 
-            dynamic customerData = CustomerModelObj.GetCustomerDataById(customerId);
+            dynamic customerData = Session.CustomerModelObj.GetCustomerDataById(customerId);
             this.customerId = customerId;
             this.customerNumber = customerData.customerNumber;
             this.customerName = customerData.displayName;
@@ -102,7 +100,7 @@ namespace MJC.forms.payment
                         reversed = !Convert.ToBoolean(reversedFlag);
                     }
                 }
-                bool refreshData = PymtHistoryModelObj.UpdateReverse(reversed, selectedPymtHistoryId);
+                bool refreshData = Session.PymtHistoryModelObj.UpdateReverse(reversed, selectedPymtHistoryId);
                 if (refreshData)
                 {
                     LoadPaymentHistory();
@@ -138,10 +136,10 @@ namespace MJC.forms.payment
         private void LoadPaymentHistory()
         {
             int filter = this.customerId;
-            var refreshData = PymtHistoryModelObj.LoadPaymentHistoryData(filter);
+            var refreshData = Session.PymtHistoryModelObj.LoadPaymentHistoryData(filter);
             if (refreshData)
             {
-                PHGridRefer.DataSource = PymtHistoryModelObj.PaymentHistoryDataList;
+                PHGridRefer.DataSource = Session.PymtHistoryModelObj.PaymentHistoryDataList;
                 PHGridRefer.Columns[0].Visible = false;
                 PHGridRefer.Columns[1].HeaderText = "Check#";
                 PHGridRefer.Columns[1].Width = 300;

@@ -13,12 +13,11 @@ namespace MJC.forms.sku
 
         private GridViewOrigin SkuCostGrid = new GridViewOrigin();
         private DataGridView SkuCostGridRefer;
-        private SKUCostQtyModel SKUCostModelObj = new SKUCostQtyModel();
-        private SKUModel SKUModelObj = new SKUModel();
-
+        
         private int skuId = 0;
+        private bool readOnly = false;
 
-        public SKUCostQuantity(int skuId) : base("Costs for SKU#", "Record of cost per quantity of a SKU, used for inventory valuation")
+        public SKUCostQuantity(int skuId, bool readOnly = false) : base("Costs for SKU#", "Record of cost per quantity of a SKU, used for inventory valuation")
         {
             InitializeComponent();
             _initBasicSize();
@@ -27,11 +26,12 @@ namespace MJC.forms.sku
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
             this.skuId = skuId;
+            this.readOnly = readOnly;
 
             InitSkuCostQty();
             if (skuId != 0)
             {
-                string skuName = SKUModelObj.GetSkuNameById(skuId);
+                string skuName = Session.SKUModelObj.GetSkuNameById(skuId);
                 this._changeFormText("Costs for SKU " + skuName);
             }
 
@@ -81,7 +81,7 @@ namespace MJC.forms.sku
                     DataGridViewRow row = SkuCostGridRefer.Rows[rowIndex];
                     int skuCostQtyId = (int)row.Cells[0].Value;
 
-                    var refreshData = SKUCostModelObj.DeleteSKUCostQty(skuCostQtyId);
+                    var refreshData = Session.SKUCostModelObj.DeleteSKUCostQty(skuCostQtyId);
                     if (refreshData)
                     {
                         LoadSKUCostQty();
@@ -92,11 +92,11 @@ namespace MJC.forms.sku
 
         private void LoadSKUCostQty()
         {
-            var refreshData = SKUCostModelObj.LoadSKUCostQty();
+            var refreshData = Session.SKUCostModelObj.LoadSKUCostQty();
 
             if (refreshData)
             {
-                SkuCostGridRefer.DataSource = SKUCostModelObj.SkuCostQtyList;
+                SkuCostGridRefer.DataSource = Session.SKUCostModelObj.SkuCostQtyList;
                 SkuCostGridRefer.Columns[0].HeaderText = "id";
                 SkuCostGridRefer.Columns[0].Visible = false;
                 SkuCostGridRefer.Columns[1].HeaderText = "skuId";
@@ -116,14 +116,14 @@ namespace MJC.forms.sku
 
         private void updateSKUCostQuantity()
         {
-            SKUCostQuantityDetail detailModal = new SKUCostQuantityDetail(this.skuId);
+            SKUCostQuantityDetail detailModal = new SKUCostQuantityDetail(this.skuId, this.readOnly);
 
             int rowIndex = SkuCostGridRefer.CurrentCell.RowIndex;
             DataGridViewRow row = SkuCostGridRefer.Rows[rowIndex];
             int skuCostQtyId = (int)row.Cells[0].Value;
 
             SKUCostQty tempSkuCostQty = new SKUCostQty();
-            foreach (SKUCostQty skuCostQty in SKUCostModelObj.SkuCostQtyList)
+            foreach (SKUCostQty skuCostQty in Session.SKUCostModelObj.SkuCostQtyList)
             {
                 if (skuCostQty.id == skuCostQtyId)
                 {

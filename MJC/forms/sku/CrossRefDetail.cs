@@ -29,6 +29,7 @@ namespace MJC.forms.sku
         private VendorsModel VendorsModelObj = new VendorsModel();
 
         private int SKUCRId = 0;
+        private bool readOnly = false;
 
         public CrossRefDetail(int _skuId) : base("Add PriceTier")
         {
@@ -46,12 +47,13 @@ namespace MJC.forms.sku
             this.Load += (s, e) => CrossRefDetail_Load(s, e);
         }
 
-        public CrossRefDetail(int _skuId, int _id) : base("Add PriceTier")
+        public CrossRefDetail(int _skuId, int _id, bool _readOnly = false) : base("Add PriceTier")
         {
             InitializeComponent();
             this.Size = new Size(600, 310);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.SKUCRId = _id;
+            this.readOnly = _readOnly;
 
             InitMBOKButton();
             InitInputBox();
@@ -101,6 +103,12 @@ namespace MJC.forms.sku
             CrossRef.SetPosition(new Point(30, 130));
             this.Controls.Add(CrossRef.GetLabel());
             this.Controls.Add(CrossRef.GetTextBox());
+
+            if (this.readOnly)
+            {
+                Vendor.GetComboBox().Enabled = false;
+                CrossRef.GetTextBox().Enabled = false;
+            }
         }
 
         private void loadSKUCombo(int SKUId = 0)

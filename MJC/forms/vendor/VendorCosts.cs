@@ -23,7 +23,7 @@ namespace MJC.forms.vendor
             
         private GridViewOrigin VendorCostsGrid = new GridViewOrigin();
         private DataGridView VGridRefer;
-        private VendorCostsModel VendorCostModelObj = new VendorCostsModel();
+
 
         private int skuId = 0;
 
@@ -65,7 +65,7 @@ namespace MJC.forms.vendor
                 int venderCostId = (int)row.Cells[0].Value;
 
                 VendorCost vendorCost = new VendorCost();
-                foreach (VendorCost vendor in VendorCostModelObj.VendorCostList)
+                foreach (VendorCost vendor in Session.VendorCostModelObj.VendorCostList)
                 {
                     if(vendor.id == venderCostId)
                     {
@@ -95,7 +95,7 @@ namespace MJC.forms.vendor
                     DataGridViewRow row = VGridRefer.Rows[rowIndex];
                     int venderCostId = (int)row.Cells[0].Value;
 
-                    var refreshData = VendorCostModelObj.DeleteVendorCost(venderCostId);
+                    var refreshData = Session.VendorCostModelObj.DeleteVendorCost(venderCostId);
                     if (refreshData)
                     {
                         LoadVendorCosts();
@@ -122,10 +122,10 @@ namespace MJC.forms.vendor
 
         private void LoadVendorCosts()
         {
-            var refreshData = VendorCostModelObj.LoadVendorCosts();
+            var refreshData = Session.VendorCostModelObj.LoadVendorCosts();
             if (refreshData)
             {
-                VGridRefer.DataSource = VendorCostModelObj.VendorCostList;
+                VGridRefer.DataSource = Session.VendorCostModelObj.VendorCostList;
                 VGridRefer.Columns[0].HeaderText = "id";
                 VGridRefer.Columns[0].Visible = false;
                 VGridRefer.Columns[1].HeaderText = "skuId";

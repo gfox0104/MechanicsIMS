@@ -12,6 +12,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Timers;
+using System.Threading;
+using QboLib;
 
 namespace MJC.forms
 {
@@ -29,6 +32,8 @@ namespace MJC.forms
         private NavLinkButton OpenQuickbooks = new NavLinkButton("Open Quickbooks", "");
 
         private PictureBox hkPicture;
+        private DateTime lastRefreshedQBO;
+
         public Dashboard() : base("Dashboard", "Dashboard view")
         {
             InitializeComponent();
@@ -50,6 +55,46 @@ namespace MJC.forms
 
             SetImage();
             SetLinkButtion();
+
+            this.Activated += Dashboard_Activated;
+
+            RefreshQuickbooks(); 
+            
+            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+            timer.Interval = 15000;
+            timer.Tick += RefreshQBOAccessTokens;
+            timer.Start();
+        }
+
+        private async void RefreshQBOAccessTokens(object? sender, EventArgs e)
+        {
+            await RefreshQuickbooks();
+        }
+        
+        private async Task RefreshQuickbooks()
+        {
+            if (QboLocal.Client == null || QboLocal.Tokens == null)
+            {
+                QboLocal.Initialize();
+            }
+
+            if (DateTime.Now.Subtract(lastRefreshedQBO).TotalMinutes > 30)
+            {
+                Console.WriteLine("Refreshing QuickBooks Online Access Token");
+                if (!string.IsNullOrEmpty(QboLocal.Tokens?.RefreshToken))
+                {
+                    lastRefreshedQBO = DateTime.Now;
+                    // Invalid Grant
+                    var response = await QboLocal.Client?.RefreshTokenAsync(QboLocal.Tokens?.RefreshToken ?? string.Empty);
+
+                }
+            }
+        }
+
+        private void Dashboard_Activated(object? sender, EventArgs e)
+        {
+            base.Activate();
+
         }
 
         private void AddHKEvents()

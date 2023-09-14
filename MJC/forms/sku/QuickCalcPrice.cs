@@ -12,7 +12,7 @@ namespace MJC.forms.sku
 
         private GridViewOrigin PriceTierGrid = new GridViewOrigin();
         private DataGridView PriceTierGridRefer;
-        
+
         private FlabelConstant Category = new FlabelConstant("Category:");
         private FlabelConstant Calculating = new FlabelConstant("Calculating:");
         private FlabelConstant BasedOn = new FlabelConstant("Based on:");
@@ -20,6 +20,7 @@ namespace MJC.forms.sku
         private QuickCalcPriceModel quickCalcPriceModelObj = new QuickCalcPriceModel();
         private SKUPricesModel SKUPricesModelObj = new SKUPricesModel();
         private CategoryPriceTierModel CategoryPriceTierModelObj = new CategoryPriceTierModel();
+        private SKUModel SKUModelObj = new SKUModel();
         private int skuId = 0;
         private int categoryId = 0;
 
@@ -91,21 +92,23 @@ namespace MJC.forms.sku
             this.Controls.Add(BasedOn.GetLabel());
             this.Controls.Add(BasedOn.GetConstant());
 
-            if(this.skuId != 0)
+            if (this.skuId != 0)
             {
                 var calcPriceInfo = quickCalcPriceModelObj.GetQuickCalcPriceInfo(this.skuId);
-                Category.SetContext(calcPriceInfo.categoryName.Replace("&","&&")); // "& stands for underscore -- use && to escape.
-                if(calcPriceInfo.calculateAs == 1)
+                Category.SetContext(calcPriceInfo.categoryName.Replace("&", "&&")); // "& stands for underscore -- use && to escape.
+                if (calcPriceInfo.calculateAs == 1)
                     Calculating.SetContext("Markup");
                 else Calculating.SetContext("Margin");
-                //BasedOn.SetContext();
+
+                double inventoryValue = SKUModelObj.GetInventoryValue(this.skuId);
+                BasedOn.SetContext(inventoryValue.ToString());
             }
         }
 
         public void LoadPriceTierList()
         {
             var refreshData = quickCalcPriceModelObj.LoadCalcPrice(this.skuId);
-            
+
             PriceTierGridRefer.DataSource = quickCalcPriceModelObj.calcPriceList;
             PriceTierGridRefer.Columns[0].HeaderText = "SkuPriceId";
             PriceTierGridRefer.Columns[0].Visible = false;
@@ -116,7 +119,7 @@ namespace MJC.forms.sku
             PriceTierGridRefer.Columns[3].HeaderText = "InventoryValue";
             PriceTierGridRefer.Columns[3].Visible = false;
             PriceTierGridRefer.Columns[4].HeaderText = "Margin";
-            PriceTierGridRefer.Columns[4].Width =  200;
+            PriceTierGridRefer.Columns[4].Width = 200;
             PriceTierGridRefer.Columns[5].HeaderText = "ProfitMargin";
             PriceTierGridRefer.Columns[5].Visible = false;
             PriceTierGridRefer.Columns[6].HeaderText = "Price";
@@ -149,7 +152,7 @@ namespace MJC.forms.sku
                 }
                 else if (dataGridView.CurrentCell != null && dataGridView.CurrentCell.IsInEditMode == false)
                 {
-                    if(dataGridView.CurrentCell.ColumnIndex == 4)
+                    if (dataGridView.CurrentCell.ColumnIndex == 4)
                     {
                         e.Handled = true;
                         dataGridView.BeginEdit(true);
@@ -173,8 +176,8 @@ namespace MJC.forms.sku
                 double margin = double.Parse(row.Cells[4].Value.ToString());
                 double profitMargin = double.Parse(row.Cells[5].Value.ToString());
 
-                double price =  SKUPricesModelObj.CalculateSKUPrice(inventoryValue, margin, profitMargin, priceTierId, categoryId);
-               
+                double price = SKUPricesModelObj.CalculateSKUPrice(inventoryValue, margin, profitMargin, priceTierId, categoryId);
+
                 quickCalcPriceModelObj.calcPriceList[e.RowIndex].price = price;
             }
         }

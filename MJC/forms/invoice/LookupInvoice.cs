@@ -33,8 +33,7 @@ namespace MJC.forms.invoice
 
         private GridViewOrigin InvoiceLookupGrid = new GridViewOrigin();
         private DataGridView ILGridRefer;
-        private InvoicesModel InvoiceModelObj = new InvoicesModel();
-        CustomersModel CustomersModelObj = new CustomersModel();
+
 
         private int customerId;
 
@@ -137,8 +136,8 @@ namespace MJC.forms.invoice
             _addFormInputs(FormComponents, 30, 110, 800, 42, 250);
 
             List<CustomerData> customerList = new List<CustomerData>();
-            bool refreshData = CustomersModelObj.LoadCustomerData("", false);
-            CustomerNum_ComBo.GetComboBox().DataSource = CustomersModelObj.CustomerDataList;
+            bool refreshData = Session.CustomersModelObj.LoadCustomerData("", false);
+            CustomerNum_ComBo.GetComboBox().DataSource = Session.CustomersModelObj.CustomerDataList;
             CustomerNum_ComBo.GetComboBox().ValueMember = "Id";
             CustomerNum_ComBo.GetComboBox().DisplayMember = "Num";
 
@@ -189,7 +188,7 @@ namespace MJC.forms.invoice
 
         private void LoadInvoiceList(int customerId = 0)
         {
-            List<InvoiceData> InvoiceDataList = InvoiceModelObj.LoadInvoiceData(customerId);
+            List<InvoiceData> InvoiceDataList = Session.InvoicesModelObj.LoadInvoiceData(customerId);
        
             ILGridRefer.DataSource = InvoiceDataList;
             ILGridRefer.Columns[0].Visible = false;
@@ -229,7 +228,7 @@ namespace MJC.forms.invoice
 
         public void setDetails(int customerId)
         {
-            var customerData = CustomersModelObj.GetCustomerData(customerId);
+            var customerData = Session.CustomersModelObj.GetCustomerData(customerId);
             if (customerData != null)
             {
                 CustomerNum_ComBo.GetComboBox().SelectedValue = customerId;

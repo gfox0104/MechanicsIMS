@@ -30,9 +30,6 @@ namespace MJC.forms.sku.subAssembly
         private FlabelConstant Status = new FlabelConstant("Status");
         private FlabelConstant InvoicePrint = new FlabelConstant("Invoice Print");
 
-        private SubAssemblyModel SubAssemblyModelObj = new SubAssemblyModel();
-        private SKUModel SKUModelObj = new SKUModel();
-
         private int subAssemblyId = 0;
         private int targetSkuId = 0;
         private int subAssemblySkuId = 0;
@@ -43,19 +40,19 @@ namespace MJC.forms.sku.subAssembly
 
         private bool status = false;
         private bool invoicePrint = false;
+        private bool readOnly = false;
 
-
-        public SubAssemblyDetail(int skuId = 0) : base("Add Sub Assembly")
+        public SubAssemblyDetail(int skuId, bool readOnly = false) : base("Add Sub Assembly")
         {
             InitializeComponent();
             this.Size = new Size(600, 550);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.targetSkuId = skuId;
-            
+            this.readOnly = readOnly;
 
             if (skuId != 0)
             {
-                SKUDetail skuDetail = SKUModelObj.GetSKUById(skuId);
+                SKUDetail skuDetail = Session.SKUModelObj.GetSKUById(skuId);
                 this.targetSKUName = skuDetail.Name;
             }
 
@@ -84,7 +81,7 @@ namespace MJC.forms.sku.subAssembly
             this.Controls.Add(SubAssembly.GetComboBox());
 
             List<KeyValuePair<int, string>> CustomerList = new List<KeyValuePair<int, string>>();
-            CustomerList = SKUModelObj.GetSKUNameList();
+            CustomerList = Session.SKUModelObj.GetSKUNameList();
             foreach (KeyValuePair<int, string> item in CustomerList)
             {
                 int id = item.Key;
@@ -106,6 +103,12 @@ namespace MJC.forms.sku.subAssembly
             Quantity.SetPosition(new Point(30, 280));
             this.Controls.Add(Quantity.GetLabel());
             this.Controls.Add(Quantity.GetTextBox());
+
+            if (this.readOnly)
+            {
+                SubAssembly.GetComboBox().Enabled = false;
+                Quantity.GetTextBox().Enabled = false;
+            }
         }
 
         private void ok_button_Click(object sender, EventArgs e)
@@ -121,8 +124,8 @@ namespace MJC.forms.sku.subAssembly
 
             bool refreshData = false;
 
-            if (this.subAssemblyId == 0) refreshData = SubAssemblyModelObj.AddSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty);
-            else refreshData = SubAssemblyModelObj.UpdateSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty, this.subAssemblyId);
+            if (this.subAssemblyId == 0) refreshData = Session.SubAssemblyModelObj.AddSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty);
+            else refreshData = Session.SubAssemblyModelObj.UpdateSubAssembly(targetSkuId, subAssemblySkuId, categoryId, status, invoicePrint, description, qty, this.subAssemblyId);
 
             string modeText = this.subAssemblyId == 0 ? "creating" : "updating";
 
@@ -158,7 +161,7 @@ namespace MJC.forms.sku.subAssembly
         {
             FComboBoxItem selectedItem = (FComboBoxItem)SubAssembly.GetComboBox().SelectedItem;
             int skuId = selectedItem.Id;
-            var skuInfo = SKUModelObj.LoadSkuInfoById(skuId);
+            var skuInfo = Session.SKUModelObj.LoadSkuInfoById(skuId);
             
             if (skuInfo != null)
             {

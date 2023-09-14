@@ -25,6 +25,7 @@ namespace MJC.model
         private int? _priceTier;
         private string _priceTierCode;
         public string message;
+        public bool? _billAsLabor;
 
         public int Id 
         {
@@ -110,12 +111,12 @@ namespace MJC.model
             }
         }
 
-        public int? PriceTier
+        public string PriceTierCode
         {
-            get => _priceTier;
+            get => _priceTierCode;
             set
             {
-                _priceTier = value;
+                _priceTierCode = value;
                 OnPropertyChanged();
             }
         }
@@ -148,12 +149,23 @@ namespace MJC.model
             }
         }
 
-        public string PriceTierCode
+
+        public int? PriceTier
         {
-            get => _priceTierCode;
+            get => _priceTier;
             set
             {
-                _priceTierCode = value;
+                _priceTier = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? BillAsLabor
+        {
+            get => _billAsLabor;
+            set
+            {
+                _billAsLabor = value;
                 OnPropertyChanged();
             }
         }

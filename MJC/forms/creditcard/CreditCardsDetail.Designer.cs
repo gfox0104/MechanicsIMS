@@ -1,6 +1,6 @@
-﻿namespace MJC.common
+﻿namespace MJC.forms.creditcard
 {
-    partial class BasicLayout
+    partial class CreditCardsDetail
     {
         /// <summary>
         /// Required designer variable.
@@ -28,20 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            SuspendLayout();
-            // 
-            // BasicLayout
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Name = "BasicLayout";
-            Text = "BasicLayout";
-            Activated += BasicLayout_Activated;
-            Load += BasicLayout_Load;
-            Paint += BasicLayout_Paint;
-            Enter += BasicLayout_Enter;
-            ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Text = "CreditCardsDetail";
         }
 
         #endregion

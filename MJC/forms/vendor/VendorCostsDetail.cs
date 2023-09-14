@@ -27,8 +27,6 @@ namespace MJC.forms.vendor
         private FInputBox Cost = new FInputBox("Cost");
         private FInputBox Core = new FInputBox("Core");
 
-        private VendorCostsModel VendorCostModelObj = new VendorCostsModel();
-        private VendorsModel VendorModelObj = new VendorsModel();
         private int vendorCostId = 0;
         private int vendorId = 0;
         private int skuId = 0;
@@ -60,7 +58,7 @@ namespace MJC.forms.vendor
             this.Controls.Add(VendorName.GetLabel());
             this.Controls.Add(VendorName.GetComboBox());
             List<KeyValuePair<int, string>> VendorList = new List<KeyValuePair<int, string>>();
-            VendorList = VendorModelObj.GetVendorList();
+            VendorList = Session.VendorsModelObj.GetVendorList();
             foreach (KeyValuePair<int, string> item in VendorList)
             {
                 int id = item.Key;
@@ -105,8 +103,8 @@ namespace MJC.forms.vendor
 
             bool refreshData = false;
 
-            if (this.vendorCostId == 0) refreshData = VendorCostModelObj.AddVendorCost(skuId, vendorId, vendorName, manuf, memo, pkgQty, cost, core);
-            else refreshData = VendorCostModelObj.UpdateVendorCost(skuId, vendorId, vendorName, manuf, memo, pkgQty, cost, core, this.vendorCostId);
+            if (this.vendorCostId == 0) refreshData = Session.VendorCostModelObj.AddVendorCost(skuId, vendorId, vendorName, manuf, memo, pkgQty, cost, core);
+            else refreshData = Session.VendorCostModelObj.UpdateVendorCost(skuId, vendorId, vendorName, manuf, memo, pkgQty, cost, core, this.vendorCostId);
 
             string modeText = vendorCostId == 0 ? "creating" : "updating";
 

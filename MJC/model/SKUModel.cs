@@ -270,7 +270,8 @@ namespace MJC.model
             double core_cost,
             double inv_value,
             string memo,
-            Dictionary<int, double> priceTierDict
+            Dictionary<int, double> priceTierDict,
+            bool billAslabor
             )
         {
 
@@ -282,7 +283,7 @@ namespace MJC.model
                 {
                     command.Connection = connection;
                     //Get Total Number of Customers
-                    command.CommandText = "INSERT INTO dbo.SKU (active, sku, category, description, measurementUnit, weight, costCode, assetAccount, taxable, manageStock, allowDiscounts, commissionable, orderFrom, lastSold, manufacturer, location, quantity, qtyAllocated, qtyAvailable, qtyCritical, qtyReorder, soldMonthToDate, soldYearToDate, freezePrices, coreCost, inventoryValue, createdAt, createdBy, updatedAt, updatedBy, subassemblyStatus, subassemblyPrint, memo) OUTPUT INSERTED.ID VALUES (@active, @Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31, @memo)";
+                    command.CommandText = "INSERT INTO dbo.SKU (active, sku, category, description, measurementUnit, weight, costCode, assetAccount, taxable, manageStock, allowDiscounts, commissionable, orderFrom, lastSold, manufacturer, location, quantity, qtyAllocated, qtyAvailable, qtyCritical, qtyReorder, soldMonthToDate, soldYearToDate, freezePrices, coreCost, inventoryValue, createdAt, createdBy, updatedAt, updatedBy, subassemblyStatus, subassemblyPrint, memo, billAsLabor) OUTPUT INSERTED.ID VALUES (@active, @Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31, @memo,  @billAsLabor)";
                     command.Parameters.AddWithValue("@active", true);
                     command.Parameters.AddWithValue("@Value1", sku__name);
                     command.Parameters.AddWithValue("@Value2", category);
@@ -316,6 +317,7 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value30", false);
                     command.Parameters.AddWithValue("@Value31", false);
                     command.Parameters.AddWithValue("@memo", memo);
+                    command.Parameters.AddWithValue("@billAsLabor", billAslabor);
 
                     int newId = (int)command.ExecuteScalar();
 
@@ -361,6 +363,7 @@ namespace MJC.model
             double inv_value,
             string memo,
             Dictionary<int, double> priceTierDict,
+            bool billAsLabor,
             int id)
         {
             using (var connection = GetConnection())
@@ -370,7 +373,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"UPDATE dbo.SKU SET sku = @Value1, category = @Value2, description = @Value3, measurementUnit = @Value4, weight = @Value5, costCode = @Value6, assetAccount = @Value7, taxable = @Value8, manageStock = @Value9, allowDiscounts = @Value10, commissionable = @Value11, orderFrom = @Value12, lastSold = @Value13, manufacturer = @Value14, location = @Value15, quantity = @Value16, qtyAllocated = @Value17, qtyAvailable = @Value18, qtyCritical = @Value19, qtyReorder = @Value20, soldMonthToDate = @Value21, soldYearToDate = @Value22, freezePrices = @Value23, coreCost = @Value24, inventoryValue = @Value25, memo = @memo WHERE id = @Value26";
+                    command.CommandText = @"UPDATE dbo.SKU SET sku = @Value1, category = @Value2, description = @Value3, measurementUnit = @Value4, weight = @Value5, costCode = @Value6, assetAccount = @Value7, taxable = @Value8, manageStock = @Value9, allowDiscounts = @Value10, commissionable = @Value11, orderFrom = @Value12, lastSold = @Value13, manufacturer = @Value14, location = @Value15, quantity = @Value16, qtyAllocated = @Value17, qtyAvailable = @Value18, qtyCritical = @Value19, qtyReorder = @Value20, soldMonthToDate = @Value21, soldYearToDate = @Value22, freezePrices = @Value23, coreCost = @Value24, inventoryValue = @Value25, memo = @memo, billAsLabor = @billAsLabor WHERE id = @Value26";
                     command.Parameters.AddWithValue("@Value1", sku__name);
                     command.Parameters.AddWithValue("@Value2", category);
                     command.Parameters.AddWithValue("@Value3", description);
@@ -397,6 +400,7 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value24", core_cost);
                     command.Parameters.AddWithValue("@Value25", inv_value);
                     command.Parameters.AddWithValue("@memo", memo);
+                    command.Parameters.AddWithValue("@billAsLabor", billAsLabor);
                     command.Parameters.AddWithValue("@Value26", id);
 
                     command.ExecuteNonQuery();
@@ -478,6 +482,32 @@ namespace MJC.model
                 }
 
                 return true;
+            }
+        }
+        public double GetInventoryValue(int id)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    SqlDataReader reader;
+                    double inventoryValue = 0;
+
+                    command.Connection = connection;
+
+                    command.CommandText = @"select inventoryValue from dbo.SKU where id = @id";
+                    command.Parameters.AddWithValue("@id", id);
+
+                    object result = command.ExecuteScalar();
+                    if (result != null)
+                    {
+                        inventoryValue = Convert.ToDouble(result);
+                    }
+
+                    return inventoryValue;
+                }
             }
         }
 
@@ -791,7 +821,7 @@ namespace MJC.model
         //    }
         //}
 
-        public bool InsertSKUCostQty(bool active, int skuId, DateTime costDate, int qty, double cost, Dictionary<int, double> priceTierDict,  int createdBy, int updatedBy)
+        public bool InsertSKUCostQty(bool active, int skuId, DateTime costDate, int qty, double cost, Dictionary<int, double> priceTierDict, int createdBy, int updatedBy)
         {
             using (var connection = GetConnection())
             {
@@ -1091,7 +1121,7 @@ namespace MJC.model
                     int qtyAvailable = int.Parse(row["qtyAvailable"].ToString());
                     int qtyRecorder = int.Parse(row["qtyReorder"].ToString());
 
-                    SKUDetail skuDetail = new SKUDetail { Id = skuId,Name = skuName, Category = categoryName, Description = description, QuantityOnHand = qtyRecorder};
+                    SKUDetail skuDetail = new SKUDetail { Id = skuId, Name = skuName, Category = categoryName, Description = description, QuantityOnHand = qtyRecorder };
 
                     return skuDetail;
                 }

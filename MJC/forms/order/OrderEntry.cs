@@ -33,9 +33,6 @@ namespace MJC.forms.order
 
         private string searchKey;
 
-        private CustomersModel CustomersModelObj = new CustomersModel();
-        private SKUModel SKUModelObj = new SKUModel();
-        private OrderItemsModel OrderItemsModalObj = new OrderItemsModel();
 
         public OrderEntry() : base("Order Entry - Select a Customer", "Select a customer to start an order for")
         {
@@ -73,7 +70,7 @@ namespace MJC.forms.order
             hkOpenCustomer.GetButton().Click += (sender, e) =>
             {
                 int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
-                CustomerInformation customerInfoModal = new CustomerInformation();
+                CustomerInformation customerInfoModal = new CustomerInformation(true);
                 customerInfoModal.setDetails(customerId);
                 _navigateToForm(sender, e, customerInfoModal);
                 this.Hide();
@@ -175,7 +172,7 @@ namespace MJC.forms.order
         {
             OEGridRefer.Rows.Clear();
 
-            DataTable dataTable = CustomersModelObj.LoadCustomerTable();
+            DataTable dataTable = Session.CustomersModelObj.LoadCustomerTable();
 
             foreach (DataRow row in dataTable.Rows)
             {

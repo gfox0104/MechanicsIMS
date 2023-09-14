@@ -16,7 +16,6 @@ namespace MJC.forms.payment
         private GridViewOrigin PaymentDetailGrid = new GridViewOrigin();
         private DataGridView PDGridRefer;
 
-        private PaymentDetailModel PymtDetailModelObj = new PaymentDetailModel();
         
         private string checkNumber = "";
         private string datePaid = "";
@@ -78,10 +77,10 @@ namespace MJC.forms.payment
         private void LoadPaymentDetailList()
         {
             string filter = "";
-            var refreshData = PymtDetailModelObj.LoadPaymentHistoryData(filter);
+            var refreshData = Session.PymtDetailModelObj.LoadPaymentHistoryData(filter);
             if (refreshData)
             {
-                PDGridRefer.DataSource = PymtDetailModelObj.PaymentDetailDataList;
+                PDGridRefer.DataSource = Session.PymtDetailModelObj.PaymentDetailDataList;
                 PDGridRefer.Columns[0].Visible = false;
                 PDGridRefer.Columns[1].HeaderText = "Invoice#";
                 PDGridRefer.Columns[1].Width = 300;

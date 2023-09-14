@@ -13,7 +13,6 @@ namespace MJC.forms.sales
 
         private GridViewOrigin slaesHistoryGrid = new GridViewOrigin();
         private DataGridView SHGridRefer;
-        private SKUModel SKUModelObj = new SKUModel();
 
         private int skuId = 0;
 
@@ -30,7 +29,7 @@ namespace MJC.forms.sales
             InitSalesHistoryGrid();
             if (skuId != 0)
             {
-                string skuName = SKUModelObj.GetSkuNameById(skuId);
+                string skuName = Session.SKUModelObj.GetSkuNameById(skuId);
                 this._changeFormText("History for SKU# " + skuName);
             }
 
@@ -54,7 +53,7 @@ namespace MJC.forms.sales
             SHGridRefer.Columns.Add("month", "Quantities");
             SHGridRefer.Columns[0].Width = 300;
 
-            List<int> SalesHistoryHeaderData = SKUModelObj.GetQtyYearList(this.skuId);
+            List<int> SalesHistoryHeaderData = Session.SKUModelObj.GetQtyYearList(this.skuId);
 
             int index = 0;
             foreach (int year in SalesHistoryHeaderData)
@@ -75,8 +74,8 @@ namespace MJC.forms.sales
 
         private void LoadCategoryList()
         {
-            List<int[]> TotalQtyList = SKUModelObj.LoadQtyHistoryData(this.skuId);
-            List<int> SalesHistoryHeaderData = SKUModelObj.GetQtyYearList(this.skuId);
+            List<int[]> TotalQtyList = Session.SKUModelObj.LoadQtyHistoryData(this.skuId);
+            List<int> SalesHistoryHeaderData = Session.SKUModelObj.GetQtyYearList(this.skuId);
             string[] ItemList = new string[13] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Totals" };
 
             for (int monthIndex = 0; monthIndex < 13; monthIndex++)

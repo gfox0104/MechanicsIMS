@@ -20,8 +20,7 @@ namespace MJC.forms.sku.subAssembly
         private FInputBox Message = new FInputBox("Message:");
 
         private int subAssemblyId = 0;
-        private SubAssemblyModel SubAssemblyModelObj = new SubAssemblyModel();
-
+        
         public SubAssemblyMessage() : base("Add message")
         {
             InitializeComponent();
@@ -52,7 +51,7 @@ namespace MJC.forms.sku.subAssembly
         public void setDetails(int _id)
         {
             this.subAssemblyId = _id;
-            var subAssemblyMessage = SubAssemblyModelObj.GetSubAssebmlyMessageById(_id);
+            var subAssemblyMessage = Session.SubAssemblyModelObj.GetSubAssebmlyMessageById(_id);
 
             this.Message.GetTextBox().Text = subAssemblyMessage.message;
         }
@@ -70,7 +69,7 @@ namespace MJC.forms.sku.subAssembly
             bool refreshData = false;
             if (subAssemblyId == 0)
                 Console.WriteLine("Create Order Message");
-            else refreshData = SubAssemblyModelObj.UpdateSubAssemblyMessageById(message, this.subAssemblyId);
+            else refreshData = Session.SubAssemblyModelObj.UpdateSubAssemblyMessageById(message, this.subAssemblyId);
 
             string modeText = subAssemblyId == 0 ? "creating" : "updating";
 

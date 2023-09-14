@@ -29,8 +29,6 @@ namespace MJC.forms
         List<model.Accounting> AcctList = new List<model.Accounting>();
         List<SubAcctType> TotalTaxTypeList = new List<SubAcctType>();
 
-        private AccountingModel accountingModelObj = new AccountingModel();
-
         public AccountingDetail() : base("Account Details", "Manage details of an Accounting")
         {
             InitializeComponent();
@@ -45,7 +43,7 @@ namespace MJC.forms
 
         private void InitInputBox()
         {
-            List<model.Accounting> accountingList = accountingModelObj.LoadAccountingList();
+            List<model.Accounting> accountingList = Session.accountingModelObj.LoadAccountingList();
             List<model.Accounting> acctTypeList = new List<model.Accounting>();
             acctTypeList.Add(new model.Accounting { Id = 0, Name = "Income" });
             acctTypeList.Add(new model.Accounting { Id = 1, Name = "Expenses"});

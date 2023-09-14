@@ -11,7 +11,6 @@ namespace MJC.forms.order
         public FInputBox Message = new FInputBox("Message:");
 
         private int orderItemId = 0;
-        private OrderItemsModel OrderItemModelObj = new OrderItemsModel();
  
         public OrderItemMessage() : base("Add Message")
         {
@@ -48,7 +47,7 @@ namespace MJC.forms.order
         public void setDetails(int _id)
         {
             orderItemId = _id;
-            var orderItem = OrderItemModelObj.GetOrderItemMessageById(_id);
+            var orderItem = Session.OrderItemModelObj.GetOrderItemMessageById(_id);
             if (orderItem != null)
             {
                 this.Message.GetTextBox().Text = orderItem.message;

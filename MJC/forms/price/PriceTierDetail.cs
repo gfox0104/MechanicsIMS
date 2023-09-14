@@ -24,7 +24,6 @@ namespace MJC.forms.price
         private FInputBox priceTierCode = new FInputBox("price tier code");
 
         private int priceTierId;
-        private PriceTiersModel PriceTiersModelObj = new PriceTiersModel();
 
         public PriceTierDetail() : base("Add PriceTier")
         {
@@ -131,8 +130,8 @@ namespace MJC.forms.price
             bool refreshData = false;
 
             if (priceTierId == 0)
-                refreshData = PriceTiersModelObj.AddPriceTier(name, profitMargin, pricetiercode);
-            else refreshData = PriceTiersModelObj.UpdatePriceTier(name, profitMargin, pricetiercode, priceTierId);
+                refreshData = Session.PriceTiersModelObj.AddPriceTier(name, profitMargin, pricetiercode);
+            else refreshData = Session.PriceTiersModelObj.UpdatePriceTier(name, profitMargin, pricetiercode, priceTierId);
 
             string modeText = priceTierId == 0 ? "creating" : "updating";
 
