@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Timers;
 using System.Threading;
 using QboLib;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace MJC.forms
 {
@@ -61,8 +62,8 @@ namespace MJC.forms
             RefreshQuickbooks(); 
             
             System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-            timer.Interval = 15000;
-            timer.Tick += RefreshQBOAccessTokens;
+            timer.Interval = 5000;
+            timer.Tick += new System.EventHandler(RefreshQBOAccessTokens);
             timer.Start();
         }
 
@@ -77,7 +78,6 @@ namespace MJC.forms
             {
                 QboLocal.Initialize();
             }
-
             if (DateTime.Now.Subtract(lastRefreshedQBO).TotalMinutes > 30)
             {
                 if (!string.IsNullOrEmpty(Session.SettingsModelObj.Settings.refreshToken))
