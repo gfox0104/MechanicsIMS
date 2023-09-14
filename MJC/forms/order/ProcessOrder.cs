@@ -51,7 +51,7 @@ namespace MJC.forms.order
         private int oldCustomerIndex = 0;
         private bool changeDetected = true;
         private string searchKey;
-
+        private decimal billAsLabor = 0;
         
         private List<OrderItem> OrderItemData = new List<OrderItem>();
         private List<SKUOrderItem> TotalSkuList = new List<SKUOrderItem>();
@@ -114,7 +114,12 @@ namespace MJC.forms.order
 
         private void printInvoice(int orderId, int orderStatus)
         {
-            OrderPrint orderPrint = new OrderPrint(orderId, orderStatus);
+            string totalSale = TotalSale.GetConstant().Text;
+            string taxValue = TaxPercent.GetConstant().Text;
+            string subTotal = Subtotal.GetConstant().Text;
+            string coreValue = "0.00";
+            string laborValue = this.billAsLabor.ToString("0.00");
+            OrderPrint orderPrint = new OrderPrint(orderId, orderStatus, subTotal, taxValue, laborValue, coreValue, totalSale);
             orderPrint.PrintForm();
         }
 
@@ -520,8 +525,13 @@ namespace MJC.forms.order
             {
                 var _lineTotal = (item?.UnitPrice * item?.Quantity) ?? 0.00;
                 var _taxAmount = _lineTotal * (taxRate / 100);
-                var _totalAmount = _taxAmount + _lineTotal;
-
+                double _billAsLabor = 0.0;
+                if(item.BillAsLabor == true)
+                {
+                    _billAsLabor = _lineTotal * (taxRate / 100);
+                    this.billAsLabor += Convert.ToDecimal(_billAsLabor);
+                }
+                var _totalAmount = _taxAmount + _lineTotal + _billAsLabor;
                 total += _lineTotal;
                 if (item?.Tax.GetValueOrDefault() ?? false)
                 {
@@ -857,7 +867,8 @@ namespace MJC.forms.order
                 LineTotal = sku.Price * sku.Qty,
                 SC = sku.CostCode.ToString(),
                 Quantity = sku.Qty > 0 ? sku.Qty : 1,
-                Tax = true
+                Tax = true,
+                BillAsLabor = true
             });
 
             BindingList<OrderItem> dataList = new BindingList<OrderItem>(this.OrderItemData);

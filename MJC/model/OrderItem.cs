@@ -25,6 +25,7 @@ namespace MJC.model
         private int? _priceTier;
         private string _priceTierCode;
         public string message;
+        public bool? _billAsLabor;
 
         public int Id 
         {
@@ -155,6 +156,16 @@ namespace MJC.model
             set
             {
                 _priceTier = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? BillAsLabor
+        {
+            get => _billAsLabor;
+            set
+            {
+                _billAsLabor = value;
                 OnPropertyChanged();
             }
         }

@@ -132,6 +132,9 @@ namespace MJC.model
                         string salesCode = row["salesCode"].ToString();
                         string qboSkuId = row["qboSkuId"].ToString();
                         string qboOrderItemId = row["qboOrderItemId"].ToString();
+                        bool? billAsLabor = null;
+                        if (!row.IsNull("billAsLabor"))
+                            billAsLabor = row.Field<Boolean>("billAsLabor");
 
                         OrderItemData.Add(new OrderItem
                         {
@@ -147,7 +150,8 @@ namespace MJC.model
                             LineTotal = lineTotal,
                             SC = salesCode,
                             QboSkuId = qboSkuId,
-                            QboItemId = qboOrderItemId
+                            QboItemId = qboOrderItemId,
+                            BillAsLabor = billAsLabor
                         });
                     }
                 }
@@ -361,7 +365,7 @@ namespace MJC.model
             return OrderList;
         }
 
-        public int CreateOrderItem(int orderId, int skuId, decimal? qty, string description, string message, bool? tax, int? priceTier, double? unitPrice, double? lineTotal, string salesCode, string sku, int qboSkuId, string qboOrderItemId, int lineNum, int createdBy = 0, int updatedBy = 0)
+        public int CreateOrderItem(int orderId, int skuId, decimal? qty, string description, string message, bool? tax, int? priceTier, double? unitPrice, double? lineTotal, string salesCode, string sku, int qboSkuId, string qboOrderItemId, int lineNum, int createdBy, int updatedBy)
         {
             using (var connection = GetConnection())
             {
@@ -406,7 +410,9 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value14", lineNum);
                     command.Parameters.AddWithValue("@Value15", createdBy);
                     command.Parameters.AddWithValue("@Value16", updatedBy);
-                    command.Parameters.AddWithValue("@message", message);
+                    if (!string.IsNullOrEmpty(message))
+                        command.Parameters.AddWithValue("@message", message);
+                    else command.Parameters.AddWithValue("@message", DBNull.Value);
 
                     orderItemId = (int)command.ExecuteScalar();
  
