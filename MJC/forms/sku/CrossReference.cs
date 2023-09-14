@@ -26,12 +26,14 @@ namespace MJC.forms.sku
         private SKUCrossRefModel SUKCrossRefMModalObj = new SKUCrossRefModel();
         private SKUModel SKUModelObj = new SKUModel();
         private int SKUId;
+        private bool readOnly = false;
 
-        public CrossReference(int _skuId = 0) : base("Cross References", "List all serials that SKUs may also be searched by based on")
+        public CrossReference(int _skuId = 0, bool readOnly = false) : base("Cross References", "List all serials that SKUs may also be searched by based on")
         {
             InitializeComponent();
             _initBasicSize();
 
+            this.readOnly = readOnly;
             this.SKUId = _skuId;
             if(_skuId != 0)
             {
@@ -39,7 +41,14 @@ namespace MJC.forms.sku
                 this._changeFormText("Cross References for SKU# " + skuName);
             }
 
-            HotkeyButton[] hkButtons = new HotkeyButton[4] { hkAdds, hkDeletes, hkSelects, hkPrevScreen };
+            HotkeyButton[] hkButtons;
+            if (readOnly)
+            {
+                hkButtons = new HotkeyButton[2] { hkSelects, hkPrevScreen };
+            } else
+            {
+                hkButtons = new HotkeyButton[4] { hkAdds, hkDeletes, hkSelects, hkPrevScreen };
+            }
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
 
@@ -128,7 +137,7 @@ namespace MJC.forms.sku
         {
 
             int CRId = (int)CRGridRefer.SelectedRows[0].Cells[0].Value;
-            CrossRefDetail CrossRefDetailModal = new CrossRefDetail(this.SKUId, CRId);
+            CrossRefDetail CrossRefDetailModal = new CrossRefDetail(this.SKUId, CRId, this.readOnly);
 
             if (CrossRefDetailModal.ShowDialog() == DialogResult.OK)
             {

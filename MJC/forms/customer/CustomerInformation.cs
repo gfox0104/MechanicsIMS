@@ -70,19 +70,27 @@ namespace MJC.forms.customer
         private string qboId = "";
         private string syncToken = "";
         private string memo = "";
+        private bool disabled = false;
 
-        public CustomerInformation() : base("Customer Information", "Manage details of Customer")
+        public CustomerInformation(bool disabled = false) : base("Customer Information", "Manage details of Customer")
         {
             this.Text = "Customer Detail";
             InitializeComponent();
             _initBasicSize();
             this.KeyDown += (s, e) => Form_KeyDown(s, e);
 
-            HotkeyButton[] hkButtons = new HotkeyButton[5] { hkCustomerMemo, hkPriceLevels, hkShipToInfo, hkCreditCards, hkSetArchived };
+            HotkeyButton[] hkButtons;
+            if (disabled)
+            {
+                hkButtons = new HotkeyButton[2] { hkCustomerMemo, hkCreditCards };
+            } else
+            {
+                hkButtons = new HotkeyButton[5] { hkCustomerMemo, hkPriceLevels, hkShipToInfo, hkCreditCards, hkSetArchived };
+            }
             _initializeHKButtons(hkButtons, false);
             AddHotKeyEvents();
 
-            //InitMBOKButton();
+            this.disabled = disabled;
             InitForms();
             this.Load += new System.EventHandler(this.CustomerDetail_Load);
         }
@@ -103,7 +111,7 @@ namespace MJC.forms.customer
             };
             hkCustomerMemo.GetButton().Click += (sender, e) =>
             {
-                CustomerMemo MemoModal = new CustomerMemo(customerId, memo);
+                CustomerMemo MemoModal = new CustomerMemo(customerId, memo, this.disabled);
                 this.Enabled = false;
                 MemoModal.Show();
                 MemoModal.FormClosed += (ss, sargs) =>
@@ -115,7 +123,7 @@ namespace MJC.forms.customer
             };
             hkCreditCards.GetButton().Click += (sender, e) =>
             {
-                CreditCards creditCardModel = new CreditCards(this.customerId);
+                CreditCards creditCardModel = new CreditCards(this.customerId, this.disabled);
                 _navigateToForm(sender, e, creditCardModel);
                 this.Hide();
             };
@@ -233,6 +241,48 @@ namespace MJC.forms.customer
             InterestRate.GetTextBox().KeyPress += validateDecimal;
             YTDInterest.GetTextBox().KeyPress += validateDecimal;
             YTDPurchases.GetTextBox().KeyPress += validateNumber;
+
+            if (this.disabled)
+            {
+                EMail.GetTextBox().Enabled = false;
+                Salesman.GetTextBox().Enabled = false;
+                Resale.GetCheckBox().Enabled = false;
+                StmtCust.GetTextBox().Enabled = false;
+                StmtName.GetTextBox().Enabled = false;
+                DateOpened.GetDateTimePicker().Enabled = false;
+                PriceTier.GetComboBox().Enabled = false;
+                Terms.GetTextBox().Enabled = false;
+                Limit.GetTextBox().Enabled = false;
+                Memo.GetTextBox().Enabled = false;
+                Taxable.GetCheckBox().Enabled = false;
+                SendStatements.GetCheckBox().Enabled = false;
+                CoreTracking.GetTextBox().Enabled = false;
+                CoreBalance.GetTextBox().Enabled = false;
+                PrintCoreTot.GetCheckBox().Enabled = false;
+                AccountType.GetTextBox().Enabled = false;
+                PORequired.GetCheckBox().Enabled = false;
+                CreditCode.GetComboBox().Enabled = false;
+                InterestRate.GetTextBox().Enabled = false;
+                AcctBalance.GetTextBox().Enabled = false;
+                YTDPurchases.GetTextBox().Enabled = false;
+                YTDInterest.GetTextBox().Enabled = false;
+                DateLastPurch.GetDateTimePicker().Enabled = false;
+                CustomerNum.GetTextBox().Enabled = false;
+                DisplayName.GetTextBox().Enabled = false;
+                GiveName.GetTextBox().Enabled = false;
+                MiddleName.GetTextBox().Enabled = false;
+                FamilyName.GetTextBox().Enabled = false;
+                Title.GetTextBox().Enabled = false;
+                Suffix.GetTextBox().Enabled = false;
+                AddressLine1.GetTextBox().Enabled = false;
+                AddressLine2.GetTextBox().Enabled = false;
+                City.GetTextBox().Enabled = false;
+                State.GetTextBox().Enabled = false;
+                Zip.GetTextBox().Enabled = false;
+                BusPhone.GetTextBox().Enabled = false;
+                Fax.GetTextBox().Enabled = false;
+                HomePhone.GetTextBox().Enabled = false;
+            }
         }
 
         private void validateNumber(object sender, KeyPressEventArgs e)
@@ -512,13 +562,19 @@ namespace MJC.forms.customer
         {
             if (e.KeyCode == Keys.Escape)
             {
-                DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
+                if(this.disabled == false)
                 {
-                    SaveCustomer(sender, e);
-                }
-                else if (result == DialogResult.No)
+                    DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        SaveCustomer(sender, e);
+                    }
+                    else if (result == DialogResult.No)
+                    {
+                        _navigateToPrev(sender, e);
+                    }
+                } else
                 {
                     _navigateToPrev(sender, e);
                 }

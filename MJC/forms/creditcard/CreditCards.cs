@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using MJC.forms.creditcode;
 using static MJC.model.CreditCardModel;
 using System.Runtime.CompilerServices;
+using System.Net.NetworkInformation;
 
 namespace MJC.forms.creditcard
 {
@@ -27,13 +28,23 @@ namespace MJC.forms.creditcard
         private DataGridView CCLGridRefer;
         private CreditCardModel CreditCardModelObj = new CreditCardModel();
         private int customerId = 0;
+        private bool readOnly = false;
 
-        public CreditCards(int customerId) : base("Credit Cards for Cust#", "Credit cards on file for the selected customer")
+        public CreditCards(int customerId, bool readOnly = false) : base("Credit Cards for Cust#", "Credit cards on file for the selected customer")
         {
             InitializeComponent();
             _initBasicSize();
 
-            HotkeyButton[] hkButtons = new HotkeyButton[4] { hkAdds, hkDeletes, hkEdits, hkPreviousScreen };
+            this.readOnly = readOnly;
+            HotkeyButton[] hkButtons;
+
+            if (this.readOnly)
+            {
+                hkButtons = new HotkeyButton[1] {hkPreviousScreen };
+            } else
+            {
+                hkButtons = new HotkeyButton[4] { hkAdds, hkDeletes, hkEdits, hkPreviousScreen };
+            }
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
             this.customerId = customerId;

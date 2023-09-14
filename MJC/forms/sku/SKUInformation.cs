@@ -25,6 +25,9 @@ namespace MJC.forms.sku
         private HotkeyButton hkMiscManagement = new HotkeyButton("F4", "Misc Management", Keys.F4);
         private HotkeyButton hkResetPrices = new HotkeyButton("F5", "Reset Prices", Keys.F5);
         private HotkeyButton hkSetArchived = new HotkeyButton("F9", "Set Archived", Keys.F9);
+        private HotkeyButton hkSubAssembly = new HotkeyButton("F4", "Sub-assebmlies", Keys.F4);
+        private HotkeyButton hkCrossReference = new HotkeyButton("F5", "Cross-references", Keys.F5);
+        private HotkeyButton hkQuantityDiscount = new HotkeyButton("F6", "Quantity discounts", Keys.F6);
 
         private FGroupLabel SKUInfo = new FGroupLabel("SKU Info");
         private FInputBox SKUName = new FInputBox("SKU#");
@@ -58,6 +61,7 @@ namespace MJC.forms.sku
 
         private FGroupLabel prices = new FGroupLabel("Prices");
         private FCheckBox freezePrices = new FCheckBox("Freeze prices");
+        private FCheckBox billAsLabor = new FCheckBox("Bill as Labor");
         private FInputBox coreCost = new FInputBox("Core Cost");
         private FInputBox invValue = new FInputBox("Inv Value");
 
@@ -72,16 +76,24 @@ namespace MJC.forms.sku
             this.Text = "Sku detail";
             InitializeComponent();
             _initBasicSize();
+            this.disabled = disabled;
             this.KeyDown += (s, e) => Form_KeyDown(s, e);
             this.disabled = disabled;
 
-            HotkeyButton[] hkButtons = new HotkeyButton[5] { hkSKUMemo, hkQuickCalcPrice, hkMiscManagement, hkResetPrices, hkSetArchived };
+            HotkeyButton[] hkButtons;
+            if (disabled)
+            {
+                hkButtons = new HotkeyButton[4] { hkSKUMemo, hkSubAssembly, hkCrossReference, hkQuantityDiscount };
+            } else
+            {
+                hkButtons = new HotkeyButton[5] { hkSKUMemo, hkQuickCalcPrice, hkMiscManagement, hkResetPrices, hkSetArchived };
+            }
+            
             _initializeHKButtons(hkButtons, false);
             AddHotKeyEvents();
             allowDiscount.GetCheckBox().Width = 200;
             InitForm();
             this.Load += new System.EventHandler(this.Add_Load);
-            
         }
 
         private void AddHotKeyEvents()
@@ -107,6 +119,24 @@ namespace MJC.forms.sku
                     this.Enabled = true;
                 };
             };
+            hkSubAssembly.GetButton().Click += (sender, e) =>
+            {
+                SubAssemblies subAssemblies = new SubAssemblies(skuId, this.disabled);
+                _navigateToForm(sender, e, subAssemblies);
+                this.Hide();
+            };
+            hkCrossReference.GetButton().Click += (sender, e) =>
+            {
+                CrossReference crossRefModal = new CrossReference(skuId, this.disabled);
+                _navigateToForm(sender, e, crossRefModal);
+                this.Hide();
+            };
+            hkQuantityDiscount.GetButton().Click += (sender, e) =>
+            {
+                SKUQuantityDiscount sKUQuantityDiscountModal = new SKUQuantityDiscount(skuId, this.disabled);
+                _navigateToForm(sender, e, sKUQuantityDiscountModal);
+                this.Hide();
+            };
             hkMiscManagement.GetButton().Click += (sender, e) =>
             {
                 MiscManagement MiscManagementActionsModal = new MiscManagement();
@@ -124,17 +154,17 @@ namespace MJC.forms.sku
                             this.Hide();
                             break;
                         case 2:
-                            CrossReference crossRefModal = new CrossReference(skuId);
+                            CrossReference crossRefModal = new CrossReference(skuId, this.disabled);
                             _navigateToForm(sender, e, crossRefModal);
                             this.Hide();
                             break;
                         case 3:
-                            SubAssemblies subAssemblies = new SubAssemblies(skuId);
+                            SubAssemblies subAssemblies = new SubAssemblies(skuId, this.disabled);
                             _navigateToForm(sender, e, subAssemblies);
                             this.Hide();
                             break;
                         case 4:
-                            SKUCostQuantity skuCostQuantityModal = new SKUCostQuantity(skuId);
+                            SKUCostQuantity skuCostQuantityModal = new SKUCostQuantity(skuId, this.disabled);
                             _navigateToForm(sender, e, skuCostQuantityModal);
                             this.Hide();
                             break;
@@ -144,7 +174,7 @@ namespace MJC.forms.sku
                             this.Hide();
                             break;
                         case 6:
-                            SKUQuantityDiscount sKUQuantityDiscountModal = new SKUQuantityDiscount(skuId);
+                            SKUQuantityDiscount sKUQuantityDiscountModal = new SKUQuantityDiscount(skuId, this.disabled);
                             _navigateToForm(sender, e, sKUQuantityDiscountModal);
                             this.Hide();
                             break;
@@ -225,7 +255,7 @@ namespace MJC.forms.sku
             FormComponents.Add(manufacturer);
             FormComponents.Add(location);
             _addFormInputs(FormComponents, 30, 20, 800, 50, 700, _panel.Controls);
-           
+
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(quantityTracking);
             FormComponents2.Add(quantity);
@@ -241,14 +271,12 @@ namespace MJC.forms.sku
 
             FormComponents2.Add(sales);
 
-            soldThisMonth.GetTextBox().Enabled = false;
-            soldYTD.GetTextBox().Enabled = false;
-
             FormComponents2.Add(soldThisMonth);
             FormComponents2.Add(soldYTD);
 
             FormComponents2.Add(prices);
             FormComponents2.Add(freezePrices);
+            FormComponents2.Add(billAsLabor);
             FormComponents2.Add(coreCost);
             FormComponents2.Add(invValue);
 
@@ -346,6 +374,7 @@ namespace MJC.forms.sku
             this.recorderQty.GetTextBox().Text = data[0].qtyReorder.ToString();
 
             this.freezePrices.GetCheckBox().Checked = (bool)data[0].freezePrices;
+            this.billAsLabor.GetCheckBox().Checked = (bool)data[0].billAsLabor;
 
             this.soldThisMonth.GetTextBox().Text = data[0].soldMonthToDate.ToString();
             this.soldYTD.GetTextBox().Text = data[0].soldYearToDate.ToString();
@@ -450,6 +479,7 @@ namespace MJC.forms.sku
             if (!is_i_sold_ytd) i_sold_ytd = 0;
 
             bool b_freeze_prices = freezePrices.GetCheckBox().Checked;
+            bool b_bill_as_Labor = billAsLabor.GetCheckBox().Checked;
 
             double i_core_cost; bool is_i_core_cost = double.TryParse(coreCost.GetTextBox().Text, out i_core_cost);
             if (!is_i_core_cost) i_core_cost = 0;
@@ -473,9 +503,9 @@ namespace MJC.forms.sku
             bool refreshData = false;
             if (skuId == 0)
             {
-                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict);
+                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor);
             }
-            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, skuId);
+            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, skuId);
             string modeText = skuId == 0 ? "creating" : "updating";
             if (refreshData)
             {
@@ -489,13 +519,19 @@ namespace MJC.forms.sku
         {
             if (e.KeyCode == Keys.Escape)
             {
-                DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
+                if(this.disabled == false)
                 {
-                    saveSKU(sender, e);
-                }
-                else if (result == DialogResult.No)
+                    DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        saveSKU(sender, e);
+                    }
+                    else if (result == DialogResult.No)
+                    {
+                        _navigateToPrev(sender, e);
+                    }
+                } else
                 {
                     _navigateToPrev(sender, e);
                 }

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MJC.forms.price;
+using Antlr4.Runtime.Tree;
 
 namespace MJC.forms.inventory
 {
@@ -128,6 +129,16 @@ namespace MJC.forms.inventory
             {
                 e.Handled = true;
             }
+            else
+            {
+                int qtyReceived = 0;
+                int.TryParse(QtyReceived.GetTextBox().Text, out qtyReceived);
+                int oldQty = 0;
+                int.TryParse(OldQtyOnHand.GetConstant().Text, out oldQty);
+                int newQty = qtyReceived + oldQty;
+                NewQtyOnHand.GetConstant().Text = newQty.ToString();
+
+            }
         }
 
         //private void TextValidateNumber(object sender, EventArgs e)
@@ -200,6 +211,9 @@ namespace MJC.forms.inventory
                 if (skuInfo.cost != null)
                     LastCost.SetContext(skuInfo.cost.ToString());
                 else LastCost.SetContext("N/A");
+
+                QtyReceived.GetTextBox().Text = "";
+                NewCost.GetTextBox().Text = "";
 
                 List<KeyValuePair<int, double>> skuPriceData = new List<KeyValuePair<int, double>>();
                 skuPriceData = SkuPriceTierModelObj.LoadPriceTierDataBySKUId(skuId);
