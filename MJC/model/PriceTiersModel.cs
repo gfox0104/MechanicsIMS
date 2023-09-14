@@ -21,6 +21,19 @@ namespace MJC.model
         }
     }
 
+    public struct PriceTierType
+    {
+        public int Value { get; set; }
+        public string Name { get; set; }
+
+        public PriceTierType(int _value, string _name)
+        {
+            Value = _value;
+            Name = _name;
+        }
+    }
+
+
     public class PriceTiersModel : DbConnection
     {
         public List<PriceTierData> PriceTierDataList { get; private set; }

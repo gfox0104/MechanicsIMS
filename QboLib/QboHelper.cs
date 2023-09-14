@@ -92,7 +92,7 @@ namespace QboLib
         public static void WriteTokensAsJson(QboAuthTokens authTokens)
         {
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string tokenFilePath = Path.Combine(directory, "Merlin", "Tokens.json");
+            string tokenFilePath = Path.Combine(directory, "MechanicsIMS", "Tokens.json");
 
             // Serialize the passed object
             // to a JSON formatted string.
