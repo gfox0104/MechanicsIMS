@@ -94,7 +94,7 @@ namespace MJC.forms.price
                 PTGridRefer.Columns[0].Visible = false;
                 PTGridRefer.Columns[1].HeaderText = "Price Tier";
                 PTGridRefer.Columns[1].Width = 300;
-                PTGridRefer.Columns[2].HeaderText = "Profit Margin";
+                PTGridRefer.Columns[2].HeaderText = "Margin";
                 PTGridRefer.Columns[2].Width = 600;
                 PTGridRefer.Columns[3].HeaderText = "Code";
                 PTGridRefer.Columns[3].Width = 300;

@@ -19,7 +19,8 @@ namespace MJC.forms.price
         private Button MBOk_button;
 
         private FInputBox priceTierName = new FInputBox("Name");
-        private FInputBox profitMargin = new FInputBox("profit margin");
+        private FComboBox priceTierType = new FComboBox("PriceTier Type");
+        private FInputBox profitMargin = new FInputBox("Margin");
         private FInputBox priceTierCode = new FInputBox("price tier code");
 
         private int priceTierId;
@@ -27,7 +28,7 @@ namespace MJC.forms.price
         public PriceTierDetail() : base("Add PriceTier")
         {
             InitializeComponent();
-            this.Size = new Size(600, 310);
+            this.Size = new Size(600, 360);
             this.StartPosition = FormStartPosition.CenterScreen;
             InitMBOKButton();
             InitInputBox();
@@ -44,7 +45,7 @@ namespace MJC.forms.price
         {
             ModalButton_HotKeyDown(MBOk);
             MBOk_button = MBOk.GetButton();
-            MBOk_button.Location = new Point(425, 200);
+            MBOk_button.Location = new Point(425, 250);
             MBOk_button.Click += (sender, e) => ok_button_Click(sender, e);
             this.Controls.Add(MBOk_button);
         }
@@ -66,8 +67,19 @@ namespace MJC.forms.price
                     e.Handled = true;
                 }
             };
+            priceTierType.SetPosition(new Point(30, 80));
+            this.Controls.Add(priceTierType.GetLabel());
+            this.Controls.Add(priceTierType.GetComboBox());
 
-            profitMargin.SetPosition(new Point(30, 80));
+            List<PriceTierType> priceTierTypeList = new List<PriceTierType>();
+            priceTierTypeList.Add(new PriceTierType { Value = 0, Name = "Profit" });
+            priceTierTypeList.Add(new PriceTierType { Value = 1, Name = "Discount" });
+
+            priceTierType.GetComboBox().DataSource = priceTierTypeList;
+            priceTierType.GetComboBox().DisplayMember = "Name";
+            priceTierType.GetComboBox().ValueMember = "Value";
+
+            profitMargin.SetPosition(new Point(30, 130));
             this.Controls.Add(profitMargin.GetLabel());
             this.Controls.Add(profitMargin.GetTextBox());
             profitMargin.GetTextBox().KeyDown += (s, e) => {
@@ -83,7 +95,7 @@ namespace MJC.forms.price
                 }
             };
 
-            priceTierCode.SetPosition(new Point(30, 130));
+            priceTierCode.SetPosition(new Point(30, 180));
             this.Controls.Add(priceTierCode.GetLabel());
             this.Controls.Add(priceTierCode.GetTextBox());
         }
@@ -106,6 +118,15 @@ namespace MJC.forms.price
             }
             string pricetiercode = this.priceTierCode.GetTextBox().Text;
 
+            int type = int.Parse(priceTierType.GetComboBox().SelectedValue.ToString());
+            if(type == 0)
+            {
+                profitMargin = profitMargin * 1;
+            } else if(type == 1)
+            {
+                profitMargin = profitMargin * (-1);
+            }
+
             bool refreshData = false;
 
             if (priceTierId == 0)
@@ -124,7 +145,14 @@ namespace MJC.forms.price
         public void setDetails(string name, double profitmargin, string pricetiercode, int pricetierId)
         {
             this.priceTierName.GetTextBox().Text = name;
-            this.profitMargin.GetTextBox().Text = profitmargin.ToString();
+            if(profitmargin >= 0)
+            {
+                this.priceTierType.GetComboBox().SelectedValue = 0;
+            } else
+            {
+                this.priceTierType.GetComboBox().SelectedValue = 1;
+            }
+            this.profitMargin.GetTextBox().Text = Math.Abs(profitmargin).ToString();
             this.priceTierCode.GetTextBox().Text = pricetiercode;
             priceTierId = pricetierId;
         }

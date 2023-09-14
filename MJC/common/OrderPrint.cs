@@ -37,8 +37,13 @@ namespace MJC.common
         private List<PrintOrderItemInfo> printOrderItemInfoList = new List<PrintOrderItemInfo>();
         private PrintInvoiceModel printInvoiceModelObj = new PrintInvoiceModel();
         private int orderStatus = 0;
+        private string subTotal = "0.00";
+        private string taxValue = "0.00";
+        private string laborValue = "0.00";
+        private string coreValue = "0.00";
+        private string totalSale = "0.00";
 
-        public OrderPrint(int orderId, int orderStatus)
+        public OrderPrint(int orderId, int orderStatus, string subTotal, string taxValue, string laborValue, string coreValue, string totalSale)
         {
             //printOrderItemList = new List<PrintOrderItem>();
             //for (int i = 0; i < 10; i++)
@@ -47,6 +52,11 @@ namespace MJC.common
             //}
 
             this.orderStatus = orderStatus;
+            this.subTotal = subTotal;
+            this.taxValue = taxValue;
+            this.laborValue = laborValue;
+            this.coreValue = coreValue;
+            this.totalSale = totalSale;
 
             printSoldToInfo = printInvoiceModelObj.GetSoldToInfo(orderId);
             printShipToInfo = printInvoiceModelObj.GetPrintShipToInfo(orderId);
@@ -560,16 +570,16 @@ namespace MJC.common
                             // Result total
                             List<PrintItem> resultList = new List<PrintItem>();
                             PrintItem subTotal = new PrintItem { value = "SUBTOTAL", width = 120, height = 18, marginTop = 0, marginLeft = 0 };
-                            PrintItem subTotalValue = new PrintItem { value = "1977.34,", width = 140, height = 18, marginTop = 0, marginLeft = 120 };
+                            PrintItem subTotalValue = new PrintItem { value = this.subTotal, width = 140, height = 18, marginTop = 0, marginLeft = 120 };
                             PrintItem salesTax = new PrintItem { value = "SALES TAX", width = 120, height = 18, marginTop = 18, marginLeft = 0 };
-                            PrintItem salesTaxValue = new PrintItem { value = "", width = 140, height = 18, marginTop = 18, marginLeft = 120 };
+                            PrintItem salesTaxValue = new PrintItem { value = this.taxValue, width = 140, height = 18, marginTop = 18, marginLeft = 120 };
                             PrintItem core = new PrintItem { value = "CORE", width = 120, height = 18, marginTop = 18, marginLeft = 0 };
-                            PrintItem coreValue = new PrintItem { value = "", width = 140, height = 18, marginTop = 18, marginLeft = 120 };
+                            PrintItem coreValue = new PrintItem { value = this.coreValue, width = 140, height = 18, marginTop = 18, marginLeft = 120 };
                             PrintItem labor = new PrintItem { value = "LABOR", width = 120, height = 18, marginTop = 18, marginLeft = 0 };
-                            PrintItem laborValue = new PrintItem { value = "1142.00", width = 140, height = 18, marginTop = 18, marginLeft = 120 };
+                            PrintItem laborValue = new PrintItem { value = this.laborValue, width = 140, height = 18, marginTop = 18, marginLeft = 120 };
 
                             PrintItem total = new PrintItem { value = "TOTAL", width = 120, height = 18, marginTop = 18, marginLeft = 0 };
-                            PrintItem totalValue = new PrintItem { value = "3119.34", width = 140, height = 18, marginTop = 18, marginLeft = 120 };
+                            PrintItem totalValue = new PrintItem { value = this.totalSale, width = 140, height = 18, marginTop = 18, marginLeft = 120 };
 
                             resultList.Add(subTotal);
                             resultList.Add(subTotalValue);
@@ -638,7 +648,7 @@ namespace MJC.common
 
                             int termsOfServiceX = iLeftMargin;
                             int tosHeight = (int)e.Graphics.MeasureString(termsOfService, _fontTOS, this.paperWidth - 2 * iLeftMargin).Height;
-                            int termsOfServiceY = iTopMargin;
+                            int termsOfServiceY = iTopMargin + 18;
 
                             e.Graphics.FillRectangle(new SolidBrush(Color.LightGray),
                                              new Rectangle(termsOfServiceX, termsOfServiceY,

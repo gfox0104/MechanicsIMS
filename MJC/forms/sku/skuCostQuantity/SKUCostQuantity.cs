@@ -15,8 +15,9 @@ namespace MJC.forms.sku
         private DataGridView SkuCostGridRefer;
         
         private int skuId = 0;
+        private bool readOnly = false;
 
-        public SKUCostQuantity(int skuId) : base("Costs for SKU#", "Record of cost per quantity of a SKU, used for inventory valuation")
+        public SKUCostQuantity(int skuId, bool readOnly = false) : base("Costs for SKU#", "Record of cost per quantity of a SKU, used for inventory valuation")
         {
             InitializeComponent();
             _initBasicSize();
@@ -25,6 +26,7 @@ namespace MJC.forms.sku
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
             this.skuId = skuId;
+            this.readOnly = readOnly;
 
             InitSkuCostQty();
             if (skuId != 0)
@@ -114,7 +116,7 @@ namespace MJC.forms.sku
 
         private void updateSKUCostQuantity()
         {
-            SKUCostQuantityDetail detailModal = new SKUCostQuantityDetail(this.skuId);
+            SKUCostQuantityDetail detailModal = new SKUCostQuantityDetail(this.skuId, this.readOnly);
 
             int rowIndex = SkuCostGridRefer.CurrentCell.RowIndex;
             DataGridViewRow row = SkuCostGridRefer.Rows[rowIndex];

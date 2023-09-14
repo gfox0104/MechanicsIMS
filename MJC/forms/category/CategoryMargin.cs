@@ -131,7 +131,7 @@ namespace MJC.forms.category
                 DataGridViewRow newRow = CLGridRefer.Rows[rowIndex];
                 newRow.Cells["id"].Value = categoryData.id;
                 newRow.Cells["category"].Value = categoryData.categoryName;
-                newRow.Cells["calculateAs"].Value = categoryData.calculateAs;
+                newRow.Cells["calculateAs"].Value = categoryData.calculateAs == 1 ? "Markup" : "Margin";
 
                 foreach (KeyValuePair<string, double> pair in priceTierData)
                 {

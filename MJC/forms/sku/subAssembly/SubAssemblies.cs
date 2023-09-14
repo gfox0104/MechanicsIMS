@@ -16,6 +16,7 @@ namespace MJC.forms.sku
         private HotkeyButton hkChangeStatus = new HotkeyButton("F2", "Change Status", Keys.F2);
         private HotkeyButton hkInsertComment = new HotkeyButton("F4", "Insert comment", Keys.F4);
         private HotkeyButton hkCalculateCot = new HotkeyButton("F5", "Calculate cost", Keys.F5);
+        private HotkeyButton hkEsc = new HotkeyButton("ESC", "Previous Screen", Keys.Escape);
 
         private GridViewOrigin SubAssembliesGrid = new GridViewOrigin();
         private DataGridView SubAssembliesGridRefer;
@@ -25,16 +26,24 @@ namespace MJC.forms.sku
 
         private int skuId = 0;
         private string targetSKU = "";
-
-        public SubAssemblies(int skuId) : base("Sub-assemblies for SKU#", "Describe the necessary inventory to construct the selected SKU#")
+        private bool readOnly = false;
+        public SubAssemblies(int skuId, bool readOnly) : base("Sub-assemblies for SKU#", "Describe the necessary inventory to construct the selected SKU#")
         {
             InitializeComponent();
             _initBasicSize();
 
-            HotkeyButton[] hkButtons = new HotkeyButton[6] { hkAdds, hkDeletes, hkEdits, hkChangeStatus, hkInsertComment, hkCalculateCot };
+            HotkeyButton[] hkButtons;
+            if (readOnly)
+            {
+                hkButtons = new HotkeyButton[1] { hkEsc };
+            } else
+            {
+                hkButtons = new HotkeyButton[6] { hkAdds, hkDeletes, hkEdits, hkChangeStatus, hkInsertComment, hkCalculateCot };
+            }
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
             this.skuId = skuId;
+            this.readOnly = readOnly;
 
             InitHeaderForm();
             InitSubAssembly();
@@ -43,6 +52,7 @@ namespace MJC.forms.sku
                 this.targetSKU = Session.SKUModelObj.GetSkuNameById(skuId);
                 this._changeFormText("Sub-assemblies for SKU# " + this.targetSKU);
             }
+
         }
 
         private void InitHeaderForm()
@@ -206,7 +216,7 @@ namespace MJC.forms.sku
 
         private void updateSubAssembly()
         {
-            SubAssemblyDetail detailModal = new SubAssemblyDetail();
+            SubAssemblyDetail detailModal = new SubAssemblyDetail(0, this.readOnly);
 
             int rowIndex = SubAssembliesGridRefer.CurrentCell.RowIndex;
             DataGridViewRow row = SubAssembliesGridRefer.Rows[rowIndex];

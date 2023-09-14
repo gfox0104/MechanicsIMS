@@ -26,9 +26,10 @@ namespace MJC.forms
         private FInputBox FederalTax = new FInputBox("Federal Tax#");
         private FCheckBox TrainingMode = new FCheckBox("Training Mode");
         private FComboBox TargetPrinter = new FComboBox("Target Printer");
-        private FInputBox InvoicePrintQty = new FInputBox("Invoice Print Qty", 230);
-        private FInputBox HoldOrdersPrintQty = new FInputBox("Hold Orders Print Qty", 230);
-        private FInputBox QuotePrintQty = new FInputBox("Quote Print Qty", 230);
+        private FGroupLabel PageQuantities = new FGroupLabel("Page Quantities to Print");
+        private FInputBox InvoicePrintQty = new FInputBox("Invoice Qty");
+        private FInputBox HoldOrdersPrintQty = new FInputBox("Hold Orders Qty");
+        private FInputBox QuotePrintQty = new FInputBox("Quote Qty");
         private FComboBox ProcessingTax = new FComboBox("Processing Tax");
         private FInputBox businessDescription = new FInputBox("Description");
         private FInputBox invoiceFooter = new FInputBox("Invoice Footer");
@@ -305,9 +306,9 @@ namespace MJC.forms
             invoiceFooter.GetTextBox().Width = 400;
             TargetPrinter.GetComboBox().Width = 400;
 
-            InvoicePrintQty.GetTextBox().Width = 370;
-            HoldOrdersPrintQty.GetTextBox().Width = 370;
-            QuotePrintQty.GetTextBox().Width = 370;
+            InvoicePrintQty.GetTextBox().Width = 400;
+            HoldOrdersPrintQty.GetTextBox().Width = 400;
+            QuotePrintQty.GetTextBox().Width = 400;
             ProcessingTax.GetComboBox().Width = 400;
 
             List<dynamic> FormComponents = new List<dynamic>();
@@ -321,20 +322,25 @@ namespace MJC.forms
             FormComponents.Add(Phone);
             FormComponents.Add(Fax);
             FormComponents.Add(FederalTax);
-
             _addFormInputs(FormComponents, 30, 20, 800, 50, 700, _panel.Controls);
 
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(TrainingMode);
             FormComponents2.Add(TargetPrinter);
-            FormComponents2.Add(InvoicePrintQty);
-            FormComponents2.Add(HoldOrdersPrintQty);
-            FormComponents2.Add(QuotePrintQty);
-            FormComponents2.Add(ProcessingTax);
-            FormComponents2.Add(invoiceFooter);
-            FormComponents2.Add(invoiceTermsOfService);
-
             _addFormInputs(FormComponents2, 700, 20, 800, 50, int.MaxValue, _panel.Controls);
+
+            List<dynamic> FormComponents3 = new List<dynamic>();
+            FormComponents3.Add(PageQuantities);
+            FormComponents3.Add(InvoicePrintQty);
+            FormComponents3.Add(HoldOrdersPrintQty);
+            FormComponents3.Add(QuotePrintQty);
+            _addFormInputs(FormComponents3, 700, 140, 800, 50, int.MaxValue, _panel.Controls);
+
+            List<dynamic> FormComponents4 = new List<dynamic>();
+            FormComponents4.Add(ProcessingTax);
+            FormComponents4.Add(invoiceFooter);
+            FormComponents4.Add(invoiceTermsOfService);
+            _addFormInputs(FormComponents4, 700, 370, 800, 50, int.MaxValue, _panel.Controls);
 
             RFPicture = new PictureBox();
             RFPicture.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
