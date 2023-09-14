@@ -38,7 +38,7 @@ namespace MJC.forms.sku
         private FInputBox costCode = new FInputBox("Sales/Cost Code");
         private FInputBox assetAcct = new FInputBox("SKU Asset Acct");
 
-        private FCheckBox taxable = new FCheckBox("taxable");
+        private FCheckBox taxable = new FCheckBox("Taxable");
         private FCheckBox maintainQtys = new FCheckBox("Maintain Qtys");
         private FCheckBox allowDiscount = new FCheckBox("Allow discount");
         private FCheckBox commissionable = new FCheckBox("Commissionable");
