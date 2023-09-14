@@ -7,7 +7,7 @@ using static System.Windows.Forms.AxHost;
 
 namespace MJC.model
 {
-    public struct SystemSettings
+    public class SystemSettings
     {
         public int? taxCodeId { get; set; }
         public string businessName { get; set; }
