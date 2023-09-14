@@ -37,10 +37,10 @@ namespace MJC.qbo
 
             // If so, proceed
 
-            try
-            {
-                if (Session.SettingsModelObj.Settings.accessToken == null)
-                {
+            //try
+            //{
+            //    if (Session.SettingsModelObj.Settings.accessToken == null)
+            //    {
                     QboAuthTokens? Tokens = null;
                     Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
                     {
@@ -49,18 +49,18 @@ namespace MJC.qbo
 
                     this.accessToken = Tokens.AccessToken;
                     this.realmId = long.Parse(Tokens.RealmId);
-                }
-                else
-                {
-                    this.accessToken = Session.SettingsModelObj.Settings.accessToken;
-                    // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
-                    // this.realmId = long.Parse(Tokens.RealmId);
-                }
-            }
-            catch(Exception e)
-            {
-                throw new Exception("TOKENS");
-            }
+            //    }
+            //    else
+            //    {
+            //        this.accessToken = Session.SettingsModelObj.Settings.accessToken;
+            //        // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
+            //        // this.realmId = long.Parse(Tokens.RealmId);
+            //    }
+            //}
+            //catch(Exception e)
+            //{
+            //    throw new Exception("TOKENS");
+            //}
         }
 
         public void RefreshToken()
@@ -566,7 +566,8 @@ namespace MJC.qbo
 
             try
             {
-                var result = await dataService.QueryAsync<Customer>("select * from Customer ORDER BY Id");
+                var result = await dataService.QueryAsync<Customer>("select * from Customer");
+                //var result = await dataService.QueryAsync<Invoice>("select* from Invoice");
                 var customers = result.Response.Entities;
                 foreach (var customer in customers)
                 {
@@ -624,7 +625,10 @@ namespace MJC.qbo
         {
             bool? active = customer.Active;
             string customerNumber = customer.DisplayName;
-            string customerName = customer.CompanyName;
+            string customerName = "";
+            if (!string.IsNullOrEmpty(customer.CompanyName))
+                customerName = customer.CompanyName;
+            else customerName = customer.FullyQualifiedName;
             string? address1 = null;
             string? address2 = null;
             string? city = null;
