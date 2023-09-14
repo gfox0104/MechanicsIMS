@@ -126,7 +126,7 @@ namespace MJC.forms.inventory
             }
             catch (Exception e)
             {
-                SentrySdk.CaptureException(e);
+                Sentry.SentrySdk.CaptureException(e);
                 Messages.ShowError("There was a problem updating the quantity.");
             }
         }

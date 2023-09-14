@@ -80,16 +80,21 @@ namespace MJC.forms
 
             if (DateTime.Now.Subtract(lastRefreshedQBO).TotalMinutes > 30)
             {
-                Console.WriteLine("Refreshing QuickBooks Online Access Token");
-                if (!string.IsNullOrEmpty(QboLocal.Tokens?.RefreshToken))
+                if (!string.IsNullOrEmpty(Session.SettingsModelObj.Settings.refreshToken))
                 {
-                    lastRefreshedQBO = DateTime.Now;
-                    // Invalid Grant
-                    var response = await QboLocal.Client?.RefreshTokenAsync(QboLocal.Tokens?.RefreshToken ?? string.Empty);
+                    Console.WriteLine("Refreshing QuickBooks Online Access Token");
+                    if (await QboLib.QboLocal.Reauthenticate(Session.SettingsModelObj.Settings.refreshToken))
+                    {
+                        Session.SettingsModelObj.Settings.accessToken = QboLocal.Tokens.AccessToken;
+                        Session.SettingsModelObj.Settings.refreshToken = QboLocal.Tokens.RefreshToken;
 
+                        Session.SettingsModelObj.SaveSetting(Session.SettingsModelObj.Settings.taxCodeId, Session.SettingsModelObj.Settings.businessName, Session.SettingsModelObj.Settings.businessDescription, Session.SettingsModelObj.Settings.address1, Session.SettingsModelObj.Settings.address2, Session.SettingsModelObj.Settings.city, Session.SettingsModelObj.Settings.state, Session.SettingsModelObj.Settings.postalCode, Session.SettingsModelObj.Settings.phone, Session.SettingsModelObj.Settings.fax, Session.SettingsModelObj.Settings.ein, Session.SettingsModelObj.Settings.trainingEnabled, Session.SettingsModelObj.Settings.targetPrinter, Session.SettingsModelObj.Settings.accessToken, Session.SettingsModelObj.Settings.refreshToken, Session.SettingsModelObj.Settings.businessFooter, Session.SettingsModelObj.Settings.businessTermsOfService, Session.SettingsModelObj.Settings.invoicePrintQty.GetValueOrDefault(), Session.SettingsModelObj.Settings.holdOrderPrintQty.GetValueOrDefault(), Session.SettingsModelObj.Settings.quotePrintQty.GetValueOrDefault());
+                    }
                 }
             }
         }
+
+
 
         private void Dashboard_Activated(object? sender, EventArgs e)
         {

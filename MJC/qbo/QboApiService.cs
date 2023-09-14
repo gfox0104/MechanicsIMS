@@ -12,8 +12,7 @@ using static System.Windows.Forms.AxHost;
 using System.Reflection.Emit;
 using System;
 using MJC.common;
-using Sentry;
-
+ 
 namespace MJC.qbo
 {
     public class QboApiService : DbConnection
@@ -40,15 +39,23 @@ namespace MJC.qbo
 
             try
             {
-                QboAuthTokens? Tokens = null;
-                Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
+                if (Session.SettingsModelObj.Settings.accessToken == null)
                 {
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                }) ?? new();
+                    QboAuthTokens? Tokens = null;
+                    Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
+                    {
+                        ReadCommentHandling = JsonCommentHandling.Skip
+                    }) ?? new();
 
-                // TODO: Push and pull this from the settings model 
-                this.accessToken = Tokens.AccessToken;
-                this.realmId = long.Parse(Tokens.RealmId);
+                    this.accessToken = Tokens.AccessToken;
+                    this.realmId = long.Parse(Tokens.RealmId);
+                }
+                else
+                {
+                    this.accessToken = Session.SettingsModelObj.Settings.accessToken;
+                    // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
+                    // this.realmId = long.Parse(Tokens.RealmId);
+                }
             }
             catch(Exception e)
             {
@@ -76,7 +83,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -97,7 +104,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -126,7 +133,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -167,7 +174,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -190,7 +197,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -317,7 +324,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -444,7 +451,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
 
                 throw;
             }
@@ -489,7 +496,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -543,7 +550,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -580,7 +587,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -936,7 +943,7 @@ namespace MJC.qbo
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -966,7 +973,7 @@ namespace MJC.qbo
                 }
                 catch (Exception exc)
                 {
-                    SentrySdk.CaptureException(exc);
+                    Sentry.SentrySdk.CaptureException(exc);
                     if (exc.Message.Contains("KEY"))
                     {
                         Messages.ShowError("There was a problem updating the SKU.");

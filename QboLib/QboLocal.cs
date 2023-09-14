@@ -8,7 +8,7 @@ namespace QboLib
         public static QboAuthTokens? Tokens { get; set; } = null;
         public static OAuth2Client? Client { get; set; } = null;
 
-        public static void Initialize()
+        public async static void Initialize()
         {
             // Loading the tokens and client once (on sign-in/start up)
             // and saving them in static properties saves us from
@@ -35,6 +35,25 @@ namespace QboLib
                     "Make sure that 'Tokens.json' is setup with your credentials."
                 );
             }
+        }
+
+        public async static Task<bool> Reauthenticate(string refreshToken)
+        {
+            var tokenResponse = await Client.RefreshTokenAsync(refreshToken);
+            
+            if(tokenResponse.IsError)
+            {
+                Console.WriteLine("Error refreshing token");
+                return false;
+            }
+            else
+            {
+                Console.WriteLine("Token was refreshed");
+
+                return true;
+            }
+
+            return true;
         }
     }
 }

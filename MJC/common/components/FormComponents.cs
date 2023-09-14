@@ -88,6 +88,11 @@ namespace MJC.common.components
             {
                 label.ForeColor = System.Drawing.Color.WhiteSmoke;
             };
+            textBox.EnabledChanged += (s, e) =>
+            {
+                if (textBox.Enabled) textBox.BackColor = Color.FromArgb(236, 242, 249);
+                else textBox.BackColor = System.Drawing.Color.DarkGray;
+            };
         }
 
         public TextBox GetTextBox()

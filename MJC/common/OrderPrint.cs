@@ -707,7 +707,7 @@ namespace MJC.common
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
@@ -737,7 +737,7 @@ namespace MJC.common
             }
             catch (Exception exc)
             {
-                SentrySdk.CaptureException(exc);
+                Sentry.SentrySdk.CaptureException(exc);
                 if (exc.Message.Contains("KEY"))
                 {
                     Messages.ShowError("There was a problem updating the SKU.");
