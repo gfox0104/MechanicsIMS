@@ -43,7 +43,9 @@ namespace MJC.forms.sku
         private FCheckBox allowDiscount = new FCheckBox("Allow discount");
         private FCheckBox commissionable = new FCheckBox("Commissionable");
 
-        private FInputBox orderForm = new FInputBox("Order From");
+        private FComboBox orderForm = new FComboBox("Order From");
+
+        //        orderForm
         private FDateTime lastSold = new FDateTime("Last Sold");
         private FInputBox manufacturer = new FInputBox("Manufacturer");
         private FInputBox location = new FInputBox("Location");
@@ -67,6 +69,13 @@ namespace MJC.forms.sku
         private FInputBox invValue = new FInputBox("Inv Value");
 
         private FInputBox[] priceTiers;
+
+        private PriceTiersModel PriceTiersModelObj = new PriceTiersModel();
+        private CategoriesModel CategoriesModelObj = new CategoriesModel();
+        private SKUPricesModel SKUPricesModelObj = new SKUPricesModel();
+        private VendorsModel VendorsModelObj = new VendorsModel();
+        private SKUModel SKUModelObj = new SKUModel();
+
         private int selectedCategoryId = 0;
         private int skuId = 0;
         private string memo = "";
@@ -196,11 +205,11 @@ namespace MJC.forms.sku
                 {
                     if (selectedCategoryId != 0)
                     {
-                        CategoryData category = Session.CategoriesModelObj.LoadCategoryById(selectedCategoryId);
+                        CategoryData category = CategoriesModelObj.LoadCategoryById(selectedCategoryId);
                         int categoryId = selectedCategoryId;
                         int calculateAs = category.calculateAs;
 
-                        Session.SKUModelObj.SetPrice(categoryId, calculateAs);
+                        SKUModelObj.SetPrice(categoryId, calculateAs);
                     }
                 }
             };
@@ -209,11 +218,11 @@ namespace MJC.forms.sku
                 DialogResult result = MessageBox.Show("Do you want to reset archived?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    Session.SKUModelObj.UpdateSKUArchived(true, this.skuId);
+                    SKUModelObj.UpdateSKUArchived(true, this.skuId);
                 }
                 else if (result == DialogResult.No)
                 {
-                    Session.SKUModelObj.UpdateSKUArchived(false, this.skuId);
+                    SKUModelObj.UpdateSKUArchived(false, this.skuId);
                 }
             };
         }
@@ -289,7 +298,6 @@ namespace MJC.forms.sku
             measurementUnit.GetTextBox().MaxLength = 2;
             costCode.GetTextBox().KeyPress += KeyValidateNumber;
             assetAcct.GetTextBox().KeyPress += KeyValidateNumber;
-            orderForm.GetTextBox().KeyPress += KeyValidateNumber;
             manufacturer.GetTextBox().KeyPress += KeyValidateNumber;
             quantity.GetTextBox().KeyPress += KeyValidateNumber;
             qtyAllocated.GetTextBox().KeyPress += KeyValidateNumber;
@@ -299,12 +307,21 @@ namespace MJC.forms.sku
             soldThisMonth.GetTextBox().KeyPress += KeyValidateNumber;
             soldYTD.GetTextBox().KeyPress += KeyValidateNumber;
 
+            orderForm.GetComboBox().DropDownStyle = ComboBoxStyle.DropDownList;
+
+
+
+            List<KeyValuePair<int, string>> VendorsData = VendorsModelObj.GetVendorList();
+            foreach (KeyValuePair<int, string> pair in VendorsData)
+            {
+                orderForm.GetComboBox().Items.Add(new FComboBoxItem(pair.Key, pair.Value));
+            }
 
             string filter = "";
-            var refreshData = Session.PriceTiersModelObj.LoadPriceTierData(filter);
+            var refreshData = PriceTiersModelObj.LoadPriceTierData(filter);
             if (refreshData)
             {
-                List<PriceTierData> pDatas = Session.PriceTiersModelObj.PriceTierDataList;
+                List<PriceTierData> pDatas = PriceTiersModelObj.PriceTierDataList;
 
                 priceTiers = new FInputBox[pDatas.Count];
                 for (int i = 0; i < pDatas.Count; i++)
@@ -329,7 +346,7 @@ namespace MJC.forms.sku
                 maintainQtys.GetCheckBox().Enabled = false;
                 allowDiscount.GetCheckBox().Enabled = false;
                 commissionable.GetCheckBox().Enabled = false;
-                orderForm.GetTextBox().Enabled = false;
+                orderForm.GetComboBox().Enabled = false;
                 lastSold.GetDateTimePicker().Enabled = false;
                 manufacturer.GetTextBox().Enabled = false;
                 location.GetTextBox().Enabled = false;
@@ -368,7 +385,16 @@ namespace MJC.forms.sku
             this.taxable.GetCheckBox().Checked = (bool)data[0].taxable;
             this.maintainQtys.GetCheckBox().Checked = (bool)data[0].manageStock;
             this.allowDiscount.GetCheckBox().Checked = (bool)data[0].allowDiscounts;
-            this.orderForm.GetTextBox().Text = data[0].orderFrom.ToString();
+
+
+            foreach (FComboBoxItem item in orderForm.GetComboBox().Items)
+            {
+                if (item.Id == data[0].orderFrom)
+                {
+                    orderForm.GetComboBox().SelectedItem = item;
+                    break;
+                }
+            }
 
             if (data[0].lastSold != null && !data[0].lastSold.Equals(DBNull.Value)) this.lastSold.GetDateTimePicker().Value = data[0].lastSold.ToLocalTime();
 
@@ -392,7 +418,7 @@ namespace MJC.forms.sku
             this.invValue.GetTextBox().Text = data[0].inventoryValue.ToString();
 
             List<KeyValuePair<int, double>> skuPriceData = new List<KeyValuePair<int, double>>();
-            skuPriceData = Session.SKUPricesModelObj.LoadPriceTierDataBySKUId(id);
+            skuPriceData = SKUPricesModelObj.LoadPriceTierDataBySKUId(id);
 
             foreach (KeyValuePair<int, double> pair in skuPriceData)
             {
@@ -407,7 +433,7 @@ namespace MJC.forms.sku
             bool initFlag = true;
             categoryCombo.GetComboBox().Items.Clear();
             List<KeyValuePair<int, string>> CategoryList = new List<KeyValuePair<int, string>>();
-            CategoryList = Session.CategoriesModelObj.GetCategoryItems();
+            CategoryList = CategoriesModelObj.GetCategoryItems();
             foreach (KeyValuePair<int, string> item in CategoryList)
             {
                 int id = item.Key;
@@ -482,8 +508,8 @@ namespace MJC.forms.sku
             bool b_allow_discount = allowDiscount.GetCheckBox().Checked;
             bool b_commissionable = commissionable.GetCheckBox().Checked;
 
-            int i_order_from; bool is_i_order_from = int.TryParse(orderForm.GetTextBox().Text, out i_order_from);
-            if (!is_i_order_from) i_order_from = 0;
+            FComboBoxItem selectedItem = (FComboBoxItem)orderForm.GetComboBox().SelectedItem;
+            int i_order_from = selectedItem.Id;
 
             DateTime d_last_sold = lastSold.GetDateTimePicker().Value;
 
