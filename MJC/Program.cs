@@ -27,7 +27,7 @@ namespace MJC
             Application.EnableVisualStyles();
             ApplicationConfiguration.Initialize();
 
-            SentrySdk.Init(o =>
+            Sentry.SentrySdk.Init(o =>
             {
                 // Tells which project in Sentry to send events to:
                 o.Dsn = "https://4b7926db913b708af6e2bdde51bc6243@o382651.ingest.sentry.io/4505844276527104";
