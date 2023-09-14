@@ -273,7 +273,8 @@ namespace MJC.model
             bool billAslabor,
             string syncToken,
             string qboSkuId,
-            bool hidden
+            bool hidden,
+            bool editingQuantity
             )
         {
 
@@ -285,7 +286,7 @@ namespace MJC.model
                 {
                     command.Connection = connection;
                     //Get Total Number of Customers
-                    command.CommandText = "INSERT INTO dbo.SKU (active, sku, category, description, measurementUnit, weight, costCode, assetAccount, taxable, manageStock, allowDiscounts, commissionable, orderFrom, lastSold, manufacturer, location, quantity, qtyAllocated, qtyAvailable, qtyCritical, qtyReorder, soldMonthToDate, soldYearToDate, freezePrices, coreCost, inventoryValue, createdAt, createdBy, updatedAt, updatedBy, subassemblyStatus, subassemblyPrint, memo, billAsLabor, syncToken, qboSkuId, hidden) OUTPUT INSERTED.ID VALUES (@active, @Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31, @memo,  @billAsLabor, @syncToken, @qboSkuId, @hidden)";
+                    command.CommandText = "INSERT INTO dbo.SKU (active, sku, category, description, measurementUnit, weight, costCode, assetAccount, taxable, manageStock, allowDiscounts, commissionable, orderFrom, lastSold, manufacturer, location, quantity, qtyAllocated, qtyAvailable, qtyCritical, qtyReorder, soldMonthToDate, soldYearToDate, freezePrices, coreCost, inventoryValue, createdAt, createdBy, updatedAt, updatedBy, subassemblyStatus, subassemblyPrint, memo, billAsLabor, syncToken, qboSkuId, hidden, editingQuantity) OUTPUT INSERTED.ID VALUES (@active, @Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31, @memo,  @billAsLabor, @syncToken, @qboSkuId, @hidden,  @editingQuantity)";
                     command.Parameters.AddWithValue("@active", true);
                     command.Parameters.AddWithValue("@Value1", sku__name);
                     command.Parameters.AddWithValue("@Value2", category);
@@ -327,6 +328,7 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@syncToken", syncToken);
                     command.Parameters.AddWithValue("@qboSkuId", qboSkuId);
                     command.Parameters.AddWithValue("@hidden", hidden);
+                    command.Parameters.AddWithValue("@editingQuantity", editingQuantity);
 
                     int newId = (int)command.ExecuteScalar();
 
@@ -373,6 +375,7 @@ namespace MJC.model
             string memo,
             Dictionary<int, double> priceTierDict,
             bool billAsLabor,
+            bool editingQuantity,
             int id)
         {
             using (var connection = GetConnection())
@@ -382,7 +385,7 @@ namespace MJC.model
                 using (var command = new SqlCommand())
                 {
                     command.Connection = connection;
-                    command.CommandText = @"UPDATE dbo.SKU SET sku = @Value1, category = @Value2, description = @Value3, measurementUnit = @Value4, weight = @Value5, costCode = @Value6, assetAccount = @Value7, taxable = @Value8, manageStock = @Value9, allowDiscounts = @Value10, commissionable = @Value11, orderFrom = @Value12, lastSold = @Value13, manufacturer = @Value14, location = @Value15, quantity = @Value16, qtyAllocated = @Value17, qtyAvailable = @Value18, qtyCritical = @Value19, qtyReorder = @Value20, soldMonthToDate = @Value21, soldYearToDate = @Value22, freezePrices = @Value23, coreCost = @Value24, inventoryValue = @Value25, memo = @memo, billAsLabor = @billAsLabor WHERE id = @Value26";
+                    command.CommandText = @"UPDATE dbo.SKU SET sku = @Value1, category = @Value2, description = @Value3, measurementUnit = @Value4, weight = @Value5, costCode = @Value6, assetAccount = @Value7, taxable = @Value8, manageStock = @Value9, allowDiscounts = @Value10, commissionable = @Value11, orderFrom = @Value12, lastSold = @Value13, manufacturer = @Value14, location = @Value15, quantity = @Value16, qtyAllocated = @Value17, qtyAvailable = @Value18, qtyCritical = @Value19, qtyReorder = @Value20, soldMonthToDate = @Value21, soldYearToDate = @Value22, freezePrices = @Value23, coreCost = @Value24, inventoryValue = @Value25, memo = @memo, billAsLabor = @billAsLabor, editingQuantity = @editingQuantity WHERE id = @Value26";
                     command.Parameters.AddWithValue("@Value1", sku__name);
                     command.Parameters.AddWithValue("@Value2", category);
                     command.Parameters.AddWithValue("@Value3", description);
@@ -410,6 +413,7 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value25", inv_value);
                     command.Parameters.AddWithValue("@memo", memo);
                     command.Parameters.AddWithValue("@billAsLabor", billAsLabor);
+                    command.Parameters.AddWithValue("@editingQuantity", editingQuantity);
                     command.Parameters.AddWithValue("@Value26", id);
 
                     command.ExecuteNonQuery();

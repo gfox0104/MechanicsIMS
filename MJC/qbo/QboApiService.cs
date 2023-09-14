@@ -1006,7 +1006,7 @@ namespace MJC.qbo
                     bool billAslabor = false;
                     string? syncToken = item.SyncToken;
                    
-                    skuModelObj.AddSKU(skuName, category, desc, measurementUnit, weight, costCode, assetAccount, taxable, maintain_qty, allow_discount, commissionable, order_from, last_sold, manufacturer, location, quantity, qty_allocated, qty_available, critical_qty, reorder_qty, sold_this_month, sold_ytd, freeze_prices, core_cost, inv_value, memo, priceTierDict, billAslabor, syncToken, itemId, hidden);
+                    skuModelObj.AddSKU(skuName, category, desc, measurementUnit, weight, costCode, assetAccount, taxable, maintain_qty, allow_discount, commissionable, order_from, last_sold, manufacturer, location, quantity, qty_allocated, qty_available, critical_qty, reorder_qty, sold_this_month, sold_ytd, freeze_prices, core_cost, inv_value, memo, priceTierDict, billAslabor, syncToken, itemId, hidden, false);
                 }
                 MessageBox.Show("Load QB data is finished");
             }
