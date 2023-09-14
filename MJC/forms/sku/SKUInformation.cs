@@ -38,7 +38,7 @@ namespace MJC.forms.sku
         private FInputBox costCode = new FInputBox("Sales/Cost Code");
         private FInputBox assetAcct = new FInputBox("SKU Asset Acct");
 
-        private FCheckBox taxable = new FCheckBox("Taxable");
+        private FCheckBox taxable = new FCheckBox("taxable");
         private FCheckBox maintainQtys = new FCheckBox("Maintain Qtys");
         private FCheckBox allowDiscount = new FCheckBox("Allow discount");
         private FCheckBox commissionable = new FCheckBox("Commissionable");
@@ -49,6 +49,7 @@ namespace MJC.forms.sku
         private FInputBox location = new FInputBox("Location");
 
         private FGroupLabel quantityTracking = new FGroupLabel("Quantity Tracking");
+        private FCheckBox editingQuantity = new FCheckBox("Enable Editing Quantities");
         private FInputBox quantity = new FInputBox("Quantity");
         private FInputBox qtyAllocated = new FInputBox("Qty Allocated");
         private FInputBox qtyAvaiable = new FInputBox("Qty Available");
@@ -84,11 +85,12 @@ namespace MJC.forms.sku
             if (disabled)
             {
                 hkButtons = new HotkeyButton[4] { hkSKUMemo, hkSubAssembly, hkCrossReference, hkQuantityDiscount };
-            } else
+            }
+            else
             {
                 hkButtons = new HotkeyButton[5] { hkSKUMemo, hkQuickCalcPrice, hkMiscManagement, hkResetPrices, hkSetArchived };
             }
-            
+
             _initializeHKButtons(hkButtons, false);
             AddHotKeyEvents();
             allowDiscount.GetCheckBox().Width = 200;
@@ -146,7 +148,7 @@ namespace MJC.forms.sku
                 {
                     this.Enabled = true;
                     int saveFlag = MiscManagementActionsModal.GetSaveFlage();
-                    switch(saveFlag)
+                    switch (saveFlag)
                     {
                         case 1:
                             VendorCosts vendorCostModal = new VendorCosts(skuId);
@@ -258,10 +260,14 @@ namespace MJC.forms.sku
 
             List<dynamic> FormComponents2 = new List<dynamic>();
             FormComponents2.Add(quantityTracking);
+            FormComponents2.Add(editingQuantity);
             FormComponents2.Add(quantity);
 
+            quantity.GetTextBox().Enabled = false;
             qtyAllocated.GetTextBox().Enabled = false;
             qtyAvaiable.GetTextBox().Enabled = false;
+            criticalQty.GetTextBox().Enabled = false;
+            recorderQty.GetTextBox().Enabled = false;
 
             FormComponents2.Add(qtyAllocated);
             FormComponents2.Add(qtyAvaiable);
@@ -292,7 +298,7 @@ namespace MJC.forms.sku
             recorderQty.GetTextBox().KeyPress += KeyValidateNumber;
             soldThisMonth.GetTextBox().KeyPress += KeyValidateNumber;
             soldYTD.GetTextBox().KeyPress += KeyValidateNumber;
- 
+
 
             string filter = "";
             var refreshData = Session.PriceTiersModelObj.LoadPriceTierData(filter);
@@ -307,6 +313,8 @@ namespace MJC.forms.sku
                     FormComponents2.Add(priceTiers[i]);
                 }
             }
+
+            editingQuantity.GetCheckBox().CheckStateChanged += new EventHandler(EditingQuantity_Changed);
 
             if (this.disabled)
             {
@@ -367,6 +375,7 @@ namespace MJC.forms.sku
             this.manufacturer.GetTextBox().Text = data[0].manufacturer.ToString();
             this.location.GetTextBox().Text = data[0].location.ToString();
 
+            this.editingQuantity.GetCheckBox().Checked = (bool)data[0].editingQuantity;
             this.quantity.GetTextBox().Text = data[0].quantity.ToString();
             this.qtyAllocated.GetTextBox().Text = data[0].qtyAllocated.ToString();
             this.qtyAvaiable.GetTextBox().Text = data[0].qtyAvailable.ToString();
@@ -418,6 +427,26 @@ namespace MJC.forms.sku
                     categoryCombo.GetComboBox().SelectedItem = item;
                     break;
                 }
+            }
+        }
+
+        private void EditingQuantity_Changed(object sender, EventArgs e)
+        {
+            if (editingQuantity.GetCheckBox().Checked)
+            {
+                quantity.GetTextBox().Enabled = true;
+                qtyAllocated.GetTextBox().Enabled = true;
+                qtyAvaiable.GetTextBox().Enabled = true;
+                criticalQty.GetTextBox().Enabled = true;
+                recorderQty.GetTextBox().Enabled = true;
+            }
+            else
+            {
+                quantity.GetTextBox().Enabled = false;
+                qtyAllocated.GetTextBox().Enabled = false;
+                qtyAvaiable.GetTextBox().Enabled = false;
+                criticalQty.GetTextBox().Enabled = false;
+                recorderQty.GetTextBox().Enabled = false;
             }
         }
 
@@ -480,6 +509,7 @@ namespace MJC.forms.sku
 
             bool b_freeze_prices = freezePrices.GetCheckBox().Checked;
             bool b_bill_as_Labor = billAsLabor.GetCheckBox().Checked;
+            bool b_editing_quantity = editingQuantity.GetCheckBox().Checked;
 
             double i_core_cost; bool is_i_core_cost = double.TryParse(coreCost.GetTextBox().Text, out i_core_cost);
             if (!is_i_core_cost) i_core_cost = 0;
@@ -503,9 +533,9 @@ namespace MJC.forms.sku
             bool refreshData = false;
             if (skuId == 0)
             {
-                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor);
+                refreshData = Session.SKUModelObj.AddSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, b_editing_quantity);
             }
-            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, skuId);
+            else refreshData = Session.SKUModelObj.UpdateSKU(s_sku_name, i_category, s_description, s_measurement_unit, i_weight, i_cost_code, i_asset_acct, b_taxable, b_maintain_qty, b_allow_discount, b_commissionable, i_order_from, d_last_sold, s_manufacturer, s_location, i_quantity, i_qty_allocated, i_qty_available, i_qty_critical, i_qty_reorder, i_sold_this_month, i_sold_ytd, b_freeze_prices, i_core_cost, i_inv_value, memo, priceTierDict, b_bill_as_Labor, b_editing_quantity, skuId);
             string modeText = skuId == 0 ? "creating" : "updating";
             if (refreshData)
             {
@@ -519,7 +549,7 @@ namespace MJC.forms.sku
         {
             if (e.KeyCode == Keys.Escape)
             {
-                if(this.disabled == false)
+                if (this.disabled == false)
                 {
                     DialogResult result = MessageBox.Show("Do you want to save your changes?", "Confirm", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
@@ -531,7 +561,8 @@ namespace MJC.forms.sku
                     {
                         _navigateToPrev(sender, e);
                     }
-                } else
+                }
+                else
                 {
                     _navigateToPrev(sender, e);
                 }
