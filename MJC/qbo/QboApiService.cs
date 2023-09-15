@@ -12,7 +12,8 @@ using static System.Windows.Forms.AxHost;
 using System.Reflection.Emit;
 using System;
 using MJC.common;
- 
+using Accessibility;
+
 namespace MJC.qbo
 {
     public class QboApiService : DbConnection
@@ -34,13 +35,14 @@ namespace MJC.qbo
 
             try
             {
+                QboAuthTokens? Tokens = null;
+                Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
+                {
+                    ReadCommentHandling = JsonCommentHandling.Skip
+                }) ?? new();
+
                 if (Session.SettingsModelObj.Settings.accessToken == null)
                 {
-                    QboAuthTokens? Tokens = null;
-                    Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
-                    {
-                        ReadCommentHandling = JsonCommentHandling.Skip
-                    }) ?? new();
 
                     this.accessToken = Tokens.AccessToken;
                     this.realmId = long.Parse(Tokens.RealmId);
@@ -49,7 +51,7 @@ namespace MJC.qbo
                 {
                     this.accessToken = Session.SettingsModelObj.Settings.accessToken;
                     // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
-                    // this.realmId = long.Parse(Tokens.RealmId);
+                    this.realmId = long.Parse(Tokens.RealmId);
                 }
             }
             catch(Exception e)
@@ -557,7 +559,7 @@ namespace MJC.qbo
 
         async public Task LoadCustomers()
         {
-            DataService dataService= new DataService(this.accessToken, this.realmId, useSandbox: true);
+            DataService dataService= new DataService(this.accessToken, this.realmId, useSandbox: false);
 
             try
             {
@@ -578,8 +580,11 @@ namespace MJC.qbo
                 }
 
                 Console.WriteLine("Customer is synchorized");
-                LoadInvoices();
-                LoadSKU();
+                //LoadInvoices();
+                for(int i = 0; i< 94; i++)
+                {
+                    LoadSKU(i);
+                }
 
             }
             catch (Exception exc)
@@ -957,12 +962,14 @@ namespace MJC.qbo
 
         }
 
-        async public void LoadSKU()
+        async public void LoadSKU(int index = 0)
         {
-            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: true);
+            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: false);
             try
             {
-                var result = await dataService.QueryAsync<Item>("select * from Item");
+                int startPosition = index * 100;
+                string query = "select * from Item ORDERBY Id StartPosition " + startPosition + " MaxResults 100";
+                var result = await dataService.QueryAsync<Item>(query);
                 var items = result.Response.Entities;
                 foreach (var item in items)
                 {
@@ -970,7 +977,7 @@ namespace MJC.qbo
                     string skuName = item.Name;
                     int category = 1;
                     string desc = item.Description;
-                    string measurementUnit = "";
+                    string measurementUnit = "ea";
                     int weight = 0;
                     int costCode = 1;
                     int assetAccount = 1;
@@ -981,20 +988,20 @@ namespace MJC.qbo
                     bool allow_discount = false;
                     bool commissionable = false;
                     int order_from = 1;
-                    DateTime last_sold = DateTime.Now;
+                    DateTime? last_sold = null;
                     string manufacturer = "";
-                    string location = "";
+                    string? location = null;
                     int quantity = Convert.ToInt32(item.QtyOnHand);
                     int qty_allocated = Convert.ToInt32(item.QtyOnSalesOrder);
                     int qty_available = Convert.ToInt32(item.QtyOnHand - item.QtyOnSalesOrder);
                     int critical_qty = 0;
                     int reorder_qty = Convert.ToInt32(item.QtyOnPurchaseOrder);
-                    int sold_this_month = 11;
+                    int sold_this_month = 12;
                     int sold_ytd = 2022;
                     bool freeze_prices = false;
                     double core_cost = Convert.ToDouble(item.UnitPrice);
                     double inv_value = Convert.ToDouble(item.PurchaseCost);
-                    string memo = item.PurchaseDesc;
+                    string? memo = null;
                     Dictionary< int, double> priceTierDict = new Dictionary< int, double>();
                     bool hidden = false;
                     bool billAslabor = false;

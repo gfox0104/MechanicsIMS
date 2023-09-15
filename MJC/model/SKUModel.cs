@@ -255,9 +255,9 @@ namespace MJC.model
             bool allow_discount,
             bool commissionable,
             int order_from,
-            DateTime last_sold,
+            DateTime? last_sold,
             string manufacturer,
-            string location,
+            string? location,
             int quantity,
             int qty_allocated,
             int qty_available,
@@ -302,9 +302,13 @@ namespace MJC.model
                     command.Parameters.AddWithValue("@Value10", allow_discount);
                     command.Parameters.AddWithValue("@Value11", commissionable);
                     command.Parameters.AddWithValue("@Value12", order_from);
-                    command.Parameters.AddWithValue("@Value13", last_sold);
+                    if(last_sold != null)
+                        command.Parameters.AddWithValue("@Value13", last_sold);
+                    else command.Parameters.AddWithValue("@Value13", DBNull.Value);
                     command.Parameters.AddWithValue("@Value14", manufacturer);
-                    command.Parameters.AddWithValue("@Value15", location);
+                    if(!string.IsNullOrEmpty(location))
+                        command.Parameters.AddWithValue("@Value15", location);
+                    else command.Parameters.AddWithValue("@Value15", DBNull.Value);
                     command.Parameters.AddWithValue("@Value16", quantity);
                     command.Parameters.AddWithValue("@Value17", qty_allocated);
                     command.Parameters.AddWithValue("@Value18", qty_available);
