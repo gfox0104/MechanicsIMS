@@ -355,9 +355,7 @@ namespace MJC.qbo
                         TaxCodeRef = new ReferenceType { value = "Tax" } };
 
                     //SubTotalLineDetail subTotalLineDetail = new SubTotalLineDetail { ServiceDate = DateTime.Now, ItemRef = new ReferenceType { name = "test_subTotalLine", value = "15" } };
-                    var m_test1 = item.Quantity;
-                    var m_test2 = item.UnitPrice;
-                    var m_test = item.Quantity * Convert.ToDecimal(item.UnitPrice);
+                 
                     Line salesItemLine = new Line
                     {
                         Id = qboItemId,

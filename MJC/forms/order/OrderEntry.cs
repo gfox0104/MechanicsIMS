@@ -28,6 +28,7 @@ namespace MJC.forms.order
         private HotkeyButton hkProfiler = new HotkeyButton("F8", "Profiler", Keys.F8);
         private HotkeyButton hkHeldOrdersForCustomer = new HotkeyButton("F9", "Held Orders for Customer", Keys.F9);
 
+        GridViewOrigin OrderEntryLookupGrid = new GridViewOrigin();
         private DataGridView OEGridRefer;
         private int OEGridSelectedIndex = 0;
 
@@ -43,8 +44,12 @@ namespace MJC.forms.order
             _initializeHKButtons(hkButtons);
             AddHotKeyEvents();
 
-            
-            InitGridFooter();
+            InitOrderItemsList();
+            //InitGridFooter();
+            this.VisibleChanged += (s, e) =>
+            {
+                //this.getcu();
+            };
 
             //ComboBox_SelectedIndexChanged(Customer.GetComboBox(), EventArgs.Empty);
         }
@@ -64,21 +69,18 @@ namespace MJC.forms.order
             };
             hkSelects.GetButton().Click += (s, e) =>
             {
-                int rowIndex = OEGridRefer.CurrentCell.RowIndex;
-                DataGridViewRow row = OEGridRefer.Rows[rowIndex];
-
-                int id = (int)row.Cells[0].Value;
-                addProcessOrder(s, e, id);
+                int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
+                addProcessOrder(s, e, customerId);
             };
             hkOpenCustomer.GetButton().Click += (sender, e) =>
             {
-                QboApiService apiService = new QboApiService();
-                apiService.LoadCustomers();
-                //int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
-                //CustomerInformation customerInfoModal = new CustomerInformation(true);
-                //customerInfoModal.setDetails(customerId);
-                //_navigateToForm(sender, e, customerInfoModal);
-                //this.Hide();
+                //QboApiService apiService = new QboApiService();
+                //apiService.LoadCustomers();
+                int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
+                CustomerInformation customerInfoModal = new CustomerInformation(true);
+                customerInfoModal.setDetails(customerId);
+                _navigateToForm(sender, e, customerInfoModal);
+                this.Hide();
             };
             hkCheckStok.GetButton().Click += (sender, e) =>
             {
@@ -117,7 +119,6 @@ namespace MJC.forms.order
 
         private void InitOrderItemsList()
         {
-            GridViewOrigin OrderEntryLookupGrid = new GridViewOrigin();
             OEGridRefer = OrderEntryLookupGrid.GetGrid();
             OEGridRefer.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(157, 196, 235);
             OEGridRefer.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(31, 63, 96);

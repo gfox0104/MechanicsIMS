@@ -147,7 +147,7 @@ namespace MJC.forms.order
                     int saveFlag = CloseOrderActionsModal.GetSaveFlage();
                     if (saveFlag == 7)
                     {
-                        Session.OrderModelObj.DeleteOrder(selectedOrderId);
+                        //Session.OrderModelObj.DeleteOrder(orderId);
 
                         _navigateToPrev(sender, e);
                     }
@@ -425,7 +425,7 @@ namespace MJC.forms.order
             POGridRefer.DataError += POGridRefer_DataError;
             this.Controls.Add(POGridRefer);
 
-            LoadOrderItemList();
+            //LoadOrderItemList();
 
             foreach (DataGridViewRow row in POGridRefer.Rows)
             {
@@ -564,12 +564,11 @@ namespace MJC.forms.order
         {
             this.OrderItemData = new List<OrderItem>(); // this.selectedOrderId
 
-            //if (!isAddNewOrderItem)
-            //{
+            if (!isAddNewOrderItem)
+            {
                 OrderItemData = Session.OrderItemModelObj.GetOrderItemsListByCustomerId(this.customerId, 0, sort);
-            //}
+            }
 
-            POGridRefer.Columns.Clear();
             POGridRefer.DataSource = this.OrderItemData;
 
             POGridRefer.VirtualMode = false;
@@ -628,14 +627,12 @@ namespace MJC.forms.order
             POGridRefer.Columns[13].Name = "PriceTier";
             POGridRefer.Columns[13].DataPropertyName = "priceTier";
             POGridRefer.Columns[13].Width = 100;
-            //POGridRefer.Columns[13].Visible = false;
+            POGridRefer.Columns[13].Visible = false;
 
             POGridRefer.Columns[14].HeaderText = "BillAsLabor";
             POGridRefer.Columns[14].Name = "BillAsLabor";
             POGridRefer.Columns[14].DataPropertyName = "billAsLabor";
             POGridRefer.Columns[14].Width = 100;
-            //POGridRefer.Columns[14].Visible = false;
-
             POGridRefer.Columns[14].Visible = false;
 
             // DataGrid ComboBox column
@@ -678,8 +675,8 @@ namespace MJC.forms.order
             POGridRefer.CellValueChanged += PoGridRefer_CellValueChanged;
             POGridRefer.CellEndEdit += POGridRefer_CellEndEdit;
             POGridRefer.SelectionChanged += POGridRefer_SelectionChanged;
-            //InsertItem(null, null);
-            if(POGridRefer.Rows.Count > 0)
+            InsertItem(null, null);
+            if (POGridRefer.Rows.Count > 0)
                 POGridRefer.CurrentCell = POGridRefer.Rows[POGridRefer.Rows.Count - 1].Cells[12];
             //POGridRefer.Select();
             //POGridRefer.BeginEdit(true);
