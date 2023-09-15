@@ -50,7 +50,8 @@ namespace QboLib
             {
                 Console.WriteLine("Token was refreshed");
 
-                return true;
+                QboLocal.Tokens.AccessToken = tokenResponse.AccessToken;
+                QboLocal.Tokens.RefreshToken = tokenResponse.RefreshToken;
             }
 
             return true;
