@@ -401,6 +401,8 @@ namespace MJC.forms.sku
             this.manufacturer.GetTextBox().Text = data[0].manufacturer.ToString();
             this.location.GetTextBox().Text = data[0].location.ToString();
 
+            if (data[0].editingQuantity == null) data[0].editingQuantity = false;
+
             this.editingQuantity.GetCheckBox().Checked = (bool)data[0].editingQuantity;
             this.quantity.GetTextBox().Text = data[0].quantity.ToString();
             this.qtyAllocated.GetTextBox().Text = data[0].qtyAllocated.ToString();

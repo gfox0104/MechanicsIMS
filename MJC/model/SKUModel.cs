@@ -854,7 +854,6 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("SKU Inventory updated successfully.");
                 }
 
                 foreach (KeyValuePair<int, double> pair in priceTierDict)
@@ -884,7 +883,6 @@ namespace MJC.model
 
                     command.ExecuteNonQuery();
 
-                    MessageBox.Show("SKU Inventory updated successfully.");
                 }
 
                 return true;

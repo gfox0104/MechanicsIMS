@@ -189,6 +189,9 @@ namespace MJC.forms.inventory
             var refreshData = SkuModelObj.InsertSKUCostQty(active, skuId, costDate, qty, cost, priceTierDict, createdBy, updatedBy);
 
             refreshData = SkuModelObj.UpdateSKUQty(totalQty, skuId);
+
+
+            ShowInformation("SKU Inventory updated successfully.");
         }
 
         private void SKU_SelectedIndexChanged(object sender, EventArgs e)

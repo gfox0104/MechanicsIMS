@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MJC.common;
 using MJC.config;
 
 namespace MJC.model
@@ -92,7 +93,7 @@ namespace MJC.model
                         CategoryPriceTierModelObj.AddCategoryPriceTier(newId, key, value);
                     }
 
-                    MessageBox.Show("New Category is added successfully.");
+                    Messages.ShowInformation("The new Category was added successfully.");
                 }
 
                 return true;
@@ -123,7 +124,7 @@ namespace MJC.model
                         if (!CategoryPriceTierModelObj.UpdateCategoryPriceTier(id, key, value)) CategoryPriceTierModelObj.AddCategoryPriceTier(id, key, value);
                     }
 
-                    MessageBox.Show("The Category updated successfully.");
+                    Messages.ShowInformation("The category was updated successfully.");
                 }
 
                 return true;

@@ -27,7 +27,7 @@ namespace MJC.forms.category
         private PriceTiersModel PriceTiersModelObj = new PriceTiersModel();
         private SKUModel SKUModelObj = new SKUModel();
 
-        public CategoryMargin() : base("Category Margins", "Manage category margins used to calcuate prices")
+        public CategoryMargin() : base("Category Margins", "Manage category margins used to calculate prices")
         {
             InitializeComponent();
             _initBasicSize();
@@ -112,7 +112,9 @@ namespace MJC.forms.category
                 CLGridRefer.Columns[3 + index++].Width = 300;
             }
             this.Controls.Add(CLGridRefer);
+     
             this.CLGridRefer.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.addcategory_btn_Click);
+      
 
             LoadCategoryList();
         }
@@ -120,22 +122,49 @@ namespace MJC.forms.category
         private void LoadCategoryList()
         {
             string filter = "";
-            CLGridRefer.Rows.Clear();
-            List<CategoryData> categoryDataList = CategoriesModelObj.LoadCategoryData(filter);
-
-            foreach (CategoryData categoryData in categoryDataList)
+            if (CLGridRefer.Rows.Count == 0)
             {
-                List<KeyValuePair<string, double>> priceTierData = new List<KeyValuePair<string, double>>();
-                priceTierData = PriceTiersModelObj.GetPriceTierMargin(categoryData.id);
-                int rowIndex = CLGridRefer.Rows.Add();
-                DataGridViewRow newRow = CLGridRefer.Rows[rowIndex];
-                newRow.Cells["id"].Value = categoryData.id;
-                newRow.Cells["category"].Value = categoryData.categoryName;
-                newRow.Cells["calculateAs"].Value = categoryData.calculateAs == 1 ? "Markup" : "Margin";
+                List<CategoryData> categoryDataList = CategoriesModelObj.LoadCategoryData(filter);
 
-                foreach (KeyValuePair<string, double> pair in priceTierData)
+                foreach (CategoryData categoryData in categoryDataList)
                 {
-                    newRow.Cells[pair.Key].Value = pair.Value;
+                    List<KeyValuePair<string, double>> priceTierData = new List<KeyValuePair<string, double>>();
+                    priceTierData = PriceTiersModelObj.GetPriceTierMargin(categoryData.id);
+                    int rowIndex = CLGridRefer.Rows.Add();
+                    DataGridViewRow newRow = CLGridRefer.Rows[rowIndex];
+
+                    newRow.Cells["id"].Value = categoryData.id;
+                    newRow.Cells["category"].Value = categoryData.categoryName;
+                    newRow.Cells["calculateAs"].Value = categoryData.calculateAs == 1 ? "Markup" : "Margin";
+
+                    foreach (KeyValuePair<string, double> pair in priceTierData)
+                    {
+                        newRow.Cells[pair.Key].Value = pair.Value;
+                    }
+                }
+            }
+            else
+            {
+                
+                List<CategoryData> categoryDataList = CategoriesModelObj.LoadCategoryData(filter);
+
+                for (int rowIndex = 0; rowIndex < categoryDataList.Count; rowIndex++)
+                {
+                    CategoryData categoryData = categoryDataList[rowIndex];
+              
+                    List<KeyValuePair<string, double>> priceTierData = new List<KeyValuePair<string, double>>();
+                    priceTierData = PriceTiersModelObj.GetPriceTierMargin(categoryData.id);
+
+                    DataGridViewRow newRow = CLGridRefer.Rows[rowIndex];
+                    newRow.Cells["id"].Value = categoryData.id;
+                    newRow.Cells["category"].Value = categoryData.categoryName;
+                    newRow.Cells["calculateAs"].Value = categoryData.calculateAs == 1 ? "Markup" : "Margin";
+
+                    foreach (KeyValuePair<string, double> pair in priceTierData)
+                    {
+                        newRow.Cells[pair.Key].Value = pair.Value;
+                    }
+                    
                 }
             }
         }
@@ -178,7 +207,7 @@ namespace MJC.forms.category
 
         private void CategoryMargin_VisibleChanged(object sender, EventArgs e)
         {
-            InitCategoryListGrid();
+            // InitCategoryListGrid();
         }
     }
 }
