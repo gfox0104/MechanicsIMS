@@ -147,7 +147,7 @@ namespace MJC.forms.order
                     int saveFlag = CloseOrderActionsModal.GetSaveFlage();
                     if (saveFlag == 7)
                     {
-                        Session.OrderModelObj.DeleteOrder(orderId);
+                        Session.OrderModelObj.DeleteOrder(selectedOrderId);
 
                         _navigateToPrev(sender, e);
                     }
@@ -893,7 +893,7 @@ namespace MJC.forms.order
                 index++;
             }
             POGridRefer.Select();
-            POGridRefer.CurrentCell = POGridRefer.Rows[dataList.Count - 1].Cells[14];
+            POGridRefer.CurrentCell = POGridRefer.Rows[dataList.Count - 1].Cells[15];
             //int rowIndex = POGridRefer.Rows.Count - 1;
             //POGridRefer.Rows[rowIndex].DefaultCellStyle.BackColor = Color.White;
 

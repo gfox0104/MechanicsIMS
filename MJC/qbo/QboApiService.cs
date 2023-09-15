@@ -6,13 +6,7 @@ using QuickBooksSharp.Entities;
 using MJC.config;
 using System.Data;
 using MJC.model;
-
-using Intuit.Ipp.OAuth2PlatformClient;
-using static System.Windows.Forms.AxHost;
-using System.Reflection.Emit;
-using System;
 using MJC.common;
-using Accessibility;
 
 namespace MJC.qbo
 {
@@ -356,12 +350,14 @@ namespace MJC.qbo
                             name = item.Sku,
                             type = null
                         },
-                            Qty = item.Quantity,  
-                            UnitPrice = Convert.ToDecimal(item.UnitPrice), 
+                        Qty = item.Quantity,  
+                        UnitPrice = Convert.ToDecimal(item.UnitPrice), 
                         TaxCodeRef = new ReferenceType { value = "Tax" } };
 
                     //SubTotalLineDetail subTotalLineDetail = new SubTotalLineDetail { ServiceDate = DateTime.Now, ItemRef = new ReferenceType { name = "test_subTotalLine", value = "15" } };
-
+                    var m_test1 = item.Quantity;
+                    var m_test2 = item.UnitPrice;
+                    var m_test = item.Quantity * Convert.ToDecimal(item.UnitPrice);
                     Line salesItemLine = new Line
                     {
                         Id = qboItemId,

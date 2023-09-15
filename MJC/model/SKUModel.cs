@@ -182,6 +182,8 @@ namespace MJC.model
                         double? price = null;
                         if (!row.IsNull("price"))
                             price = double.Parse(row["price"].ToString());
+                        if(price < 0)
+                            price = price * (-1);
                         string priceTier = row["priceTierCode"].ToString();
                         int priceTierId = int.Parse(row["priceTierId"].ToString());
                         string qboSkuId = row["qboSkuId"].ToString();
