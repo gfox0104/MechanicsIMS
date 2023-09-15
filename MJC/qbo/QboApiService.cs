@@ -32,16 +32,10 @@ namespace MJC.qbo
             string directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string tokenFilePath = Path.Combine(directory, "MechanicsIMS", "Tokens.json");
 
-            // Check if directory %appdata%s\MechanicsIMS\ exists
-
-            // If not, create %appdata%\MechanicsIMS\ and download Tokens.json to it
-
-            // If so, proceed
-
-            //try
-            //{
-            //    if (Session.SettingsModelObj.Settings.accessToken == null)
-            //    {
+            try
+            {
+                if (Session.SettingsModelObj.Settings.accessToken == null)
+                {
                     QboAuthTokens? Tokens = null;
                     Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
                     {
@@ -50,18 +44,18 @@ namespace MJC.qbo
 
                     this.accessToken = Tokens.AccessToken;
                     this.realmId = long.Parse(Tokens.RealmId);
-            //    }
-            //    else
-            //    {
-            //        this.accessToken = Session.SettingsModelObj.Settings.accessToken;
-            //        // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
-            //        // this.realmId = long.Parse(Tokens.RealmId);
-            //    }
-            //}
-            //catch(Exception e)
-            //{
-            //    throw new Exception("TOKENS");
-            //}
+                }
+                else
+                {
+                    this.accessToken = Session.SettingsModelObj.Settings.accessToken;
+                    // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
+                    // this.realmId = long.Parse(Tokens.RealmId);
+                }
+            }
+            catch(Exception e)
+            {
+                throw new Exception("TOKENS");
+            }
         }
 
         public void RefreshToken()
