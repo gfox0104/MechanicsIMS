@@ -1,7 +1,12 @@
+|Branch|Master|Dev|
+-|-|-|
+Building|![image]({https://gitlab.com/paradynamix/mjc-desktop/badges/master/pipeline.svg})|![image]({https://gitlab.com/paradynamix/mjc-desktop/badges/dev/pipeline.svg})
+Coverage|![image]({https://gitlab.com/paradynamix/mjc-desktop/badges/master/coverage.svg})|![image]({https://gitlab.com/paradynamix/mjc-desktop/badges/dev/coverage.svg})
+
+
 # MJC Desktop App
 
 A Winforms app to replace a DOS based inventory system. 
-
 
 ## Database Setup
 
