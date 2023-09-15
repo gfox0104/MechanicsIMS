@@ -726,7 +726,7 @@ namespace MJC.forms.order
             }
             else
             // SKU Changed
-            if (e.RowIndex >= 0 && e.ColumnIndex == 14)
+            if (e.ColumnIndex == 15)
             {
                 DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 int selectedValue = int.Parse(comboBoxCell.Value?.ToString());
