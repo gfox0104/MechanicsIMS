@@ -50,6 +50,8 @@ namespace MJC.forms.login
                 UserData UserData = UserModelObj.getUserDataById(Username.GetTextBox().Text);
 
                 Session.LoggedIn = true;
+                Session.PriceTiersModelObj.LoadPriceTierData();
+
                 Program.permissionOrders = UserData.permissionOrders;
                 Program.permissionInventory = UserData.permissionInventory;
                 Program.permissionReceivables = UserData.permissionReceivables;

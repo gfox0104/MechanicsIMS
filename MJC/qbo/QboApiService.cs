@@ -559,31 +559,31 @@ namespace MJC.qbo
 
             try
             {
-                var result = await dataService.QueryAsync<Customer>("select * from Customer");
-                var customers = result.Response.Entities;
+                //var result = await dataService.QueryAsync<Customer>("select * from Customer");
+                //var customers = result.Response.Entities;
                 
-                if(customers != null)
-                {
-                    foreach (var customer in customers)
-                    {
-                        if (await DoesCustomerExist(customer))
-                        {
-                            UpdateCustomer(customer);
-                        }
-                        else
-                        {
-                            CreateNewCustomer(customer);
-                        }
+                //if(customers != null)
+                //{
+                //    foreach (var customer in customers)
+                //    {
+                //        if (await DoesCustomerExist(customer))
+                //        {
+                //            UpdateCustomer(customer);
+                //        }
+                //        else
+                //        {
+                //            CreateNewCustomer(customer);
+                //        }
 
-                    }
-                }
+                //    }
+                //}
 
                 Console.WriteLine("Customer is synchorized");
-                LoadInvoices();
-                //for (int i = 0; i< 94; i++)
-                //{
-                //    LoadSKU(i);
-                //}
+                //LoadInvoices();
+                for (int i = 0; i < 94; i++)
+                {
+                    LoadSKU(i);
+                }
 
             }
             catch (Exception exc)
@@ -1009,6 +1009,10 @@ namespace MJC.qbo
                         bool hidden = false;
                         bool billAslabor = false;
                         string? syncToken = item.SyncToken;
+                        foreach(var priceTier in Session.PriceTiersModelObj.PriceTierDataList)
+                        {
+                            priceTierDict.Add(priceTier.Id, priceTier.ProfitMargin);
+                        }
 
                         skuModelObj.AddSKU(skuName, category, desc, measurementUnit, weight, costCode, assetAccount, taxable, maintain_qty, allow_discount, commissionable, order_from, last_sold, manufacturer, location, quantity, qty_allocated, qty_available, critical_qty, reorder_qty, sold_this_month, sold_ytd, freeze_prices, core_cost, inv_value, memo, priceTierDict, billAslabor, syncToken, itemId, hidden, false);
                     }

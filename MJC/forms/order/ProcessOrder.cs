@@ -636,6 +636,8 @@ namespace MJC.forms.order
             POGridRefer.Columns[14].Width = 100;
             //POGridRefer.Columns[14].Visible = false;
 
+            POGridRefer.Columns[14].Visible = false;
+
             // DataGrid ComboBox column
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
             comboBoxColumn.DataSource = Session.SKUModelObj.SKUDataList;
@@ -730,7 +732,8 @@ namespace MJC.forms.order
             }
             else
             // SKU Changed
-            if (e.RowIndex >= 0 && e.ColumnIndex == 15)
+
+            if (e.ColumnIndex == 15)
             {
                 DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 int selectedValue = int.Parse(comboBoxCell.Value?.ToString());
