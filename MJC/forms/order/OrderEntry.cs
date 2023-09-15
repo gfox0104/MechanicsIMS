@@ -65,6 +65,8 @@ namespace MJC.forms.order
             hkSelects.GetButton().Click += (s, e) =>
             {
                 int sRId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
+
+                var m_var = OEGridRefer.SelectedRows;
                 addProcessOrder(s, e, sRId);
             };
             hkOpenCustomer.GetButton().Click += (sender, e) =>
@@ -172,7 +174,7 @@ namespace MJC.forms.order
 
         public void LoadSKUList(bool keepSelection = true)
         {
-            OEGridRefer.Rows.Clear();
+            //OEGridRefer.Rows.Clear();
 
             DataTable dataTable = Session.CustomersModelObj.LoadCustomerTable();
 

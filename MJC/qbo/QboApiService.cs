@@ -333,7 +333,7 @@ namespace MJC.qbo
 
         async public Task<bool> CreateInvoice(CustomerData customer, string invoiceNumber, List<OrderItem> itemList)
         {
-            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: true);
+            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: false);
             
             try
             {
