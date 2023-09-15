@@ -88,15 +88,16 @@ namespace MJC.model
 
                     if (customerId != 0 && orderId != 0)
                     {
-                        command.CommandText = @"SELECT OrderItems.* FROM OrderItems INNER JOIN
-                                            (SELECT id FROM Orders WHERE id = @Value1) AS tblOrder ON tblOrder.id = OrderItems.orderId " + sort;
-
+                        command.CommandText = @"SELECT OrderItems.*, SalesCostCodes.scCode FROM OrderItems INNER JOIN
+                                            (SELECT id FROM Orders WHERE id = @Value1) AS tblOrder ON tblOrder.id = OrderItems.orderId 
+                                            INNER JOIN SalesCostCodes On SalesCostCodes.id = OrderItems.salesCode" + sort;
                         command.Parameters.AddWithValue("@Value1", orderId);
                     }
                     else
                     {
-                        command.CommandText = @"SELECT OrderItems.* FROM OrderItems INNER JOIN
-                                            (SELECT id FROM Orders WHERE customerId = @Value1) AS tblOrder ON tblOrder.id = OrderItems.orderId " + sort;
+                        command.CommandText = @"SELECT OrderItems.*, SalesCostCodes.scCode FROM OrderItems INNER JOIN
+                                            (SELECT id FROM Orders WHERE customerId = @Value1) AS tblOrder ON tblOrder.id = OrderItems.orderId 
+                                            INNER JOIN SalesCostCodes On SalesCostCodes.id = OrderItems.salesCode" + sort;
 
                         command.Parameters.AddWithValue("@Value1", customerId);
                     }
@@ -129,7 +130,7 @@ namespace MJC.model
                         double? lineTotal = null;
                         if (!row.IsNull("lineTotal"))
                             lineTotal = double.Parse(row["lineTotal"].ToString());
-                        string salesCode = row["salesCode"].ToString();
+                        string salesCode = row["scCode"].ToString();
                         string qboSkuId = row["qboSkuId"].ToString();
                         string qboOrderItemId = row["qboOrderItemId"].ToString();
                         bool? billAsLabor = null;
