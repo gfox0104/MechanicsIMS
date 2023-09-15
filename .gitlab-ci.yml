@@ -86,6 +86,9 @@ cache:
 # Learn more about GitLab cache: https://docs.gitlab.com/ee/ci/caching/index.html
 before_script:
 #  - 'dotnet restore --packages $NUGET_PACKAGES_DIRECTORY'
+#    - "export PATH=\"$PATH:/home/gitlab-runner/.dotnet/tools\""
+#  - 'dotnet restore --packages $NUGET_PACKAGES_DIRECTORY'
+#    - 'dotnet tool install -g GrapeCity.LicenseManagerTool'
 
 build:
   stage: build
@@ -99,7 +102,7 @@ build:
   # path to the directory where it is located (e.g. 'dotnet build ./src/ConsoleApp').
   # Only one project path can be passed as a parameter to 'dotnet build' command.
   script:
-    - 'dotnet build MJC/MJC.csproj -c Release -o bin/release'
+    - 'dotnet build --nologo -v q --property WarningLevel=0 /clp:ErrorsOnly MJC/MJC.csproj -c Release -o bin/release'
 
 #tests:
   # stage: test
