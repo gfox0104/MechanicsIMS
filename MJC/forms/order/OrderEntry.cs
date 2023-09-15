@@ -69,17 +69,13 @@ namespace MJC.forms.order
             };
             hkOpenCustomer.GetButton().Click += (sender, e) =>
             {
-                QboApiService apiService = new QboApiService();
-                //for(int i = 0; i < 94; i++)
-                //{
-                //    apiService.LoadSKU(i);
-                //}
-                apiService.LoadCustomers();
-                //int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
-                //CustomerInformation customerInfoModal = new CustomerInformation(true);
-                //customerInfoModal.setDetails(customerId);
-                //_navigateToForm(sender, e, customerInfoModal);
-                //this.Hide();
+                //QboApiService apiService = new QboApiService();
+                //apiService.LoadCustomers();
+                int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
+                CustomerInformation customerInfoModal = new CustomerInformation(true);
+                customerInfoModal.setDetails(customerId);
+                _navigateToForm(sender, e, customerInfoModal);
+                this.Hide();
             };
             hkCheckStok.GetButton().Click += (sender, e) =>
             {
