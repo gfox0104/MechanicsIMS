@@ -12,7 +12,8 @@ using static System.Windows.Forms.AxHost;
 using System.Reflection.Emit;
 using System;
 using MJC.common;
- 
+using Accessibility;
+
 namespace MJC.qbo
 {
     public class QboApiService : DbConnection
@@ -34,13 +35,14 @@ namespace MJC.qbo
 
             try
             {
+                QboAuthTokens? Tokens = null;
+                Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
+                {
+                    ReadCommentHandling = JsonCommentHandling.Skip
+                }) ?? new();
+
                 if (Session.SettingsModelObj.Settings.accessToken == null)
                 {
-                    QboAuthTokens? Tokens = null;
-                    Tokens = System.Text.Json.JsonSerializer.Deserialize<QboAuthTokens>(File.ReadAllText(tokenFilePath), new JsonSerializerOptions()
-                    {
-                        ReadCommentHandling = JsonCommentHandling.Skip
-                    }) ?? new();
 
                     this.accessToken = Tokens.AccessToken;
                     this.realmId = long.Parse(Tokens.RealmId);
@@ -49,7 +51,7 @@ namespace MJC.qbo
                 {
                     this.accessToken = Session.SettingsModelObj.Settings.accessToken;
                     // this.refreshToken = Session.SettingsModelObj.Settings.refreshToken;
-                    // this.realmId = long.Parse(Tokens.RealmId);
+                    this.realmId = long.Parse(Tokens.RealmId);
                 }
             }
             catch(Exception e)
@@ -557,29 +559,35 @@ namespace MJC.qbo
 
         async public Task LoadCustomers()
         {
-            DataService dataService= new DataService(this.accessToken, this.realmId, useSandbox: true);
+            DataService dataService= new DataService(this.accessToken, this.realmId, useSandbox: false);
 
             try
             {
                 var result = await dataService.QueryAsync<Customer>("select * from Customer");
-                //var result = await dataService.QueryAsync<Invoice>("select* from Invoice");
                 var customers = result.Response.Entities;
-                foreach (var customer in customers)
+                
+                if(customers != null)
                 {
-                    if (await DoesCustomerExist(customer))
+                    foreach (var customer in customers)
                     {
-                        UpdateCustomer(customer);
-                    }
-                    else
-                    {
-                        CreateNewCustomer(customer);
-                    }
+                        if (await DoesCustomerExist(customer))
+                        {
+                            UpdateCustomer(customer);
+                        }
+                        else
+                        {
+                            CreateNewCustomer(customer);
+                        }
 
+                    }
                 }
 
                 Console.WriteLine("Customer is synchorized");
                 LoadInvoices();
-                LoadSKU();
+                //for (int i = 0; i< 94; i++)
+                //{
+                //    LoadSKU(i);
+                //}
 
             }
             catch (Exception exc)
@@ -836,113 +844,114 @@ namespace MJC.qbo
 
         async public void LoadInvoices(int skuId = 0, int customerId1 = 0, double unitPrice = 0, int qty = 1)
         {
-            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: true);
+            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: false);
             try
             {
                 var result = await dataService.QueryAsync<Invoice>("select * from Invoice");
                 var invoices = result.Response.Entities;
-                foreach (var invoice in invoices)
+                if(invoices != null)
                 {
-                    string customerId = invoice.CustomerRef.value;
-                    string customerName = invoice.CustomerRef.name;
-                    string creditCode = "";
-                    string terms = invoice.SalesTermRef?.value;
-                    string zone = "";
-                    string? poNumber = invoice.PONumber;
-                    string? shipVia = null;
-                    if (invoice.ShipMethodRef != null)
-                        shipVia = invoice.ShipMethodRef.value;
-                    string fob = invoice.FOB;
-                    string salesman = "";
-                    DateTime shipTo = DateTime.UtcNow;
-                    var status = invoice.status;
-                    string processedBy = "";
-                    DateTime? dateShipped = invoice.ShipDate;
-                    string invoiceNumber = invoice.DocNumber;
-                    DateTime? invoiceDate = invoice.TxnDate;
-                    string invoiceDesc = "";
-                    DateTime? lastPayment = invoice.DueDate;
-                    DateTime? paidDate = DateTime.UtcNow;
-                    double interestRate = 0;
-                    bool interestApplied = false;
-                    double discountAllowed = 0;
-                    decimal? invoiceTotal = invoice.TotalAmt;
-                    double discountableAmount = 0;
-                    double totalPaid = 0;
-                    decimal? invoiceBalance = invoice.Balance;
-                    bool trainingMode = false;
-                    DateTimeOffset? createdAt = invoice.MetaData.CreateTime;
-                    int createdBy = 2;
-                    if (invoice.MetaData.CreatedByRef != null)
-                        createdBy = int.Parse(invoice.MetaData.CreatedByRef.value);
-                    DateTimeOffset? updatedAt = invoice.MetaData.LastUpdatedTime;
-                    int updatedBy = 2;
-                    if (invoice.MetaData.CreatedByRef != null)
-                        updatedBy = int.Parse(invoice.MetaData.LastModifiedByRef.value);
-
-                    using (var connection = GetConnection())
+                    foreach (var invoice in invoices)
                     {
-                        connection.Open();
+                        string customerId = invoice.CustomerRef.value;
+                        string customerName = invoice.CustomerRef.name;
+                        string creditCode = "";
+                        string terms = invoice.SalesTermRef?.value;
+                        string zone = "";
+                        string? poNumber = invoice.PONumber;
+                        string? shipVia = null;
+                        if (invoice.ShipMethodRef != null)
+                            shipVia = invoice.ShipMethodRef.value;
+                        string fob = invoice.FOB;
+                        string salesman = "";
+                        DateTime shipTo = DateTime.UtcNow;
+                        var status = invoice.status;
+                        string processedBy = "";
+                        DateTime? dateShipped = invoice.ShipDate;
+                        string invoiceNumber = invoice.DocNumber;
+                        DateTime? invoiceDate = invoice.TxnDate;
+                        string invoiceDesc = "";
+                        DateTime? lastPayment = invoice.DueDate;
+                        DateTime? paidDate = DateTime.UtcNow;
+                        double interestRate = 0;
+                        bool interestApplied = false;
+                        double discountAllowed = 0;
+                        decimal? invoiceTotal = invoice.TotalAmt;
+                        double discountableAmount = 0;
+                        double totalPaid = 0;
+                        decimal? invoiceBalance = invoice.Balance;
+                        bool trainingMode = false;
+                        DateTimeOffset? createdAt = invoice.MetaData.CreateTime;
+                        int createdBy = 2;
+                        if (invoice.MetaData.CreatedByRef != null)
+                            createdBy = int.Parse(invoice.MetaData.CreatedByRef.value);
+                        DateTimeOffset? updatedAt = invoice.MetaData.LastUpdatedTime;
+                        int updatedBy = 2;
+                        if (invoice.MetaData.CreatedByRef != null)
+                            updatedBy = int.Parse(invoice.MetaData.LastModifiedByRef.value);
 
-                        using (var command = new SqlCommand())
+                        using (var connection = GetConnection())
                         {
-                            command.Connection = connection;
-                            command.CommandText = @"INSERT INTO dbo.Orders(active, customerId, customerName, creditCode, terms, zone, poNumber, shipVia, fob, salesman, shipTo, status, processedBy, dateShipped, invoiceNumber, invoiceDate, invoiceDesc, lastPayment, paidDate, interestRate, interestApplied, discountAllowed, invoiceTotal, discountableAmount, totalPaid, invoiceBalance, trainingMode, createdAt, createdBy, updatedAt, updatedBy) OUTPUT INSERTED.id VALUES(@Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31)";
-                            command.Parameters.AddWithValue("@Value1", 1);
-                            command.Parameters.AddWithValue("@Value2", customerId);
-                            command.Parameters.AddWithValue("@Value3", customerName);
-                            command.Parameters.AddWithValue("@Value4", creditCode);
-                            command.Parameters.AddWithValue("@Value5", terms ?? "No default terms");
-                            command.Parameters.AddWithValue("@Value6", zone);
-                            if (poNumber != null)
-                                command.Parameters.AddWithValue("@Value7", poNumber);
-                            else command.Parameters.AddWithValue("@Value7", DBNull.Value);
-                            if (shipVia != null)
-                                command.Parameters.AddWithValue("@Value8", shipVia);
-                            else command.Parameters.AddWithValue("@Value8", DBNull.Value);
-                            if (fob != null)
-                                command.Parameters.AddWithValue("@Value9", fob);
-                            else command.Parameters.AddWithValue("@Value9", DBNull.Value);
-                            if (salesman != null)
-                                command.Parameters.AddWithValue("@Value10", salesman);
-                            else command.Parameters.AddWithValue("@Value10", DBNull.Value);
-                            if (shipTo != null)
-                                command.Parameters.AddWithValue("@Value11", shipTo);
-                            else command.Parameters.AddWithValue("@Value11", DBNull.Value);
-                            if (status != null)
-                                command.Parameters.AddWithValue("@Value12", status);
-                            else command.Parameters.AddWithValue("@Value12", DBNull.Value);
-                            if (processedBy != null)
-                                command.Parameters.AddWithValue("@Value13", processedBy);
-                            else command.Parameters.AddWithValue("@Value13", DBNull.Value);
-                            if (dateShipped != null)
-                                command.Parameters.AddWithValue("@Value14", dateShipped);
-                            else command.Parameters.AddWithValue("@Value14", DBNull.Value);
+                            connection.Open();
 
-                            command.Parameters.AddWithValue("@Value15", invoiceNumber);
-                            command.Parameters.AddWithValue("@Value16", invoiceDate);
-                            command.Parameters.AddWithValue("@Value17", invoiceDesc);
-                            command.Parameters.AddWithValue("@Value18", lastPayment);
-                            command.Parameters.AddWithValue("@Value19", paidDate);
-                            command.Parameters.AddWithValue("@Value20", interestRate);
-                            command.Parameters.AddWithValue("@Value21", interestApplied);
-                            command.Parameters.AddWithValue("@Value22", discountAllowed);
-                            command.Parameters.AddWithValue("@Value23", invoiceTotal);
-                            command.Parameters.AddWithValue("@Value24", discountableAmount);
-                            command.Parameters.AddWithValue("@Value25", totalPaid);
-                            command.Parameters.AddWithValue("@Value26", invoiceBalance);
-                            command.Parameters.AddWithValue("@Value27", trainingMode);
-                            command.Parameters.AddWithValue("@Value28", createdAt);
-                            command.Parameters.AddWithValue("@Value29", createdBy);
-                            command.Parameters.AddWithValue("@Value30", updatedAt);
-                            command.Parameters.AddWithValue("@Value31", updatedBy);
+                            using (var command = new SqlCommand())
+                            {
+                                command.Connection = connection;
+                                command.CommandText = @"INSERT INTO dbo.Orders(active, customerId, customerName, creditCode, terms, zone, poNumber, shipVia, fob, salesman, shipTo, status, processedBy, dateShipped, invoiceNumber, invoiceDate, invoiceDesc, lastPayment, paidDate, interestRate, interestApplied, discountAllowed, invoiceTotal, discountableAmount, totalPaid, invoiceBalance, trainingMode, createdAt, createdBy, updatedAt, updatedBy) OUTPUT INSERTED.id VALUES(@Value1, @Value2, @Value3, @Value4, @Value5, @Value6, @Value7, @Value8, @Value9, @Value10, @Value11, @Value12, @Value13, @Value14, @Value15, @Value16, @Value17, @Value18, @Value19, @Value20, @Value21, @Value22, @Value23, @Value24, @Value25, @Value26, @Value27, @Value28, @Value29, @Value30, @Value31)";
+                                command.Parameters.AddWithValue("@Value1", 1);
+                                command.Parameters.AddWithValue("@Value2", customerId);
+                                command.Parameters.AddWithValue("@Value3", customerName);
+                                command.Parameters.AddWithValue("@Value4", creditCode);
+                                command.Parameters.AddWithValue("@Value5", terms ?? "No default terms");
+                                command.Parameters.AddWithValue("@Value6", zone);
+                                if (poNumber != null)
+                                    command.Parameters.AddWithValue("@Value7", poNumber);
+                                else command.Parameters.AddWithValue("@Value7", DBNull.Value);
+                                if (shipVia != null)
+                                    command.Parameters.AddWithValue("@Value8", shipVia);
+                                else command.Parameters.AddWithValue("@Value8", DBNull.Value);
+                                if (fob != null)
+                                    command.Parameters.AddWithValue("@Value9", fob);
+                                else command.Parameters.AddWithValue("@Value9", DBNull.Value);
+                                if (salesman != null)
+                                    command.Parameters.AddWithValue("@Value10", salesman);
+                                else command.Parameters.AddWithValue("@Value10", DBNull.Value);
+                                if (shipTo != null)
+                                    command.Parameters.AddWithValue("@Value11", shipTo);
+                                else command.Parameters.AddWithValue("@Value11", DBNull.Value);
+                                if (status != null)
+                                    command.Parameters.AddWithValue("@Value12", status);
+                                else command.Parameters.AddWithValue("@Value12", DBNull.Value);
+                                if (processedBy != null)
+                                    command.Parameters.AddWithValue("@Value13", processedBy);
+                                else command.Parameters.AddWithValue("@Value13", DBNull.Value);
+                                if (dateShipped != null)
+                                    command.Parameters.AddWithValue("@Value14", dateShipped);
+                                else command.Parameters.AddWithValue("@Value14", DBNull.Value);
 
-                            command.ExecuteScalar();
+                                command.Parameters.AddWithValue("@Value15", invoiceNumber);
+                                command.Parameters.AddWithValue("@Value16", invoiceDate);
+                                command.Parameters.AddWithValue("@Value17", invoiceDesc);
+                                command.Parameters.AddWithValue("@Value18", lastPayment);
+                                command.Parameters.AddWithValue("@Value19", paidDate);
+                                command.Parameters.AddWithValue("@Value20", interestRate);
+                                command.Parameters.AddWithValue("@Value21", interestApplied);
+                                command.Parameters.AddWithValue("@Value22", discountAllowed);
+                                command.Parameters.AddWithValue("@Value23", invoiceTotal);
+                                command.Parameters.AddWithValue("@Value24", discountableAmount);
+                                command.Parameters.AddWithValue("@Value25", totalPaid);
+                                command.Parameters.AddWithValue("@Value26", invoiceBalance);
+                                command.Parameters.AddWithValue("@Value27", trainingMode);
+                                command.Parameters.AddWithValue("@Value28", createdAt);
+                                command.Parameters.AddWithValue("@Value29", createdBy);
+                                command.Parameters.AddWithValue("@Value30", updatedAt);
+                                command.Parameters.AddWithValue("@Value31", updatedBy);
+
+                                command.ExecuteScalar();
+                            }
                         }
                     }
                 }
-
-
             }
             catch (Exception exc)
             {
@@ -957,52 +966,59 @@ namespace MJC.qbo
 
         }
 
-        async public void LoadSKU()
+        async public void LoadSKU(int index = 0)
         {
-            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: true);
+            DataService dataService = new DataService(this.accessToken, this.realmId, useSandbox: false);
             try
             {
-                var result = await dataService.QueryAsync<Item>("select * from Item");
+                int startPosition = index * 100;
+                string query = "select * from Item ORDERBY Id StartPosition " + startPosition + " MaxResults 100";
+                var result = await dataService.QueryAsync<Item>(query);
                 var items = result.Response.Entities;
-                foreach (var item in items)
+
+                if(items != null)
                 {
-                    string itemId = item.Id;
-                    string skuName = item.Name;
-                    int category = 1;
-                    string desc = item.Description;
-                    string measurementUnit = "";
-                    int weight = 0;
-                    int costCode = 1;
-                    int assetAccount = 1;
-                    if (item.AssetAccountRef?.value != null)
-                        assetAccount = int.Parse(item.AssetAccountRef.value);
-                    bool taxable = item.Taxable ?? false;
-                    bool maintain_qty = item.TrackQtyOnHand ?? false;
-                    bool allow_discount = false;
-                    bool commissionable = false;
-                    int order_from = 1;
-                    DateTime last_sold = DateTime.Now;
-                    string manufacturer = "";
-                    string location = "";
-                    int quantity = Convert.ToInt32(item.QtyOnHand);
-                    int qty_allocated = Convert.ToInt32(item.QtyOnSalesOrder);
-                    int qty_available = Convert.ToInt32(item.QtyOnHand - item.QtyOnSalesOrder);
-                    int critical_qty = 0;
-                    int reorder_qty = Convert.ToInt32(item.QtyOnPurchaseOrder);
-                    int sold_this_month = 11;
-                    int sold_ytd = 2022;
-                    bool freeze_prices = false;
-                    double core_cost = Convert.ToDouble(item.UnitPrice);
-                    double inv_value = Convert.ToDouble(item.PurchaseCost);
-                    string memo = item.PurchaseDesc;
-                    Dictionary< int, double> priceTierDict = new Dictionary< int, double>();
-                    bool hidden = false;
-                    bool billAslabor = false;
-                    string? syncToken = item.SyncToken;
-                   
-                    skuModelObj.AddSKU(skuName, category, desc, measurementUnit, weight, costCode, assetAccount, taxable, maintain_qty, allow_discount, commissionable, order_from, last_sold, manufacturer, location, quantity, qty_allocated, qty_available, critical_qty, reorder_qty, sold_this_month, sold_ytd, freeze_prices, core_cost, inv_value, memo, priceTierDict, billAslabor, syncToken, itemId, hidden, false);
+                    foreach (var item in items)
+                    {
+                        string itemId = item.Id;
+                        string skuName = item.Name;
+                        int category = 1;
+                        string desc = item.Description;
+                        string measurementUnit = "ea";
+                        int weight = 0;
+                        int costCode = 1;
+                        int assetAccount = 1;
+                        if (item.AssetAccountRef?.value != null)
+                            assetAccount = int.Parse(item.AssetAccountRef.value);
+                        bool taxable = item.Taxable ?? false;
+                        bool maintain_qty = item.TrackQtyOnHand ?? false;
+                        bool allow_discount = false;
+                        bool commissionable = false;
+                        int order_from = 1;
+                        DateTime? last_sold = null;
+                        string manufacturer = "";
+                        string? location = null;
+                        int quantity = Convert.ToInt32(item.QtyOnHand);
+                        int qty_allocated = Convert.ToInt32(item.QtyOnSalesOrder);
+                        int qty_available = Convert.ToInt32(item.QtyOnHand - item.QtyOnSalesOrder);
+                        int critical_qty = 0;
+                        int reorder_qty = Convert.ToInt32(item.QtyOnPurchaseOrder);
+                        int sold_this_month = 12;
+                        int sold_ytd = 2022;
+                        bool freeze_prices = false;
+                        double core_cost = Convert.ToDouble(item.UnitPrice);
+                        double inv_value = Convert.ToDouble(item.PurchaseCost);
+                        string? memo = null;
+                        Dictionary<int, double> priceTierDict = new Dictionary<int, double>();
+                        bool hidden = false;
+                        bool billAslabor = false;
+                        string? syncToken = item.SyncToken;
+
+                        skuModelObj.AddSKU(skuName, category, desc, measurementUnit, weight, costCode, assetAccount, taxable, maintain_qty, allow_discount, commissionable, order_from, last_sold, manufacturer, location, quantity, qty_allocated, qty_available, critical_qty, reorder_qty, sold_this_month, sold_ytd, freeze_prices, core_cost, inv_value, memo, priceTierDict, billAslabor, syncToken, itemId, hidden, false);
+                    }
                 }
-                MessageBox.Show("Load QB data is finished");
+               
+                //MessageBox.Show("Load QB data is finished");
             }
             catch (Exception exc)
             {

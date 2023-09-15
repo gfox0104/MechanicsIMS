@@ -69,6 +69,8 @@ namespace MJC.forms.order
             };
             hkOpenCustomer.GetButton().Click += (sender, e) =>
             {
+                //QboApiService apiService = new QboApiService();
+                //apiService.LoadCustomers();
                 int customerId = (int)OEGridRefer.SelectedRows[0].Cells[0].Value;
                 CustomerInformation customerInfoModal = new CustomerInformation(true);
                 customerInfoModal.setDetails(customerId);
