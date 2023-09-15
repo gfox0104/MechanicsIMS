@@ -631,6 +631,8 @@ namespace MJC.forms.order
             POGridRefer.Columns[6].Width = 200;
             POGridRefer.Columns[6].Visible = false;
 
+            POGridRefer.Columns[14].Visible = false;
+
             // DataGrid ComboBox column
             DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
             comboBoxColumn.DataSource = Session.SKUModelObj.SKUDataList;
