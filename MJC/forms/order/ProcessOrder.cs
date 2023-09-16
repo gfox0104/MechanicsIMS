@@ -13,7 +13,7 @@ namespace MJC.forms.order
     {
         private HotkeyButton hkAdds = new HotkeyButton("Ins", "Adds", Keys.Insert);
         private HotkeyButton hkDeletes = new HotkeyButton("Del", "Deletes", Keys.Delete);
-        private HotkeyButton hkEdit = new HotkeyButton("Enter", "Edits", Keys.F6);
+        private HotkeyButton hkEdit = new HotkeyButton("Enter", "Edits", Keys.Enter);
         private HotkeyButton hkSaveOrder = new HotkeyButton("F1", "Save Order", Keys.F1);
         private HotkeyButton hkAddMessage = new HotkeyButton("F2", "Add message", Keys.F2);
         private HotkeyButton hkCustomerProfiler = new HotkeyButton("F4", "Customer Profiler", Keys.F4);
@@ -69,7 +69,7 @@ namespace MJC.forms.order
             this.customerId = customerId;
             this.selectedOrderId = orderId;
             this.orderId = selectedOrderId;
-
+            
             if (this.selectedOrderId != 0)
             {
                 isNewOrder = false;
@@ -119,7 +119,8 @@ namespace MJC.forms.order
             string subTotal = Subtotal.GetConstant().Text;
             string coreValue = "0.00";
             string laborValue = this.billAsLabor.ToString("0.00");
-            OrderPrint orderPrint = new OrderPrint(orderId, orderStatus, subTotal, taxValue, laborValue, coreValue, totalSale);
+            
+            OrderPrint orderPrint = new OrderPrint(orderId, orderStatus, subTotal, taxValue, laborValue, coreValue, totalSale, this.customerId);
             orderPrint.PrintForm();
         }
 
@@ -300,6 +301,11 @@ namespace MJC.forms.order
                         Message = detailModal.Message.GetTextBox().Text;
                     }
                 }
+            };
+
+            hkShippingInformation.GetButton().Click += (sender, e) =>
+            {
+
             };
         }
 
@@ -728,9 +734,7 @@ namespace MJC.forms.order
                 PopulateInformationField();
             }
             else
-            // SKU Changed
-
-            if (e.ColumnIndex == 15)
+            if (e.RowIndex >= 0 && e.ColumnIndex == 14)
             {
                 DataGridViewComboBoxCell comboBoxCell = (DataGridViewComboBoxCell)POGridRefer.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 int selectedValue = int.Parse(comboBoxCell.Value?.ToString());
@@ -859,7 +863,9 @@ namespace MJC.forms.order
             SKUOrderItem sku = this.SubSkuList[0];
             var items = Session.PriceTiersModelObj.GetPriceTierItems();
             var priceTierItem = items[sku.PriceTierId];
+            int costCodeId = sku.CostCode.Value;
 
+            var salesCostCodeData = Session.SalesCostCodesModelObj.GetSalesCostCodeData(costCodeId);
             this.OrderItemData.Add(new OrderItem
             {
                 SkuId = sku.Id,
@@ -870,7 +876,7 @@ namespace MJC.forms.order
                 PriceTierCode = sku.PriceTier,
                 UnitPrice = sku.Price,
                 LineTotal = sku.Price * sku.Qty,
-                SC = sku.CostCode.ToString(),
+                SC = salesCostCodeData.scCode,
                 Quantity = sku.Qty > 0 ? sku.Qty : 1,
                 Tax = true,
                 BillAsLabor = true

@@ -183,7 +183,7 @@ namespace MJC.model
             return PrintOrderInfo;
         }
 
-        public List<PrintOrderItemInfo> GetPrintOrderItemInfo(int orderId)
+        public List<PrintOrderItemInfo> GetPrintOrderItemInfo(int orderId, int priceTierId)
         {
             List<PrintOrderItemInfo> printOrderItemInfoList = new List<PrintOrderItemInfo>();
 
@@ -197,8 +197,10 @@ namespace MJC.model
                     SqlDataAdapter sda;
                     DataSet ds;
 
-                    command.CommandText = @"SELECT categoryName, tblSKU.* FROM Categories RIGHT JOIN (SELECT category, tblOrderSKU.* FROM SKU INNER JOIN (SELECT skuId, sku, description, message, quantity, coreCharge, lineTotal, orderItemType FROM OrderItems WHERE orderId = @Value1) AS tblOrderSKU ON tblOrderSKU.skuId = SKU.id) AS tblSKU ON tblSKU.category = Categories.id";
-                    command.Parameters.AddWithValue("@Value1", orderId);
+                    //command.CommandText = @"SELECT categoryName, tblSKU.* FROM Categories RIGHT JOIN (SELECT category, tblOrderSKU.* FROM SKU INNER JOIN (SELECT skuId, sku, description, message, quantity, unitPrice, coreCharge, lineTotal, orderItemType FROM OrderItems WHERE orderId = @Value1) AS tblOrderSKU ON tblOrderSKU.skuId = SKU.id) AS tblSKU ON tblSKU.category = Categories.id";
+                    command.CommandText = @"SELECt profitMargin, tblSKU.* FROM priceTiers RIGHT JOIN (SELECT categoryName, tblSKU.* FROM Categories RIGHT JOIN (SELECT category, tblOrderSKU.* FROM SKU INNER JOIN (SELECT skuId, sku, description, message, quantity, unitPrice, coreCharge, lineTotal, orderItemType FROM OrderItems WHERE orderId = @OrderId) AS tblOrderSKU ON tblOrderSKU.skuId = SKU.id) AS tblSKU ON tblSKU.category = Categories.id) AS tblSKU ON PriceTiers.id= @PriceTierId";
+                    command.Parameters.AddWithValue("@OrderId", orderId);
+                    command.Parameters.AddWithValue("@PriceTierId", priceTierId);
 
                     sda = new SqlDataAdapter(command);
                     ds = new DataSet();
@@ -213,16 +215,24 @@ namespace MJC.model
                             qty = int.Parse(row["quantity"].ToString());
                         string desc = row["description"].ToString();
                         string message = row["message"].ToString();
-                        double? coreCharge = null;
+                        double? coreCharge = 0.0;
                         if (!row.IsNull("coreCharge"))
                             coreCharge = double.Parse(row["coreCharge"].ToString());
-                        double? lineTotal = null;
+                        double? lineTotal = 0.0;
                         if (!row.IsNull("lineTotal"))
                             lineTotal = double.Parse(row["lineTotal"].ToString());
-                        int? orderItemType = null;
+                        int? orderItemType = 0;
                         if (!row.IsNull("orderItemType"))
                             orderItemType = int.Parse(row["orderItemType"].ToString());
+                        double unitPrice = 0.0;
+                        if (!row.IsNull("unitPrice"))
+                            unitPrice = double.Parse(row["unitPrice"].ToString());
+                        double? labor = lineTotal* (7.25 / 100);
                         string partNo = "";
+                        double margin = 0.0;
+                        if (!row.IsNull("profitMargin"))
+                            margin = double.Parse(row["profitMargin"].ToString());
+                        double lineItemPrice = unitPrice + margin;
                         switch (orderItemType)
                         {
                             case 1:
@@ -241,7 +251,7 @@ namespace MJC.model
                                 partNo = sku + "\n" + categoryName + " " + desc;
                                 break;
                         }
-                        printOrderItemInfoList.Add(new PrintOrderItemInfo { Qty = qty, PartNo = partNo, Core = coreCharge, Extended = lineTotal });
+                        printOrderItemInfoList.Add(new PrintOrderItemInfo { Qty = qty, PartNo = partNo, Core = coreCharge, Extended = lineTotal, Net = lineItemPrice, List = unitPrice, Labor = labor });
                     }
                 }
             }

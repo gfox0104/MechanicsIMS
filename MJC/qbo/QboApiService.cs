@@ -335,11 +335,12 @@ namespace MJC.qbo
                 Line[] LineList = new Line[itemCount];
 
                 int index = 0;
+                string qboItemId = "0";
+                decimal? totalAmount = 0;
                 foreach (OrderItem item in itemList)
                 {
                     var sku = item.Sku;
                     
-                    string qboItemId = "0";
                     if (!string.IsNullOrEmpty(item.QboItemId))
                         qboItemId = item.QboItemId.ToString();
 
@@ -354,8 +355,8 @@ namespace MJC.qbo
                         UnitPrice = Convert.ToDecimal(item.UnitPrice), 
                         TaxCodeRef = new ReferenceType { value = "Tax" } };
 
-                    //SubTotalLineDetail subTotalLineDetail = new SubTotalLineDetail { ServiceDate = DateTime.Now, ItemRef = new ReferenceType { name = "test_subTotalLine", value = "15" } };
-                 
+                    //SubTotalLineDetail subTotalLineDetail = new SubTotalLineDetail { ServiceDate = DateTime.Now, ItemRef = new ReferenceType { name = "test_subTotalLine", value = "15" } 
+
                     Line salesItemLine = new Line
                     {
                         Id = qboItemId,
@@ -365,9 +366,30 @@ namespace MJC.qbo
                         LineNum = (uint)(index + 1),
                         Amount = item.Quantity * Convert.ToDecimal(item.UnitPrice)
                     };
+
+                    totalAmount += item.Quantity * Convert.ToDecimal(item.UnitPrice);
                     LineList[index] = salesItemLine;
                     index++;
                 }
+
+                //TaxLineDetail taxLineDetail = new TaxLineDetail
+                //{
+                //    PercentBased = true,
+                //    TaxPercent = taxPercent,
+                //    NetAmountTaxable = totalAmount,
+                //    TaxRateRef = new ReferenceType
+                //    {
+                //        value = "2"
+                //    }
+                //};
+
+                //Line taxItemLine = new Line
+                //{
+                //    Id = qboItemId,
+                //    DetailType = LineDetailTypeEnum.TaxLineDetail,
+                //    TaxLineDetail = taxLineDetail,
+                //};
+                //LineList[index] = taxItemLine;
 
                 var result = await dataService.PostAsync(new Invoice
                 {
@@ -387,7 +409,8 @@ namespace MJC.qbo
                         Address = customer.Email
                     },
                     DueDate = DateTime.Now,
-                    Line = LineList
+                    Line = LineList,
+                    ShippingTaxIncludedInTotalTax = true
                 }) ;
 
                 Invoice invoice = result.Response;
@@ -404,7 +427,7 @@ namespace MJC.qbo
                 for (int i = 0; i < count; i++)
                 {
                     Line item = items[i];
-                    string qboItemId = item.Id;
+                    string qboId = item.Id;
                     decimal qty = item.SalesItemLineDetail?.Qty ?? 0;
 
                     string description = item.Description;
@@ -432,7 +455,7 @@ namespace MJC.qbo
                     int createdBy = 1;
                     int updatedBy = 1;
                   
-                    orderItemModelObj.CreateOrderItem(orderId, skuId, qty, description, message, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboItemId, lineNum, createdBy, updatedBy);
+                    orderItemModelObj.CreateOrderItem(orderId, skuId, qty, description, message, tax, priceTier, unitPrice, lineTotal, salesCode, sku, qboSkuId, qboId, lineNum, createdBy, updatedBy);
                     //orderItemModelObj.UpdateOrderItemMessageById(message, orderId); 
                     
                     index++;

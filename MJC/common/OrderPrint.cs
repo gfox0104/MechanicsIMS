@@ -43,7 +43,7 @@ namespace MJC.common
         private string coreValue = "0.00";
         private string totalSale = "0.00";
 
-        public OrderPrint(int orderId, int orderStatus, string subTotal, string taxValue, string laborValue, string coreValue, string totalSale)
+        public OrderPrint(int orderId, int orderStatus, string subTotal, string taxValue, string laborValue, string coreValue, string totalSale,  int customerId)
         {
             //printOrderItemList = new List<PrintOrderItem>();
             //for (int i = 0; i < 10; i++)
@@ -61,7 +61,7 @@ namespace MJC.common
             printSoldToInfo = printInvoiceModelObj.GetSoldToInfo(orderId);
             printShipToInfo = printInvoiceModelObj.GetPrintShipToInfo(orderId);
             printOrderInfo = printInvoiceModelObj.GetPrintOrderInfo(orderId);
-            printOrderItemInfoList = printInvoiceModelObj.GetPrintOrderItemInfo(orderId);
+            printOrderItemInfoList = printInvoiceModelObj.GetPrintOrderItemInfo(orderId, customerId);
 
             int orderItemCount = printOrderItemInfoList.Count;
             while( orderItemCount < 10 ) {
