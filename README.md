@@ -29,3 +29,15 @@ Password: `Drew-Cubicle5-Guru`
 ## Quickbooks Setup
 
 [TBD]
+
+## Demo
+
+Dashboard: <img src="./Img/Dashboard.png" height="500">
+
+QB_Login: <img src="./Img/QB_Login.png" height="500">
+
+Inventory: <img src="./Img/Inventory.png" height="500">
+
+Receivable: <img src="./Img/Receivable.png" height="500">
+
+Invoices: <img src="./Img/Invoices.png" height="500">
